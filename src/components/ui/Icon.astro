@@ -1,0 +1,42 @@
+---
+/**
+ * Pictogrammes SVG en ligne (aucune dépendance, aucun emoji : charte Phi-Lean).
+ * L'icône hérite de la couleur du texte (currentColor).
+ */
+interface Props {
+  name: 'bolt' | 'menu' | 'close' | 'external' | 'download' | 'calendar' | 'check' | 'mail' | 'cart' | 'linkedin' | 'book' | 'lock';
+  class?: string;
+  size?: number;
+}
+const { name, class: className = '', size = 20 } = Astro.props;
+
+const paths: Record<Props['name'], string> = {
+  bolt: '<path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12L13 2Z" fill="currentColor" stroke="none"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  external: '<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+  calendar: '<rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  mail: '<rect x="3.5" y="5.5" width="17" height="13" rx="1"/><path d="m4 7 8 6 8-6"/>',
+  cart: '<path d="M3 4h2.5l2.2 10.5h10.6L20.5 7H7"/><circle cx="9" cy="19" r="1.4"/><circle cx="17" cy="19" r="1.4"/>',
+  linkedin: '<path d="M6.5 9.5V18M6.5 6.2v.1M10.5 18v-4.8a2.7 2.7 0 0 1 5.4 0V18M10.5 9.5V18"/>',
+  book: '<path d="M5 4.5h10.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2V4.5Z"/><path d="M5 18a2 2 0 0 1 2-2h10.5"/>',
+  lock: '<rect x="5" y="10.5" width="14" height="10" rx="1"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>',
+};
+---
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  class={`shrink-0 ${className}`}
+  set:html={paths[name]}
+/>

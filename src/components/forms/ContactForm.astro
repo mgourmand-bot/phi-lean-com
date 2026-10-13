@@ -1,0 +1,122 @@
+---
+/**
+ * Formulaire de contact qualifié : identifie le besoin, la taille et
+ * l'échéance pour préparer le premier échange.
+ * Pré-remplissage possible par l'URL : /contact/?sujet=vsm-express&detail=...
+ */
+import FormShell from './FormShell.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const topics = [
+  { value: 'vsm-express', label: fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic' },
+  { value: 'conseil-usine', label: fr ? 'Conseil – Ligne Usine (Lean Manufacturing)' : 'Consulting – Plant (Lean Manufacturing)' },
+  { value: 'conseil-service', label: fr ? 'Conseil – Ligne Service (Lean Office)' : 'Consulting – Office (Lean Office)' },
+  { value: 'conseil-supply', label: fr ? 'Conseil – Supply Chain & Risk Management' : 'Consulting – Supply Chain & Risk Management' },
+  { value: 'formation', label: fr ? 'Formation' : 'Training' },
+  { value: 'serious-game', label: fr ? 'Serious Game (animation ou kit)' : 'Serious Game (session or kit)' },
+  { value: 'publication', label: fr ? 'Phi-Lean Press, conférence, presse' : 'Phi-Lean Press, speaking, media' },
+  { value: 'autre', label: fr ? 'Autre demande' : 'Other request' },
+];
+const sizes = fr
+  ? ['Moins de 50 salariés', '50 à 249 salariés', '250 à 999 salariés', '1 000 salariés et plus']
+  : ['Fewer than 50 employees', '50 to 249 employees', '250 to 999 employees', '1,000 employees or more'];
+const horizons = fr
+  ? ['Dès que possible', 'Dans les 3 mois', 'Dans les 6 mois', 'Je me renseigne']
+  : ['As soon as possible', 'Within 3 months', 'Within 6 months', 'Just exploring'];
+const L = {
+  firstName: fr ? 'Prénom' : 'First name',
+  lastName: fr ? 'Nom' : 'Last name',
+  email: fr ? 'E-mail professionnel' : 'Work e-mail',
+  phone: fr ? 'Téléphone' : 'Phone',
+  optional: fr ? '(facultatif)' : '(optional)',
+  company: fr ? 'Entreprise' : 'Company',
+  role: fr ? 'Fonction' : 'Job title',
+  size: fr ? 'Taille de l’entreprise' : 'Company size',
+  topic: fr ? 'Votre besoin' : 'What you need',
+  horizon: fr ? 'Échéance' : 'Timeline',
+  message: fr ? 'Votre situation en quelques lignes' : 'Your situation in a few lines',
+  messageHint: fr
+    ? 'Le flux concerné, ce qui coince aujourd’hui, ce que vous avez déjà essayé.'
+    : 'The flow concerned, what is stuck today, what you have already tried.',
+  choose: fr ? 'Choisir…' : 'Choose…',
+  submit: fr ? 'Envoyer ma demande' : 'Send my request',
+};
+---
+<FormShell
+  id="contact-form"
+  endpoint={site.forms.contact}
+  lang={lang}
+  subject={fr ? 'Nouvelle demande – phi-lean.com' : 'New enquiry – phi-lean.com (EN)'}
+  submitLabel={L.submit}
+>
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="cf-firstname" class="field-label">{L.firstName} *</label>
+      <input id="cf-firstname" name="prenom" type="text" autocomplete="given-name" required class="field" />
+    </div>
+    <div>
+      <label for="cf-lastname" class="field-label">{L.lastName} *</label>
+      <input id="cf-lastname" name="nom" type="text" autocomplete="family-name" required class="field" />
+    </div>
+    <div>
+      <label for="cf-email" class="field-label">{L.email} *</label>
+      <input id="cf-email" name="email" type="email" autocomplete="email" required class="field" />
+    </div>
+    <div>
+      <label for="cf-phone" class="field-label">{L.phone} <span class="field-hint">{L.optional}</span></label>
+      <input id="cf-phone" name="telephone" type="tel" autocomplete="tel" class="field" />
+    </div>
+    <div>
+      <label for="cf-company" class="field-label">{L.company} *</label>
+      <input id="cf-company" name="entreprise" type="text" autocomplete="organization" required class="field" />
+    </div>
+    <div>
+      <label for="cf-role" class="field-label">{L.role} *</label>
+      <input id="cf-role" name="fonction" type="text" autocomplete="organization-title" required class="field" />
+    </div>
+    <div>
+      <label for="cf-size" class="field-label">{L.size} *</label>
+      <select id="cf-size" name="taille" required class="field">
+        <option value="">{L.choose}</option>
+        {sizes.map((s) => <option>{s}</option>)}
+      </select>
+    </div>
+    <div>
+      <label for="cf-horizon" class="field-label">{L.horizon} *</label>
+      <select id="cf-horizon" name="echeance" required class="field">
+        <option value="">{L.choose}</option>
+        {horizons.map((h) => <option>{h}</option>)}
+      </select>
+    </div>
+  </div>
+  <div>
+    <label for="cf-topic" class="field-label">{L.topic} *</label>
+    <select id="cf-topic" name="besoin" required class="field">
+      <option value="">{L.choose}</option>
+      {topics.map((topic) => <option value={topic.value}>{topic.label}</option>)}
+    </select>
+  </div>
+  <div>
+    <label for="cf-message" class="field-label">{L.message} *</label>
+    <p id="cf-message-hint" class="mb-2 text-sm text-gris">{L.messageHint}</p>
+    <textarea id="cf-message" name="message" rows="6" required aria-describedby="cf-message-hint" class="field"></textarea>
+  </div>
+</FormShell>
+
+<script>
+  // Pré-remplissage depuis les boutons du site (?sujet=...&detail=...)
+  const params = new URLSearchParams(window.location.search);
+  const topic = params.get('sujet');
+  const detail = params.get('detail');
+  const select = document.querySelector<HTMLSelectElement>('#cf-topic');
+  const message = document.querySelector<HTMLTextAreaElement>('#cf-message');
+  if (topic && select && [...select.options].some((o) => o.value === topic)) select.value = topic;
+  if (detail && message && !message.value) message.value = `${detail}\n\n`;
+</script>

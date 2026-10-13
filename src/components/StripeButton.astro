@@ -1,0 +1,43 @@
+---
+/**
+ * Bouton d'achat Stripe Checkout (Payment Link).
+ * Si le lien n'est pas encore configuré, le bouton renvoie vers le
+ * formulaire de contact pré-rempli : aucune impasse pour le visiteur.
+ */
+import Icon from './ui/Icon.astro';
+import { site, type StripeProduct } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+
+interface Props {
+  product: StripeProduct;
+  lang: Lang;
+  label: string;
+  detail: string; // texte pré-rempli dans le message si repli vers le contact
+  class?: string;
+}
+const { product, lang, label, detail, class: className = '' } = Astro.props;
+const link = site.stripe[product];
+const fallback = path('contact', lang, `?sujet=serious-game&detail=${encodeURIComponent(detail)}#formulaire`);
+const fr = lang === 'fr';
+---
+{link ? (
+  <div class:list={['flex flex-col items-start gap-2', className]}>
+    <a href={link} class="btn btn-primary" rel="noopener">
+      <Icon name="cart" size={18} />
+      {label}
+    </a>
+    <p class="flex items-center gap-1.5 text-xs text-gris">
+      <Icon name="lock" size={14} />
+      {fr ? 'Paiement sécurisé par Stripe' : 'Secure payment by Stripe'}
+    </p>
+  </div>
+) : (
+  <div class:list={['flex flex-col items-start gap-2', className]}>
+    <a href={fallback} class="btn btn-primary">
+      <Icon name="cart" size={18} />
+      {label}
+    </a>
+    <p class="text-xs text-gris">{fr ? 'Commande confirmée par e-mail sous 24 h' : 'Order confirmed by e-mail within 24 h'}</p>
+  </div>
+)}

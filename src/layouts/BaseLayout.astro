@@ -1,0 +1,138 @@
+---
+/**
+ * Gabarit commun : balises SEO (title, description, canonical, hreflang,
+ * Open Graph, Twitter), données structurées JSON-LD, header et footer.
+ */
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import { site } from '@/config/site';
+import { routes, hreflang, ogLocale, portugueseRoute, type Lang, type RouteKey } from '@/i18n/routes';
+import { useTranslations } from '@/i18n/utils';
+
+interface Alternate {
+  hreflang: string;
+  href: string;
+}
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  routeKey?: RouteKey;
+  /** Remplace la langue du document (page portugaise). */
+  htmlLang?: string;
+  alternates?: Alternate[];
+  ogImage?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const {
+  lang,
+  title,
+  description,
+  routeKey,
+  htmlLang,
+  alternates: customAlternates,
+  ogImage = site.ogImage,
+  jsonLd = [],
+  noindex = false,
+} = Astro.props;
+
+const t = useTranslations(lang);
+const siteUrl = Astro.site ?? new URL(site.url);
+const abs = (p: string) => new URL(p, siteUrl).href;
+
+const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
+const canonical = abs(Astro.url.pathname);
+
+let alternates: Alternate[] = customAlternates ?? [];
+if (!customAlternates && routeKey) {
+  alternates = [
+    { hreflang: hreflang.fr, href: abs(routes[routeKey].fr) },
+    { hreflang: hreflang.en, href: abs(routes[routeKey].en) },
+    { hreflang: 'x-default', href: abs(routes[routeKey].fr) },
+  ];
+  if (routeKey === 'home') alternates.push({ hreflang: 'pt', href: abs(portugueseRoute) });
+}
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${site.url}/#organization`,
+  name: site.name,
+  slogan: site.tagline,
+  url: site.url,
+  logo: abs(site.logo.src),
+  image: abs(ogImage),
+  email: site.email,
+  description:
+    lang === 'fr'
+      ? 'Cabinet de conseil et de formation en Lean Management : Lean Manufacturing, Lean Office, Supply Chain et Risk Management.'
+      : 'Lean management consulting and training firm: Lean Manufacturing, Lean Office, Supply Chain and Risk Management.',
+  founder: {
+    '@type': 'Person',
+    '@id': `${site.url}/#founder`,
+    name: site.founder.name,
+    jobTitle: site.founder.jobTitle[lang],
+    hasCredential: 'MSc Lean Enterprise',
+  },
+  knowsAbout: ['Lean Management', 'Lean Manufacturing', 'Lean Office', 'Value Stream Mapping', 'Supply Chain Risk Management', 'Serious Games'],
+  knowsLanguage: ['fr', 'en', 'pt'],
+  areaServed: [{ '@type': 'Country', name: 'France' }, 'Europe'],
+  sameAs: [site.aiUrl, site.founder.linkedin].filter(Boolean),
+};
+const structuredData = [organization, ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])];
+const chromeLang = htmlLang ? lang : undefined;
+---
+<!doctype html>
+<html lang={htmlLang ?? lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={abs(ogImage)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={htmlLang === 'pt' ? 'pt_BR' : ogLocale[lang]} />
+    {(['fr', 'en'] as Lang[]).filter((l) => l !== lang || htmlLang).map((l) => (
+      <meta property="og:locale:alternate" content={ogLocale[l]} />
+    ))}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#215f9a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#contenu"
+      class="sr-only z-50 bg-bleu px-4 py-3 font-bold text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      {t('skip')}
+    </a>
+    <div lang={chromeLang} class="contents">
+      <Header lang={lang} routeKey={routeKey} />
+    </div>
+    <main id="contenu" tabindex="-1" class="flex-1 focus:outline-none">
+      <slot />
+    </main>
+    <div lang={chromeLang} class="contents">
+      <Footer lang={lang} routeKey={routeKey} />
+    </div>
+  </body>
+</html>

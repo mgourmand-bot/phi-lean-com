@@ -1,0 +1,227 @@
+---
+/**
+ * PAGE SERIOUS GAMES (FR et EN « /serious-games/ »)
+ * The Beer Game et The Lean Coffee Shop, chacun en trois options :
+ * animation par Phi-Lean (devis), kit physique et Print & Play (Stripe Checkout).
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import StripeButton from '@/components/StripeButton.astro';
+import GameVisual from '@/components/GameVisual.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { games, optionLabels } from '@/data/games';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path, formatPrice, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const t = useTranslations(lang);
+
+const c = {
+  fr: {
+    title: 'Serious Games Lean : The Beer Game et The Lean Coffee Shop',
+    description:
+      'Faites vivre le Lean et la supply chain à vos équipes : The Beer Game et The Lean Coffee Shop, animés par Phi-Lean, en kit physique ou en Print & Play.',
+    crumb: 'Serious Games',
+    h1: 'Trois heures de jeu valent trois jours de cours',
+    lead:
+      'Nos serious games font vivre aux équipes ce qu’un exposé peine à faire comprendre : l’effet coup de fouet, le poids des en-cours, la force d’un flux tiré. Le débriefing relie ensuite le jeu à votre réalité.',
+    players: 'Joueurs',
+    duration: 'Durée',
+    lessons: 'Ce que les équipes comprennent',
+    choose: 'Trois façons de jouer',
+    quote: 'Demander un devis',
+    buyKit: 'Commander le kit',
+    buyPdf: 'Acheter le Print & Play',
+    compareTitle: 'Quelle option choisir ?',
+    compareHead: ['', 'Animation par Phi-Lean', 'Kit physique', 'Print & Play'],
+    compareRows: [
+      ['Animateur', 'Un consultant Phi-Lean', 'Votre animateur interne', 'Votre animateur interne'],
+      ['Matériel', 'Fourni et repris', 'Livré, réutilisable', 'À imprimer vous-même'],
+      ['Débriefing', 'Sur mesure, avec vos données', 'Guide et tableur fournis', 'Guide et tableur fournis'],
+      ['Idéal pour', 'Séminaire, lancement de démarche', 'Formations internes répétées', 'Écoles, essais, petits budgets'],
+    ],
+    sessionTitle: 'Déroulé d’une session animée',
+    session: [
+      { title: 'Briefing', text: 'Règles, rôles et objectif de l’équipe, en quinze minutes.' },
+      { title: 'Jeu', text: 'Plusieurs tours chronométrés, avec mesure des stocks, des délais et des coûts.' },
+      { title: 'Analyse', text: 'Les courbes de chaque équipe sont projetées et comparées.' },
+      { title: 'Débriefing', text: 'Le lien entre le jeu et vos propres flux, et les premières actions à lancer.' },
+    ],
+  },
+  en: {
+    title: 'Lean Serious Games: The Beer Game and The Lean Coffee Shop',
+    description:
+      'Let your teams experience Lean and supply chain dynamics: The Beer Game and The Lean Coffee Shop, facilitated by Phi-Lean, as a physical kit or Print & Play.',
+    crumb: 'Serious Games',
+    h1: 'Three hours of play beat three days of lectures',
+    lead:
+      'Our serious games let teams experience what a lecture struggles to convey: the bullwhip effect, the weight of WIP, the power of pull flow. The debrief then links the game to your own reality.',
+    players: 'Players',
+    duration: 'Duration',
+    lessons: 'What teams take away',
+    choose: 'Three ways to play',
+    quote: 'Request a quotation',
+    buyKit: 'Order the kit',
+    buyPdf: 'Buy the Print & Play',
+    compareTitle: 'Which option is right for you?',
+    compareHead: ['', 'Facilitated by Phi-Lean', 'Physical kit', 'Print & Play'],
+    compareRows: [
+      ['Facilitator', 'A Phi-Lean consultant', 'Your in-house facilitator', 'Your in-house facilitator'],
+      ['Materials', 'Provided and collected', 'Delivered, reusable', 'Print them yourself'],
+      ['Debrief', 'Tailored, with your data', 'Guide and spreadsheet included', 'Guide and spreadsheet included'],
+      ['Best for', 'Off-sites, programme kick-offs', 'Repeated in-house training', 'Schools, trials, small budgets'],
+    ],
+    sessionTitle: 'How a facilitated session runs',
+    session: [
+      { title: 'Briefing', text: 'Rules, roles and team objective, in fifteen minutes.' },
+      { title: 'Play', text: 'Several timed rounds, measuring inventory, lead times and costs.' },
+      { title: 'Analysis', text: "Each team's curves are projected and compared." },
+      { title: 'Debrief', text: 'Linking the game to your own flows, and the first actions to launch.' },
+    ],
+  },
+}[lang];
+
+const jsonLd = games.flatMap((g) =>
+  g.options
+    .filter((o) => o.price !== null)
+    .map((o) => ({
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: `${g.name} – ${optionLabels[o.kind][lang]}`,
+      description: g.pitch[lang],
+      brand: { '@type': 'Brand', name: site.name },
+      offers: {
+        '@type': 'Offer',
+        price: o.price,
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        url: `${site.url}${path('games', lang)}#${g.id}`,
+      },
+    }))
+);
+---
+<BaseLayout lang={lang} routeKey="games" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+    <nav slot="actions" aria-label={fr ? 'Les jeux' : 'The games'} class="mt-8 flex flex-wrap gap-3">
+      {games.map((g) => (
+        <a href={`#${g.id}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{g.name}</a>
+      ))}
+    </nav>
+  </PageHero>
+
+  {games.map((game, index) => (
+    <section id={game.id} class:list={['py-16 md:py-24', index % 2 === 1 && 'bg-zebra']} aria-labelledby={`h-${game.id}`}>
+      <div class="container-pl">
+        <div class="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-start">
+          <div>
+            <p class="text-lg font-bold text-soleil-fonce">{game.topic[lang]}</p>
+            <h2 id={`h-${game.id}`} class="mt-1 text-4xl font-bold tracking-tight text-bleu md:text-5xl">{game.name}</h2>
+            <p class="lead mt-6">{game.pitch[lang]}</p>
+            <dl class="mt-8 grid max-w-lg grid-cols-2 gap-4">
+              <div class="border-t-[3px] border-bleu pt-3">
+                <dt class="text-sm text-gris">{c.players}</dt>
+                <dd class="mt-1 font-bold">{game.players[lang]}</dd>
+              </div>
+              <div class="border-t-[3px] border-bleu pt-3">
+                <dt class="text-sm text-gris">{c.duration}</dt>
+                <dd class="mt-1 font-bold">{game.duration[lang]}</dd>
+              </div>
+            </dl>
+            <h3 class="mt-10 text-lg font-bold text-anthracite">{c.lessons}</h3>
+            <ul class="list-square mt-3">{game.lessons[lang].map((l) => <li>{l}</li>)}</ul>
+          </div>
+          <div class="border border-bordure bg-white p-6">
+            <GameVisual game={game.id} lang={lang} />
+          </div>
+        </div>
+
+        <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.choose}</h3>
+        <div class="mt-6 grid gap-6 lg:grid-cols-3">
+          {game.options.map((option) => (
+            <article
+              class:list={[
+                'flex flex-col border bg-white p-6',
+                option.kind === 'animation' ? 'border-bleu border-t-[6px]' : 'border-bordure border-t-[6px] border-t-soleil',
+              ]}
+            >
+              <h4 class="text-xl font-bold text-anthracite">{optionLabels[option.kind][lang]}</h4>
+              <p class="mt-3 text-3xl font-bold text-bleu" style="font-variant-numeric: tabular-nums">
+                {option.price === null ? t('price.onQuote') : formatPrice(option.price, lang)}
+              </p>
+              <p class="mt-1 text-sm text-gris">{option.priceNote[lang]}</p>
+              <ul class="mt-5 space-y-2 text-[0.97rem]">
+                {option.includes[lang].map((item) => (
+                  <li class="flex gap-2"><Icon name="check" size={18} class="mt-0.5 text-turquoise" />{item}</li>
+                ))}
+              </ul>
+              <div class="mt-auto pt-6">
+                {option.kind === 'animation' ? (
+                  <a
+                    href={path('contact', lang, `?sujet=serious-game&detail=${encodeURIComponent(`${game.name} – ${optionLabels.animation[lang]}`)}#formulaire`)}
+                    class="btn btn-secondary"
+                  >
+                    {c.quote}
+                  </a>
+                ) : (
+                  <StripeButton
+                    product={option.stripe!}
+                    lang={lang}
+                    label={option.kind === 'kit' ? c.buyKit : c.buyPdf}
+                    detail={`${game.name} – ${optionLabels[option.kind][lang]}`}
+                  />
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="border-t border-bordure py-16 md:py-24" aria-labelledby="comparer">
+    <div class="container-pl">
+      <h2 id="comparer" class="section-title">{c.compareTitle}</h2>
+      <div class="mt-10 overflow-x-auto">
+        <table class="table-pl min-w-[44rem]">
+          <thead>
+            <tr>
+              {c.compareHead.map((h, i) => (i === 0 ? <td class="!border-0 !bg-transparent"></td> : <th scope="col">{h}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {c.compareRows.map((row) => (
+              <tr>
+                <th scope="row">{row[0]}</th>
+                {row.slice(1).map((cell) => <td>{cell}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="section-title mt-20">{c.sessionTitle}</h2>
+      <ol class="list-steps mt-10 grid gap-x-10 md:grid-cols-2 lg:grid-cols-4 [&>li+li]:mt-0 [&>li]:mb-8">
+        {c.session.map((s) => (
+          <li>
+            <p class="text-lg font-bold text-anthracite">{s.title}</p>
+            <p class="mt-1 text-anthracite/85">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <CtaBand
+    lang={lang}
+    title={fr ? 'Organiser une session pour vos équipes' : 'Organise a session for your teams'}
+    text={fr
+      ? 'Dites-nous combien de participants, où et quand : nous vous proposons le format et un devis sous 48 heures.'
+      : 'Tell us how many participants, where and when: we will suggest a format and send a quotation within two working days.'}
+  />
+</BaseLayout>

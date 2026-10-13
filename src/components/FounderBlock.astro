@@ -1,0 +1,105 @@
+---
+/**
+ * Présentation du fondateur. Portrait si site.founder.photo est renseigné
+ * et le fichier présent ; sinon, un bloc monogramme aux couleurs de la charte.
+ */
+import Icon from './ui/Icon.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+import { publicFileExists } from '@/lib/files';
+
+interface Props {
+  lang: Lang;
+  showLink?: boolean;
+  headingLevel?: 'h2' | 'h3';
+}
+const { lang, showLink = true, headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+const fr = lang === 'fr';
+const hasPhoto = publicFileExists(site.founder.photo);
+
+const credentials = fr
+  ? [
+      { title: 'MSc Lean Enterprise', text: 'Formation de haut niveau aux principes et outils du Lean, du poste de travail à la stratégie.' },
+      { title: 'Ancien Site Manager', text: "La responsabilité d'un site : sécurité, qualité, coûts, délais, et les équipes qui les tiennent." },
+      { title: 'Enseignant et chercheur', text: 'Des cours, des publications, et le réflexe de vérifier ce qui fonctionne vraiment.' },
+    ]
+  : [
+      { title: 'MSc Lean Enterprise', text: 'Advanced training in Lean principles and tools, from the workstation to strategy.' },
+      { title: 'Former Site Manager', text: 'Accountable for a site: safety, quality, cost, delivery, and the teams who deliver them.' },
+      { title: 'Lecturer and researcher', text: 'Teaching, publishing, and the habit of checking what actually works.' },
+    ];
+---
+<div class="grid items-start gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
+  <div class="relative max-w-[22rem]">
+    {hasPhoto ? (
+      <img
+        src={site.founder.photo}
+        alt={`${site.founder.name}, ${fr ? 'fondateur de Phi-Lean' : 'founder of Phi-Lean'}`}
+        width="800"
+        height="1000"
+        class="aspect-[4/5] w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="flex aspect-[4/5] w-full flex-col justify-end bg-bleu p-7 text-white" role="img" aria-label={site.founder.name}>
+        <span class="text-[6rem] font-bold leading-none tracking-tighter text-white/95">MG</span>
+        <span class="mt-3 text-sm text-white/80">{fr ? 'Portrait à venir' : 'Portrait coming soon'}</span>
+      </div>
+    )}
+    <div class="stripe-tri absolute -bottom-3 left-6 w-2/3" aria-hidden="true"></div>
+  </div>
+
+  <div>
+    <Heading class="section-title">{site.founder.name}</Heading>
+    <p class="mt-3 text-lg font-bold text-turquoise-fonce">{site.founder.jobTitle[lang]}</p>
+    <div class="mt-6 max-w-[64ch] space-y-4 text-[1.05rem]">
+      {fr ? (
+        <>
+          <p>
+            Manuel Gourmand a fondé Phi-Lean après avoir dirigé un site de production. Il en a gardé une conviction : les outils
+            Lean ne produisent des résultats durables que si l'encadrement et les équipes les comprennent assez bien pour les
+            faire vivre sans aide extérieure.
+          </p>
+          <p>
+            Enseignant et chercheur, il confronte chaque mission à l'état de la connaissance et publie ce qu'il apprend sur le
+            terrain sous la marque Phi-Lean Press. C'est le sens de la signature du cabinet : <em>The True Philosophie of Lean</em>,
+            le Lean comme manière de penser avant d'être une boîte à outils.
+          </p>
+        </>
+      ) : (
+        <>
+          <p>
+            Manuel Gourmand founded Phi-Lean after running a production site. He came away with one conviction: Lean tools only
+            deliver lasting results when managers and teams understand them well enough to keep them alive without outside help.
+          </p>
+          <p>
+            As a lecturer and researcher, he tests every engagement against current knowledge and publishes what he learns in
+            the field under the Phi-Lean Press imprint. That is the meaning of the firm's signature, <em>The True Philosophie of
+            Lean</em>: Lean as a way of thinking before it is a toolbox.
+          </p>
+        </>
+      )}
+    </div>
+    <dl class="mt-8 grid gap-5 sm:grid-cols-3">
+      {credentials.map((c) => (
+        <div class="border-t-[3px] border-bleu pt-3">
+          <dt class="font-bold text-bleu">{c.title}</dt>
+          <dd class="mt-1 text-[0.95rem] text-anthracite/85">{c.text}</dd>
+        </div>
+      ))}
+    </dl>
+    <div class="mt-8 flex flex-wrap items-center gap-5">
+      {showLink && (
+        <a href={path('about', lang)} class="btn btn-secondary">{fr ? 'Découvrir le cabinet' : 'About the firm'}</a>
+      )}
+      {site.founder.linkedin && (
+        <a href={site.founder.linkedin} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+          <Icon name="linkedin" size={18} /> LinkedIn
+        </a>
+      )}
+    </div>
+  </div>
+</div>

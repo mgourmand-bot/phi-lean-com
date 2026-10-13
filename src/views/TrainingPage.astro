@@ -1,0 +1,196 @@
+---
+/**
+ * PAGE FORMATIONS (FR « /formations/ », EN « /en/training/ »)
+ * Catalogue de cours opérationnels classés par domaine : Usine, Service, Logistique.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import { trainings, domains, formatLabels, type TrainingDomain } from '@/data/trainings';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Formations Lean opérationnelles : usine, services, logistique',
+    description:
+      'Catalogue de formations Lean : VSM, SMED, TPM, résolution de problèmes, Lean Office, management visuel, kanban, SCRM et S&OP. En intra, en inter ou à distance.',
+    crumb: 'Formations',
+    h1: 'Des formations qui se jouent sur vos cas réels',
+    lead:
+      'Chaque module alterne apports, exercices sur le terrain et mise en pratique sur un flux de votre entreprise. Les participants repartent avec un livrable utilisable dès le lendemain.',
+    principles: [
+      { title: 'Sur vos cas', text: 'En intra, les exercices portent sur vos produits, vos dossiers ou vos flux.' },
+      { title: 'Au plus près du terrain', text: 'Une partie de chaque journée se passe à l’atelier, au bureau ou à l’entrepôt.' },
+      { title: 'Évaluées', text: 'Un test d’entrée, un test de sortie et un livrable réalisé par chaque participant.' },
+    ],
+    catalogue: 'Catalogue',
+    courses: (n: number) => `${n} formation${n > 1 ? 's' : ''}`,
+    audience: 'Pour qui',
+    objectives: 'Objectifs',
+    cta: 'Demander le programme',
+    formatsTitle: 'Trois formats',
+    formatsHead: ['', 'Intra-entreprise', 'Inter-entreprises', 'À distance'],
+    formatsRows: [
+      ['Lieu', 'Dans vos locaux', 'Salle partenaire', 'Classe virtuelle'],
+      ['Groupe', '6 à 12 personnes de votre entreprise', '4 à 10 personnes de plusieurs entreprises', '4 à 10 personnes'],
+      ['Contenu', 'Adapté à vos flux et à vos données', 'Programme standard, cas variés', 'Modules courts de 3 heures'],
+      ['Tarif', 'Forfait par session, sur devis', 'Prix par participant, sur demande', 'Prix par participant, sur demande'],
+    ],
+  },
+  en: {
+    title: 'Hands-on Lean training: plant, office, logistics',
+    description:
+      'Lean training catalogue: VSM, SMED, TPM, problem solving, Lean Office, visual management, kanban, SCRM and S&OP. In-company, open sessions or remote.',
+    crumb: 'Training',
+    h1: 'Training built around your real cases',
+    lead:
+      'Each module mixes input, exercises on the shop floor and practice on one of your own flows. Participants leave with a deliverable they can use the next day.',
+    principles: [
+      { title: 'On your cases', text: 'In-company, exercises use your products, files or flows.' },
+      { title: 'Close to the floor', text: 'Part of every day is spent in the workshop, the office or the warehouse.' },
+      { title: 'Assessed', text: 'An entry test, an exit test and a deliverable produced by each participant.' },
+    ],
+    catalogue: 'Catalogue',
+    courses: (n: number) => `${n} course${n > 1 ? 's' : ''}`,
+    audience: 'Who it is for',
+    objectives: 'Objectives',
+    cta: 'Request the syllabus',
+    formatsTitle: 'Three formats',
+    formatsHead: ['', 'In-company', 'Open session', 'Remote'],
+    formatsRows: [
+      ['Venue', 'At your premises', 'Partner venue', 'Virtual classroom'],
+      ['Group', '6 to 12 people from your company', '4 to 10 people from several companies', '4 to 10 people'],
+      ['Content', 'Tailored to your flows and data', 'Standard syllabus, varied cases', 'Short 3-hour modules'],
+      ['Price', 'Fixed fee per session, on quotation', 'Price per participant, on request', 'Price per participant, on request'],
+    ],
+  },
+}[lang];
+
+const order: TrainingDomain[] = ['usine', 'service', 'logistique'];
+const accent: Record<TrainingDomain, string> = {
+  usine: 'border-t-bleu',
+  service: 'border-t-turquoise',
+  logistique: 'border-t-soleil',
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: trainings.map((tr, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Course',
+      name: tr.title[lang],
+      description: tr.objectives[lang].join('. '),
+      provider: { '@type': 'Organization', name: site.name, sameAs: site.url },
+      inLanguage: lang,
+    },
+  })),
+};
+---
+<BaseLayout lang={lang} routeKey="training" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+    <nav slot="actions" aria-label={c.catalogue} class="mt-8 flex flex-wrap gap-3">
+      {order.map((d) => (
+        <a href={`#${d}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">
+          {domains[d][lang]}
+          <span class="ml-1 font-normal text-gris">({trainings.filter((t) => t.domain === d).length})</span>
+        </a>
+      ))}
+    </nav>
+  </PageHero>
+
+  <section class="border-b border-bordure py-12" aria-label={fr ? 'Nos principes' : 'Our principles'}>
+    <div class="container-pl grid gap-8 md:grid-cols-3">
+      {c.principles.map((p) => (
+        <div class="border-l-4 border-turquoise pl-5">
+          <p class="text-lg font-bold text-anthracite">{p.title}</p>
+          <p class="mt-1 text-anthracite/85">{p.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {order.map((domain, index) => {
+    const list = trainings.filter((t) => t.domain === domain);
+    return (
+      <section id={domain} class:list={['py-16 md:py-20', index % 2 === 0 && 'bg-zebra']} aria-labelledby={`h-${domain}`}>
+        <div class="container-pl">
+          <div class="flex flex-wrap items-baseline justify-between gap-4">
+            <h2 id={`h-${domain}`} class="section-title">{domains[domain][lang]}</h2>
+            <p class="text-gris">{c.courses(list.length)}</p>
+          </div>
+          <div class="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {list.map((course) => (
+              <article class:list={['flex flex-col border border-bordure border-t-[6px] bg-white p-6', accent[domain]]}>
+                <div class="flex flex-wrap items-center gap-2 text-sm">
+                  <span class="bg-ciel px-2.5 py-1 font-bold text-bleu">{course.duration[lang]}</span>
+                  {course.formats.map((f) => (
+                    <span class="border border-bordure px-2.5 py-0.5 text-gris">{formatLabels[f][lang]}</span>
+                  ))}
+                </div>
+                <h3 class="mt-4 text-xl font-bold text-anthracite">{course.title[lang]}</h3>
+                <p class="mt-3 text-[0.95rem]">
+                  <span class="font-bold text-bleu">{c.audience} : </span>
+                  {course.audience[lang]}
+                </p>
+                <p class="mt-4 font-bold text-bleu">{c.objectives}</p>
+                <ul class="list-square mt-2 text-[0.97rem]">
+                  {course.objectives[lang].map((o) => <li>{o}</li>)}
+                </ul>
+                <div class="mt-auto pt-6">
+                  <a
+                    href={path('contact', lang, `?sujet=formation&detail=${encodeURIComponent((fr ? 'Formation : ' : 'Course: ') + course.title[lang])}#formulaire`)}
+                    class="btn btn-secondary"
+                  >
+                    {c.cta}
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  })}
+
+  <section class="py-16 md:py-24" aria-labelledby="formats">
+    <div class="container-pl">
+      <h2 id="formats" class="section-title">{c.formatsTitle}</h2>
+      <div class="mt-10 overflow-x-auto">
+        <table class="table-pl min-w-[44rem]">
+          <thead>
+            <tr>
+              {c.formatsHead.map((h, i) => (i === 0 ? <td class="!border-0 !bg-transparent"></td> : <th scope="col">{h}</th>))}
+            </tr>
+          </thead>
+          <tbody>
+            {c.formatsRows.map((row) => (
+              <tr>
+                <th scope="row">{row[0]}</th>
+                {row.slice(1).map((cell) => <td>{cell}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    lang={lang}
+    title={fr ? 'Construisons votre parcours de formation' : "Let's build your training path"}
+    text={fr
+      ? 'Un échange de trente minutes pour définir les publics, les objectifs et le format le plus adapté.'
+      : 'A thirty-minute call to define the audience, the objectives and the best-suited format.'}
+  />
+</BaseLayout>

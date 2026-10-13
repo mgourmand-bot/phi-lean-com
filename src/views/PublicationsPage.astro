@@ -1,0 +1,166 @@
+---
+/**
+ * PAGE PHI-LEAN PRESS (FR et EN « /publications/ »)
+ * Livres (Amazon), white papers (contre e-mail), articles scientifiques (PDF libre).
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import BookCard from '@/components/BookCard.astro';
+import WhitePaperCard from '@/components/WhitePaperCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { books, whitePapers, papers } from '@/data/publications';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { publicFileExists } from '@/lib/files';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Phi-Lean Press : livres, white papers et articles sur le Lean',
+    description:
+      'Les publications de Manuel Gourmand et du cabinet Phi-Lean : livres disponibles sur Amazon, white papers pratiques à télécharger, articles scientifiques en libre accès.',
+    crumb: 'Phi-Lean Press',
+    h1: 'Phi-Lean Press',
+    lead:
+      'Ce que nous apprenons en mission, nous le publions. Des livres pour prendre du recul, des white papers pour passer à l’action, des articles pour ceux qui veulent les preuves.',
+    nav: { books: 'Livres', wp: 'White papers', papers: 'Articles scientifiques' },
+    booksTitle: 'Livres',
+    booksLead: 'Disponibles en version papier et numérique sur Amazon.',
+    wpTitle: 'White papers',
+    wpLead: 'Des guides courts et concrets. Laissez votre adresse professionnelle pour les recevoir.',
+    papersTitle: 'Articles scientifiques',
+    papersLead: 'Travaux de recherche en accès libre, au format PDF auteur.',
+    pdf: 'Télécharger le PDF',
+    soon: 'PDF bientôt disponible',
+    todo: 'Référence à compléter',
+    doi: 'Lire sur le site de l’éditeur',
+  },
+  en: {
+    title: 'Phi-Lean Press: books, white papers and papers on Lean',
+    description:
+      'Publications by Manuel Gourmand and Phi-Lean: books available on Amazon, practical white papers to download, open-access scientific papers.',
+    crumb: 'Phi-Lean Press',
+    h1: 'Phi-Lean Press',
+    lead:
+      'What we learn in the field, we publish. Books to step back, white papers to take action, papers for those who want the evidence.',
+    nav: { books: 'Books', wp: 'White papers', papers: 'Scientific papers' },
+    booksTitle: 'Books',
+    booksLead: 'Available in print and e-book on Amazon.',
+    wpTitle: 'White papers',
+    wpLead: 'Short, practical guides. Leave your work e-mail to receive them.',
+    papersTitle: 'Scientific papers',
+    papersLead: 'Open-access research, as author PDFs.',
+    pdf: 'Download the PDF',
+    soon: 'PDF coming soon',
+    todo: 'Reference to be completed',
+    doi: "Read on the publisher's site",
+  },
+}[lang];
+
+const jsonLd = [
+  ...books
+    .filter((b) => !b.placeholder)
+    .map((b) => ({
+      '@context': 'https://schema.org',
+      '@type': 'Book',
+      name: b.title[lang],
+      author: { '@id': `${site.url}/#founder`, '@type': 'Person', name: site.founder.name },
+      publisher: { '@type': 'Organization', name: 'Phi-Lean Press' },
+      url: b.amazonUrl[lang] || b.amazonUrl.fr || undefined,
+    })),
+  ...papers
+    .filter((p) => !p.placeholder)
+    .map((p) => ({
+      '@context': 'https://schema.org',
+      '@type': 'ScholarlyArticle',
+      headline: p.title,
+      author: p.authors,
+      datePublished: p.year ? String(p.year) : undefined,
+      isAccessibleForFree: true,
+    })),
+];
+---
+<BaseLayout lang={lang} routeKey="publications" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+    <nav slot="actions" aria-label={fr ? 'Sur cette page' : 'On this page'} class="mt-8 flex flex-wrap gap-3">
+      <a href="#livres" class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.nav.books}</a>
+      <a href="#white-papers" class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.nav.wp}</a>
+      <a href="#articles" class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.nav.papers}</a>
+    </nav>
+  </PageHero>
+
+  <section id="livres" class="py-16 md:py-24" aria-labelledby="h-livres">
+    <div class="container-pl">
+      <h2 id="h-livres" class="section-title">{c.booksTitle}</h2>
+      <p class="lead mt-6">{c.booksLead}</p>
+      <div class="mt-12 grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+        {books.map((book) => <BookCard book={book} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+
+  <section id="white-papers" class="border-y border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-wp">
+    <div class="container-pl">
+      <h2 id="h-wp" class="section-title">{c.wpTitle}</h2>
+      <p class="lead mt-6">{c.wpLead}</p>
+      <div class="mt-12 grid items-start gap-6 lg:grid-cols-3">
+        {whitePapers.map((paper) => <WhitePaperCard paper={paper} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+
+  <section id="articles" class="py-16 md:py-24" aria-labelledby="h-articles">
+    <div class="container-pl">
+      <h2 id="h-articles" class="section-title">{c.papersTitle}</h2>
+      <p class="lead mt-6">{c.papersLead}</p>
+      <ul class="mt-10 divide-y divide-bordure border-y border-bordure">
+        {papers.map((paper) => {
+          const hasPdf = publicFileExists(paper.file);
+          return (
+            <li class="grid gap-4 py-7 md:grid-cols-[1fr_auto] md:gap-10">
+              <div>
+                {paper.placeholder && (
+                  <p class="mb-2 inline-flex bg-creme px-2 py-0.5 text-xs font-bold text-soleil-fonce">{c.todo}</p>
+                )}
+                <h3 class="text-lg font-bold text-anthracite">{paper.title}</h3>
+                <p class="mt-1 text-[0.95rem] text-gris">
+                  {paper.authors}, <em>{paper.venue}</em>{paper.year ? `, ${paper.year}` : ''}
+                </p>
+                <p class="mt-3 max-w-[72ch] text-[0.97rem] text-anthracite/85">{paper.abstract[lang]}</p>
+              </div>
+              <div class="flex flex-col items-start gap-3 md:items-end">
+                {hasPdf ? (
+                  <a href={paper.file} class="btn btn-secondary" download>
+                    <Icon name="download" size={18} />
+                    {c.pdf}
+                  </a>
+                ) : (
+                  <p class="text-sm font-bold text-gris">{c.soon}</p>
+                )}
+                {paper.doi && (
+                  <a href={`https://doi.org/${paper.doi}`} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
+                    {c.doi} <Icon name="external" size={14} />
+                  </a>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    lang={lang}
+    title={fr ? 'Une conférence, une intervention, une interview ?' : 'A talk, a lecture, an interview?'}
+    text={fr
+      ? 'Manuel Gourmand intervient en entreprise, en école et en conférence, en français comme en anglais.'
+      : 'Manuel Gourmand speaks at companies, schools and conferences, in French and in English.'}
+  />
+</BaseLayout>

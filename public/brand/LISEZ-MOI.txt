@@ -1,0 +1,8 @@
+Déposez ici le logo officiel Phi-Lean, sans le modifier :
+
+  phi-lean-logo.png   (PNG d'origine, 706 x 315 px)
+
+Dès que le fichier est présent, le header et le footer l'affichent
+automatiquement à la place du repère texte provisoire.
+Le favicon (public/favicon.svg, favicon-32.png, apple-touch-icon.png)
+pourra ensuite être décliné à partir du « Phi » du logo.

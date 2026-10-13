@@ -1,0 +1,49 @@
+---
+/**
+ * Sélecteur FR | EN.
+ * Renvoie vers la page équivalente dans l'autre langue (slugs traduits),
+ * pas vers la page d'accueil.
+ */
+import { languages, routes, type Lang, type RouteKey } from '@/i18n/routes';
+import { useTranslations } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  routeKey?: RouteKey;
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+const { lang, routeKey = 'home', tone = 'light', class: className = '' } = Astro.props;
+const t = useTranslations(lang);
+const codes = Object.keys(languages) as Lang[];
+---
+<nav aria-label={t('lang.label')} class:list={['flex items-center text-sm font-bold', className]}>
+  {codes.map((code, i) => (
+    <>
+      {i > 0 && <span aria-hidden="true" class:list={['px-1.5', tone === 'dark' ? 'text-white/40' : 'text-bordure']}>|</span>}
+      {code === lang ? (
+        <span
+          aria-current="true"
+          class:list={['px-1 py-1', tone === 'dark' ? 'text-white' : 'text-bleu']}
+          title={languages[code]}
+        >
+          {code.toUpperCase()}
+        </span>
+      ) : (
+        <a
+          href={routes[routeKey][code]}
+          hreflang={code}
+          lang={code}
+          title={code === 'en' ? 'English' : 'Français'}
+          aria-label={t('lang.switchTo')}
+          class:list={[
+            'px-1 py-1 underline-offset-4 hover:underline',
+            tone === 'dark' ? 'text-white/70 hover:text-white' : 'text-gris hover:text-bleu',
+          ]}
+        >
+          {code.toUpperCase()}
+        </a>
+      )}
+    </>
+  ))}
+</nav>

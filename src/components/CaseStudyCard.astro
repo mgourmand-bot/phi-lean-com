@@ -1,0 +1,80 @@
+---
+/**
+ * Étude de cas anonymisée : secteur, enjeu, actions, résultat phare
+ * et tableau avant / après.
+ */
+import type { CaseStudy } from '@/data/proof';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  study: CaseStudy;
+  lang: Lang;
+  headingLevel?: 'h3' | 'h4';
+}
+const { study, lang, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+
+const lineLabels = {
+  usine: { fr: 'Usine', en: 'Plant', cls: 'bg-ciel text-bleu' },
+  service: { fr: 'Service', en: 'Office', cls: 'bg-menthe text-turquoise-fonce' },
+  supply: { fr: 'Supply chain', en: 'Supply chain', cls: 'bg-creme text-soleil-fonce' },
+} as const;
+const line = lineLabels[study.line];
+const txt = {
+  challenge: lang === 'fr' ? 'Enjeu' : 'Challenge',
+  actions: lang === 'fr' ? 'Ce que nous avons fait' : 'What we did',
+  indicator: lang === 'fr' ? 'Indicateur' : 'Indicator',
+  before: lang === 'fr' ? 'Avant' : 'Before',
+  after: lang === 'fr' ? 'Après' : 'After',
+  duration: lang === 'fr' ? 'Durée' : 'Duration',
+};
+---
+<article class="flex h-full flex-col border border-bordure bg-white">
+  <div class="border-b border-bordure p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <span class:list={['px-2.5 py-1 text-xs font-bold', line.cls]}>{line[lang]}</span>
+      <span class="text-sm text-gris">{txt.duration} : {study.duration[lang]}</span>
+    </div>
+    <Heading class="mt-4 text-lg font-bold text-anthracite">
+      {study.sector[lang]}
+      <span class="block text-[0.95rem] font-normal text-gris">{study.size[lang]}</span>
+    </Heading>
+    <p class="mt-5 flex items-baseline gap-3">
+      <span class="text-5xl font-bold tracking-tight text-turquoise" style="font-variant-numeric: tabular-nums">
+        {study.headline.value[lang]}
+      </span>
+      <span class="font-bold text-turquoise-fonce">{study.headline.label[lang]}</span>
+    </p>
+  </div>
+
+  <div class="flex flex-1 flex-col gap-5 p-6 text-[0.97rem]">
+    <div>
+      <p class="font-bold text-bleu">{txt.challenge}</p>
+      <p class="mt-1">{study.challenge[lang]}</p>
+    </div>
+    <div>
+      <p class="font-bold text-bleu">{txt.actions}</p>
+      <ul class="list-square mt-2">
+        {study.actions[lang].map((a) => <li>{a}</li>)}
+      </ul>
+    </div>
+    <table class="table-pl mt-auto text-sm">
+      <thead>
+        <tr>
+          <th scope="col">{txt.indicator}</th>
+          <th scope="col">{txt.before}</th>
+          <th scope="col">{txt.after}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {study.results.map((r) => (
+          <tr>
+            <th scope="row">{r.label[lang]}</th>
+            <td class="whitespace-nowrap">{r.before}</td>
+            <td class="whitespace-nowrap font-bold text-turquoise-fonce">{r.after}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</article>

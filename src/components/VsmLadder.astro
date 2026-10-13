@@ -1,0 +1,134 @@
+---
+/**
+ * Visuel du hero : extrait d'une cartographie de flux (VSM) avec sa
+ * « ligne de temps » en créneaux. Seule animation non déclenchée du site :
+ * la ligne se trace au chargement (désactivée si l'utilisateur réduit les animations).
+ */
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const fr = lang === 'fr';
+const processes = fr ? ['Découpe', 'Soudure', 'Peinture', 'Montage'] : ['Cutting', 'Welding', 'Painting', 'Assembly'];
+const waits = fr ? ['6 j', '4 j', '6,5 j', '3 j', '4 j'] : ['6 d', '4 d', '6.5 d', '3 d', '4 d'];
+const cycles = ['9 min', '14 min', '11 min', '13 min'];
+
+// 9 créneaux : stock | poste | stock | poste ... | stock
+const TRI = 40;
+const BOX = 104;
+const X0 = 12;
+const slots: { kind: 'tri' | 'box'; x: number; w: number; i: number }[] = [];
+let x = X0;
+for (let i = 0; i < 9; i++) {
+  const kind = i % 2 === 0 ? 'tri' : 'box';
+  const w = kind === 'tri' ? TRI : BOX;
+  slots.push({ kind, x, w, i: Math.floor(i / 2) });
+  x += w;
+}
+const HIGH = 138;
+const LOW = 178;
+const ladder =
+  `M${X0},${HIGH} ` +
+  slots
+    .map((s, k) => {
+      const end = s.x + s.w;
+      const next = slots[k + 1];
+      const y = s.kind === 'tri' ? HIGH : LOW;
+      const nextY = next ? (next.kind === 'tri' ? HIGH : LOW) : y;
+      return `H${end} ` + (next ? `V${nextY} ` : '');
+    })
+    .join('');
+
+const aria = fr
+  ? 'Cartographie de flux simplifiée : quatre postes séparés par des stocks. Le délai de traversée totalise 23,5 jours, dont 47 minutes seulement de valeur ajoutée.'
+  : 'Simplified value stream map: four process steps separated by inventory. Total lead time is 23.5 days, of which only 47 minutes add value.';
+---
+<figure class="border border-bordure bg-white p-5 shadow-[0_1px_0_var(--color-bordure)] sm:p-6">
+  <figcaption class="flex flex-wrap items-baseline justify-between gap-2">
+    <span class="font-bold text-bleu">{fr ? 'Exemple de cartographie de flux' : 'Example value stream map'}</span>
+    <span class="text-sm text-gris">{fr ? 'Famille de produits A' : 'Product family A'}</span>
+  </figcaption>
+
+  <svg viewBox="0 0 640 214" role="img" aria-label={aria} class="vsm mt-4 h-auto w-full" font-family="Arial, Helvetica, sans-serif">
+    <!-- Ligne de flux -->
+    <line x1="12" y1="50" x2="628" y2="50" stroke="var(--color-bordure)" stroke-width="2" />
+
+    {slots.map((s) =>
+      s.kind === 'tri' ? (
+        <g>
+          <polygon
+            points={`${s.x + s.w / 2},30 ${s.x + s.w / 2 - 17},66 ${s.x + s.w / 2 + 17},66`}
+            fill="var(--color-creme)"
+            stroke="var(--color-soleil)"
+            stroke-width="2"
+            stroke-linejoin="round"
+          />
+          <text x={s.x + s.w / 2} y="60" text-anchor="middle" font-size="15" font-weight="700" fill="var(--color-soleil-fonce)">I</text>
+        </g>
+      ) : (
+        <g>
+          <rect x={s.x + 5} y="20" width={s.w - 10} height="60" fill="var(--color-bleu)" />
+          <text x={s.x + s.w / 2} y="56" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">{processes[s.i]}</text>
+        </g>
+      )
+    )}
+
+    <!-- Ligne de temps -->
+    <path d={ladder} pathLength="1" fill="none" stroke="var(--color-anthracite)" stroke-width="2.5" class="vsm-ladder" />
+
+    <g class="vsm-labels">
+      {slots.map((s) =>
+        s.kind === 'tri' ? (
+          <>
+            <rect x={s.x + 4} y={HIGH - 3} width={s.w - 8} height="6" fill="var(--color-soleil)" />
+            <text x={s.x + s.w / 2} y={HIGH - 13} text-anchor="middle" font-size="18" font-weight="700" fill="var(--color-soleil-fonce)">{waits[s.i]}</text>
+          </>
+        ) : (
+          <>
+            <rect x={s.x + 6} y={LOW - 3} width={s.w - 12} height="6" fill="var(--color-turquoise)" />
+            <text x={s.x + s.w / 2} y={LOW + 27} text-anchor="middle" font-size="18" font-weight="700" fill="var(--color-turquoise-fonce)">{cycles[s.i]}</text>
+          </>
+        )
+      )}
+    </g>
+  </svg>
+
+  <div class="mt-5 grid grid-cols-2 gap-3">
+    <div class="kpi-tile kpi-sun !p-4">
+      <p class="text-3xl font-bold leading-none text-soleil-fonce sm:text-4xl">{fr ? '23,5 jours' : '23.5 days'}</p>
+      <p class="text-sm leading-snug">{fr ? 'de délai de traversée' : 'total lead time'}</p>
+    </div>
+    <div class="kpi-tile kpi-turq !p-4">
+      <p class="text-3xl font-bold leading-none text-turquoise-fonce sm:text-4xl">47 min</p>
+      <p class="text-sm leading-snug">{fr ? 'de valeur ajoutée' : 'of value-added time'}</p>
+    </div>
+  </div>
+  <p class="mt-4 text-[0.95rem] text-anthracite/85">
+    {fr
+      ? "Moins de 1 % du délai transforme réellement le produit. Le reste, c'est de l'attente : c'est là que nous travaillons."
+      : 'Less than 1% of the lead time actually transforms the product. The rest is waiting, and that is where we work.'}
+  </p>
+</figure>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .vsm-ladder {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: vsm-draw 1.8s cubic-bezier(0.55, 0, 0.3, 1) 0.3s forwards;
+    }
+    .vsm-labels {
+      opacity: 0;
+      animation: vsm-fade 0.6s ease-out 1.7s forwards;
+    }
+  }
+  @keyframes vsm-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes vsm-fade {
+    to { opacity: 1; }
+  }
+</style>

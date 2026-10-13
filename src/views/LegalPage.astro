@@ -1,0 +1,107 @@
+---
+/**
+ * MENTIONS LÉGALES (FR « /mentions-legales/ », EN « /en/legal-notice/ »)
+ * Modèle à compléter : les zones surlignées (.todo) attendent vos informations.
+ * À faire relire par votre conseil juridique avant mise en ligne.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+---
+<BaseLayout
+  lang={lang}
+  routeKey="legal"
+  title={fr ? 'Mentions légales' : 'Legal notice'}
+  description={fr ? 'Mentions légales du site phi-lean.com : éditeur, hébergeur, propriété intellectuelle.' : 'Legal notice for phi-lean.com: publisher, host, intellectual property.'}
+>
+  <PageHero
+    lang={lang}
+    crumb={fr ? 'Mentions légales' : 'Legal notice'}
+    title={fr ? 'Mentions légales' : 'Legal notice'}
+    lead={fr ? 'Informations prévues par la loi pour la confiance dans l’économie numérique (LCEN).' : 'Information required under French law (LCEN) for online services.'}
+  />
+  <section class="py-16 md:py-20">
+    <div class="container-pl prose-pl">
+      {fr ? (
+        <>
+          <h2>Éditeur du site</h2>
+          <p>
+            Le site phi-lean.com est édité par {site.name}, <span class="todo">[forme juridique]</span> au capital de
+            <span class="todo">[montant]</span> euros, immatriculée au RCS de <span class="todo">[ville]</span> sous le numéro
+            <span class="todo">[SIREN]</span>, dont le siège social est situé <span class="todo">[adresse complète]</span>.
+          </p>
+          <ul>
+            <li>Numéro de TVA intracommunautaire : <span class="todo">[FR00000000000]</span></li>
+            <li>Directeur de la publication : {site.founder.name}</li>
+            <li>Contact : <a href={`mailto:${site.email}`}>{site.email}</a></li>
+          </ul>
+          <h2>Hébergement</h2>
+          <p>
+            Le site est hébergé par <span class="todo">[nom de l’hébergeur]</span>, <span class="todo">[adresse]</span>,
+            <span class="todo">[téléphone ou site web]</span>.
+          </p>
+          <h2>Propriété intellectuelle</h2>
+          <p>
+            L’ensemble des contenus de ce site (textes, schémas, logos, marques {site.name}, Phi-Lean Press et Phi-Lean.ai,
+            supports des serious games) est la propriété exclusive de {site.name}, sauf mention contraire. Toute reproduction ou
+            représentation, totale ou partielle, sans autorisation écrite préalable est interdite.
+          </p>
+          <h2>Données personnelles</h2>
+          <p>
+            Le traitement de vos données est décrit dans notre <a href={path('privacy', 'fr')}>politique de confidentialité</a>.
+          </p>
+          <h2>Ventes en ligne</h2>
+          <p>
+            Les kits et fichiers Print & Play sont vendus via Stripe Checkout. Les conditions générales de vente sont disponibles
+            sur demande et rappelées lors de la commande. <span class="todo">[Ajouter le lien vers vos CGV]</span>
+          </p>
+          <h2>Médiation de la consommation</h2>
+          <p>
+            Pour les achats effectués par des consommateurs, le médiateur compétent est <span class="todo">[nom et coordonnées du médiateur]</span>.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2>Publisher</h2>
+          <p>
+            phi-lean.com is published by {site.name}, <span class="todo">[legal form]</span> with a share capital of
+            <span class="todo">[amount]</span> euros, registered with the RCS of <span class="todo">[city]</span> under number
+            <span class="todo">[SIREN]</span>, with its registered office at <span class="todo">[full address]</span>.
+          </p>
+          <ul>
+            <li>EU VAT number: <span class="todo">[FR00000000000]</span></li>
+            <li>Publication director: {site.founder.name}</li>
+            <li>Contact: <a href={`mailto:${site.email}`}>{site.email}</a></li>
+          </ul>
+          <h2>Hosting</h2>
+          <p>
+            The site is hosted by <span class="todo">[host name]</span>, <span class="todo">[address]</span>,
+            <span class="todo">[phone or website]</span>.
+          </p>
+          <h2>Intellectual property</h2>
+          <p>
+            All content on this site (texts, diagrams, logos, the {site.name}, Phi-Lean Press and Phi-Lean.ai brands, serious game
+            materials) is the exclusive property of {site.name} unless stated otherwise. Any full or partial reproduction without
+            prior written permission is prohibited.
+          </p>
+          <h2>Personal data</h2>
+          <p>How we process your data is described in our <a href={path('privacy', 'en')}>privacy policy</a>.</p>
+          <h2>Online sales</h2>
+          <p>
+            Kits and Print & Play files are sold through Stripe Checkout. Terms of sale are available on request and shown at
+            checkout. <span class="todo">[Add the link to your terms of sale]</span>
+          </p>
+          <p class="text-sm text-gris">The French version of this notice prevails.</p>
+        </>
+      )}
+    </div>
+  </section>
+</BaseLayout>

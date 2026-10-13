@@ -1,0 +1,51 @@
+---
+/**
+ * Agenda Calendly en iframe, chargé uniquement à la demande du visiteur
+ * (Calendly dépose ses propres cookies : pas de chargement sans action, RGPD).
+ */
+import Icon from './ui/Icon.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { useTranslations } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  url?: string;
+}
+const { lang, url = site.calendlyUrl } = Astro.props;
+const t = useTranslations(lang);
+---
+<div class="flex flex-col border border-bordure bg-white" data-calendly data-url={url} data-title={t('calendly.title')}>
+  <div class="flex min-h-[26rem] flex-1 flex-col items-start justify-center gap-5 bg-zebra p-6 sm:p-8" data-calendly-placeholder>
+    <Icon name="calendar" size={36} class="text-bleu" />
+    <p class="max-w-[46ch] text-[0.97rem] text-anthracite/85">{t('calendly.notice')}</p>
+    <div class="flex flex-wrap items-center gap-4">
+      <button type="button" class="btn btn-primary" data-calendly-load>
+        {t('calendly.load')}
+      </button>
+      <a href={url} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
+        {t('calendly.open')}
+        <Icon name="external" size={16} />
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-calendly]').forEach((box) => {
+    const button = box.querySelector<HTMLButtonElement>('[data-calendly-load]');
+    button?.addEventListener('click', () => {
+      const src = new URL(box.dataset.url ?? '');
+      src.searchParams.set('embed_type', 'Inline');
+      src.searchParams.set('embed_domain', window.location.hostname);
+      src.searchParams.set('hide_gdpr_banner', '1');
+      const iframe = document.createElement('iframe');
+      iframe.src = src.toString();
+      iframe.title = box.dataset.title ?? 'Calendly';
+      iframe.loading = 'lazy';
+      iframe.className = 'block h-[44rem] w-full border-0';
+      box.replaceChildren(iframe);
+      iframe.focus();
+    });
+  });
+</script>

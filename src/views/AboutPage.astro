@@ -1,0 +1,215 @@
+---
+/**
+ * PAGE À PROPOS & CABINET (FR « /a-propos/ », EN « /en/about/ »)
+ * Rigueur académique et expertise terrain, sens de la signature,
+ * fondateur, engagements, écosystème Phi-Lean / Press / .ai.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import FounderBlock from '@/components/FounderBlock.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Le cabinet Phi-Lean : rigueur académique et expertise terrain',
+    description:
+      'Phi-Lean, cabinet de conseil Lean fondé par Manuel Gourmand (MSc Lean Enterprise, ancien Site Manager, enseignant-chercheur). Notre approche, nos engagements, notre écosystème.',
+    crumb: 'Le cabinet',
+    h1: 'Rigueur académique, expertise terrain',
+    lead:
+      'Phi-Lean réunit deux cultures qui se parlent trop peu : celle du chercheur, qui veut des preuves, et celle du directeur de site, qui veut des résultats lundi matin.',
+    poles: [
+      {
+        title: 'Rigueur académique',
+        tone: 'border-t-bleu',
+        points: [
+          'Des méthodes issues de la recherche, pas des modes',
+          'Des mesures avant et après chaque chantier',
+          'Des enseignements publiés et ouverts à la critique',
+        ],
+      },
+      {
+        title: 'Expertise terrain',
+        tone: 'border-t-turquoise',
+        points: [
+          'L’expérience de la direction d’un site de production',
+          'Le temps passé à l’atelier, au bureau, à l’entrepôt',
+          'Des recommandations que vos équipes peuvent appliquer',
+        ],
+      },
+    ],
+    whyTitle: 'Pourquoi « Philosophie » ?',
+    why: [
+      "L'orthographe est volontaire. The True Philosophie of Lean rappelle que le Lean est d'abord une manière de penser le travail : respect des personnes, amélioration continue, regard porté sur le flux plutôt que sur les silos.",
+      'Les outils, VSM, kanban ou SMED, ne sont que la traduction de cette philosophie. Appliqués sans elle, ils produisent des gains qui s’évaporent. Appliqués avec elle, ils transforment durablement une organisation.',
+    ],
+    commitmentsTitle: 'Nos engagements',
+    commitments: [
+      { title: 'Le terrain d’abord', text: 'Aucune recommandation sans être allé voir le flux réel.' },
+      { title: 'Des gains mesurés', text: 'Chaque mission a ses indicateurs, relevés au début et à la fin.' },
+      { title: 'L’autonomie pour objectif', text: 'Nous réussissons quand vos équipes n’ont plus besoin de nous.' },
+      { title: 'Des prix lisibles', text: 'Forfaits annoncés, frais refacturés au réel, sans surprise.' },
+    ],
+    ecosystemTitle: 'Un écosystème, trois marques',
+    ecosystem: [
+      { name: 'Phi-Lean', text: 'Conseil, formation et serious games en Lean Management.', href: path('consulting', 'fr'), external: false },
+      { name: 'Phi-Lean Press', text: 'Livres, white papers et articles de recherche.', href: path('publications', 'fr'), external: false },
+      { name: 'Phi-Lean.ai', text: 'Intelligence artificielle et automatisation au service du flux.', href: site.aiUrl, external: true },
+    ],
+    joinTitle: 'Envie de travailler avec nous ?',
+    joinText: 'Consultants, experts métiers, formateurs : le cabinet s’entoure de profils qui partagent cette double exigence.',
+    joinCta: 'Rejoindre Phi-Lean',
+  },
+  en: {
+    title: 'About Phi-Lean: academic rigour and hands-on expertise',
+    description:
+      'Phi-Lean, a Lean consulting firm founded by Manuel Gourmand (MSc Lean Enterprise, former Site Manager, lecturer and researcher). Our approach, commitments and ecosystem.',
+    crumb: 'The firm',
+    h1: 'Academic rigour, hands-on expertise',
+    lead:
+      'Phi-Lean brings together two cultures that rarely talk: the researcher, who wants evidence, and the site manager, who wants results on Monday morning.',
+    poles: [
+      {
+        title: 'Academic rigour',
+        tone: 'border-t-bleu',
+        points: ['Methods grounded in research, not fashion', 'Measurements before and after every workshop', 'Lessons published and open to challenge'],
+      },
+      {
+        title: 'Hands-on expertise',
+        tone: 'border-t-turquoise',
+        points: ['Experience running a production site', 'Time spent in the workshop, the office, the warehouse', 'Recommendations your teams can actually apply'],
+      },
+    ],
+    whyTitle: 'Why “Philosophie”?',
+    why: [
+      'The spelling is deliberate. The True Philosophie of Lean is a reminder that Lean is first a way of thinking about work: respect for people, continuous improvement, looking at the flow rather than the silos.',
+      'The tools, VSM, kanban or SMED, are only the translation of that philosophy. Applied without it, their gains evaporate. Applied with it, they change an organisation for good.',
+    ],
+    commitmentsTitle: 'Our commitments',
+    commitments: [
+      { title: 'The floor comes first', text: 'No recommendation without seeing the real flow.' },
+      { title: 'Measured gains', text: 'Every engagement has KPIs, recorded at the start and at the end.' },
+      { title: 'Self-sufficiency as the goal', text: 'We succeed when your teams no longer need us.' },
+      { title: 'Clear pricing', text: 'Fixed fees stated upfront, expenses at cost, no surprises.' },
+    ],
+    ecosystemTitle: 'One ecosystem, three brands',
+    ecosystem: [
+      { name: 'Phi-Lean', text: 'Lean management consulting, training and serious games.', href: path('consulting', 'en'), external: false },
+      { name: 'Phi-Lean Press', text: 'Books, white papers and research papers.', href: path('publications', 'en'), external: false },
+      { name: 'Phi-Lean.ai', text: 'Artificial intelligence and automation in service of the flow.', href: site.aiUrl, external: true },
+    ],
+    joinTitle: 'Want to work with us?',
+    joinText: 'Consultants, domain experts, trainers: the firm surrounds itself with people who share this dual standard.',
+    joinCta: 'Join Phi-Lean',
+  },
+}[lang];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: c.title,
+  about: { '@id': `${site.url}/#organization` },
+  mainEntity: {
+    '@type': 'Person',
+    '@id': `${site.url}/#founder`,
+    name: site.founder.name,
+    jobTitle: site.founder.jobTitle[lang],
+    worksFor: { '@id': `${site.url}/#organization` },
+  },
+};
+---
+<BaseLayout lang={lang} routeKey="about" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead} />
+
+  <section class="py-16 md:py-24" aria-label={c.h1}>
+    <div class="container-pl grid gap-10 md:grid-cols-2">
+      {c.poles.map((pole) => (
+        <div class:list={['border-t-[6px] bg-zebra p-7 md:p-9', pole.tone]}>
+          <h2 class="text-2xl font-bold text-bleu md:text-3xl">{pole.title}</h2>
+          <ul class="list-square mt-6 text-lg">{pole.points.map((p) => <li>{p}</li>)}</ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="pb-16 md:pb-24" aria-labelledby="pourquoi">
+    <div class="container-pl">
+      <div class="callout callout-blue max-w-4xl">
+        <h2 id="pourquoi" class="callout-head text-lg">{c.whyTitle}</h2>
+        <div class="callout-body space-y-4 text-lg">
+          {c.why.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-y border-bordure bg-zebra py-16 md:py-24" aria-label={site.founder.name}>
+    <div class="container-pl">
+      <FounderBlock lang={lang} showLink={false} />
+    </div>
+  </section>
+
+  <section class="py-16 md:py-24" aria-labelledby="engagements">
+    <div class="container-pl">
+      <h2 id="engagements" class="section-title">{c.commitmentsTitle}</h2>
+      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {c.commitments.map((item) => (
+          <div class="border-l-4 border-turquoise pl-5">
+            <h3 class="text-lg font-bold text-anthracite">{item.title}</h3>
+            <p class="mt-1 text-anthracite/85">{item.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="section-title mt-20">{c.ecosystemTitle}</h2>
+      <div class="mt-10 overflow-x-auto">
+        <table class="table-pl min-w-[36rem]">
+          <thead>
+            <tr>
+              <th scope="col">{fr ? 'Marque' : 'Brand'}</th>
+              <th scope="col">{fr ? 'Rôle' : 'Role'}</th>
+              <th scope="col"><span class="sr-only">{fr ? 'Lien' : 'Link'}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {c.ecosystem.map((e) => (
+              <tr>
+                <th scope="row" class="whitespace-nowrap">
+                  {e.external && <Icon name="bolt" size={16} class="mr-1 inline text-soleil" />}
+                  {e.name}
+                </th>
+                <td>{e.text}</td>
+                <td class="whitespace-nowrap">
+                  <a href={e.href} class="link-pl" {...(e.external ? { target: '_blank', rel: 'noopener' } : {})}>
+                    {fr ? 'Découvrir' : 'Explore'}
+                    {e.external && <span class="sr-only">{fr ? ' (nouvel onglet)' : ' (opens in a new tab)'}</span>}
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-20 flex flex-col gap-6 border-t-[6px] border-soleil bg-creme p-7 md:flex-row md:items-center md:justify-between md:p-9">
+        <div>
+          <h2 class="text-2xl font-bold text-anthracite">{c.joinTitle}</h2>
+          <p class="mt-2 max-w-[60ch]">{c.joinText}</p>
+        </div>
+        <a href={path('careers', lang)} class="btn btn-primary self-start md:self-auto">{c.joinCta}</a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

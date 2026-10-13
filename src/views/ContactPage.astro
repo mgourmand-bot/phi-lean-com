@@ -1,0 +1,126 @@
+---
+/**
+ * PAGE CONTACT & RDV (FR « /contact/ », EN « /en/contact/ »)
+ * Prise de rendez-vous Calendly (chargée sur demande) et formulaire qualifié.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CalendlyEmbed from '@/components/CalendlyEmbed.astro';
+import ContactForm from '@/components/forms/ContactForm.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const c = {
+  fr: {
+    title: 'Contact et prise de rendez-vous',
+    description:
+      'Prenez rendez-vous avec Phi-Lean ou décrivez votre besoin : Diagnostic VSM Express, conseil Lean, formation ou serious game. Réponse sous 48 heures ouvrées.',
+    crumb: 'Contact',
+    h1: 'Parlons de votre flux',
+    lead: 'Réservez directement un créneau de trente minutes, ou décrivez votre situation : nous revenons vers vous sous 48 heures ouvrées.',
+    ways: [
+      { icon: 'calendar' as const, title: 'Prendre rendez-vous', text: '30 minutes en visio ou au téléphone', href: '#rdv' },
+      { icon: 'mail' as const, title: 'Décrire votre besoin', text: 'Formulaire qualifié, réponse sous 48 h', href: '#formulaire' },
+    ],
+    rdvTitle: 'Prendre rendez-vous',
+    rdvText:
+      'Un premier échange de trente minutes avec Manuel Gourmand pour comprendre votre contexte et voir si un diagnostic est pertinent.',
+    nextTitle: 'Ce qui se passe ensuite',
+    next: [
+      'Nous préparons l’échange à partir des informations transmises.',
+      'Pendant l’appel, nous qualifions le flux, les enjeux et le périmètre.',
+      'Si cela a du sens, vous recevez une proposition écrite sous une semaine.',
+    ],
+    formTitle: 'Décrire votre besoin',
+    formLead: 'Plus votre description est précise, plus notre première réponse sera utile.',
+    direct: 'Par e-mail',
+    languages: 'Nous travaillons en français et en anglais.',
+  },
+  en: {
+    title: 'Contact and book a call',
+    description:
+      'Book a call with Phi-Lean or describe your needs: VSM Express Diagnostic, Lean consulting, training or serious games. Reply within two working days.',
+    crumb: 'Contact',
+    h1: "Let's talk about your flow",
+    lead: 'Book a thirty-minute slot directly, or describe your situation: we will get back to you within two working days.',
+    ways: [
+      { icon: 'calendar' as const, title: 'Book a call', text: '30 minutes by video or phone', href: '#rdv' },
+      { icon: 'mail' as const, title: 'Describe your needs', text: 'Qualified form, reply within 48 h', href: '#formulaire' },
+    ],
+    rdvTitle: 'Book a call',
+    rdvText: 'A first thirty-minute conversation with Manuel Gourmand to understand your context and see whether a diagnostic makes sense.',
+    nextTitle: 'What happens next',
+    next: [
+      'We prepare the call from the information you shared.',
+      'During the call, we qualify the flow, the stakes and the scope.',
+      'If it makes sense, you receive a written proposal within a week.',
+    ],
+    formTitle: 'Describe your needs',
+    formLead: 'The more precise your description, the more useful our first reply will be.',
+    direct: 'By e-mail',
+    languages: 'We work in French and English.',
+  },
+}[lang];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: c.title,
+  about: { '@id': `${site.url}/#organization` },
+};
+---
+<BaseLayout lang={lang} routeKey="contact" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+    <div slot="aside" class="grid gap-3">
+      {c.ways.map((w) => (
+        <a href={w.href} class="flex items-center gap-4 border border-bordure bg-white p-4 hover:border-bleu">
+          <span class="grid h-11 w-11 shrink-0 place-items-center bg-ciel text-bleu"><Icon name={w.icon} size={22} /></span>
+          <span>
+            <span class="block font-bold text-anthracite">{w.title}</span>
+            <span class="block text-sm text-gris">{w.text}</span>
+          </span>
+        </a>
+      ))}
+      <a href={`mailto:${site.email}`} class="flex items-center gap-4 border border-bordure bg-white p-4 hover:border-bleu">
+        <span class="grid h-11 w-11 shrink-0 place-items-center bg-menthe text-turquoise-fonce"><Icon name="mail" size={22} /></span>
+        <span>
+          <span class="block font-bold text-anthracite">{c.direct}</span>
+          <span class="block text-sm text-gris">{site.email}</span>
+        </span>
+      </a>
+    </div>
+  </PageHero>
+
+  <section id="rdv" class="py-16 md:py-24" aria-labelledby="h-rdv">
+    <div class="container-pl grid gap-12 lg:grid-cols-[1fr_1.6fr]">
+      <div>
+        <h2 id="h-rdv" class="section-title">{c.rdvTitle}</h2>
+        <p class="mt-6 text-lg">{c.rdvText}</p>
+        <h3 class="mt-10 font-bold text-bleu">{c.nextTitle}</h3>
+        <ol class="list-steps mt-5">
+          {c.next.map((n) => <li class="text-anthracite/90">{n}</li>)}
+        </ol>
+      </div>
+      <CalendlyEmbed lang={lang} />
+    </div>
+  </section>
+
+  <section id="formulaire" class="border-t border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-form">
+    <div class="container-pl grid gap-12 lg:grid-cols-[1fr_1.6fr]">
+      <div>
+        <h2 id="h-form" class="section-title">{c.formTitle}</h2>
+        <p class="mt-6 text-lg">{c.formLead}</p>
+        <p class="mt-6 text-[0.95rem] text-gris">{c.languages}</p>
+      </div>
+      <div class="border border-bordure bg-white p-6 md:p-8">
+        <ContactForm lang={lang} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

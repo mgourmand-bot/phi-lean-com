@@ -1,0 +1,34 @@
+---
+/**
+ * En-tête des pages intérieures : fil d'Ariane, grand titre bleu,
+ * chapeau, liseré tricolore. Un slot « aside » accueille un encadré à droite.
+ */
+import { routes, type Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  lead: string;
+  crumb: string;
+}
+const { lang, title, lead, crumb } = Astro.props;
+const hasAside = Astro.slots.has('aside');
+---
+<section class="border-b border-bordure bg-zebra">
+  <div class:list={['container-pl grid gap-10 py-14 md:py-20', hasAside && 'lg:grid-cols-[1.35fr_1fr] lg:items-end']}>
+    <div>
+      <nav aria-label={lang === 'fr' ? "Fil d'Ariane" : 'Breadcrumb'} class="mb-6 text-sm text-gris">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li><a href={routes.home[lang]} class="hover:text-bleu hover:underline">{lang === 'fr' ? 'Accueil' : 'Home'}</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" class="font-bold text-anthracite">{crumb}</li>
+        </ol>
+      </nav>
+      <h1 class="max-w-[22ch] text-4xl font-bold tracking-tight text-bleu sm:text-5xl lg:text-6xl">{title}</h1>
+      <div class="stripe-tri mt-7 w-36" aria-hidden="true"></div>
+      <p class="lead mt-7">{lead}</p>
+      <slot name="actions" />
+    </div>
+    {hasAside && <div><slot name="aside" /></div>}
+  </div>
+</section>

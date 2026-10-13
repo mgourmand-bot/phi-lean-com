@@ -1,0 +1,82 @@
+---
+/**
+ * Encadré de l'offre d'entrée « Diagnostic VSM Express » (bandeau soleil = mise en avant).
+ * variant="teaser" : version courte pour l'accueil.
+ * variant="full"   : version détaillée pour la page Conseil.
+ */
+import Icon from './ui/Icon.astro';
+import { vsmExpress } from '@/data/offers';
+import type { Lang } from '@/i18n/routes';
+import { formatPrice, path, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  variant?: 'teaser' | 'full';
+  headingLevel?: 'h2' | 'h3';
+}
+const { lang, variant = 'teaser', headingLevel = 'h2' } = Astro.props;
+const Heading = headingLevel;
+const fr = lang === 'fr';
+const t = useTranslations(lang);
+const price = formatPrice(vsmExpress.priceHT, lang);
+const ctaHref = path('contact', lang, '?sujet=vsm-express#formulaire');
+---
+<div class="callout callout-sun">
+  <p class="callout-head">{fr ? "Offre d'entrée" : 'Entry offer'}</p>
+  <div class="callout-body grid gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+    <div>
+      <Heading class="text-3xl font-bold tracking-tight text-bleu md:text-4xl">
+        {fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic'}
+      </Heading>
+      <p class="mt-4 max-w-[58ch] text-lg">
+        {fr
+          ? `En ${vsmExpress.days} jours sur site, nous cartographions l'un de vos flux avec vos équipes, mesurons où le temps se perd et chiffrons les gains atteignables. Vous repartez avec un plan d'action, que vous travailliez ensuite avec nous ou non.`
+          : `In ${vsmExpress.days} days on site, we map one of your value streams with your teams, measure where time is lost and size the achievable gains. You leave with an action plan, whether or not you continue with us.`}
+      </p>
+      {variant === 'teaser' ? (
+        <ul class="list-square mt-6">
+          {vsmExpress.deliverables[lang].map((d) => <li>{d}</li>)}
+        </ul>
+      ) : (
+        <ol class="list-steps mt-8">
+          {vsmExpress.steps[lang].map((s) => (
+            <li>
+              <p class="font-bold text-anthracite">{s.title}</p>
+              <p class="mt-1 text-anthracite/85">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+
+    <aside class="flex flex-col gap-5 self-start border border-soleil/40 bg-white p-6" aria-label={fr ? 'Tarif' : 'Pricing'}>
+      <div>
+        <p class="text-sm text-gris">{fr ? 'Forfait tout compris' : 'Fixed fee'}</p>
+        <p class="mt-1 text-4xl font-bold text-anthracite" style="font-variant-numeric: tabular-nums">
+          {price} <span class="text-lg font-bold text-gris">{t('price.ht')}</span>
+        </p>
+      </div>
+      <div class="border-l-4 border-turquoise bg-menthe px-4 py-3">
+        <p class="font-bold text-turquoise-fonce">{fr ? '100 % déductible' : '100% deductible'}</p>
+        <p class="mt-1 text-sm">
+          {fr
+            ? `du montant de la mission d'accompagnement, si elle est engagée dans les ${vsmExpress.deductibleWindow.fr}.`
+            : `from the follow-up engagement, if it starts within ${vsmExpress.deductibleWindow.en}.`}
+        </p>
+      </div>
+      {variant === 'full' && (
+        <ul class="space-y-2 text-[0.95rem]">
+          {vsmExpress.deliverables[lang].map((d) => (
+            <li class="flex gap-2"><Icon name="check" size={18} class="mt-0.5 text-turquoise" />{d}</li>
+          ))}
+        </ul>
+      )}
+      <a href={ctaHref} class="btn btn-primary w-full !whitespace-normal">{t('cta.vsm')}</a>
+      {variant === 'teaser' && (
+        <a href={path('consulting', lang, '#vsm-express')} class="link-pl self-start text-[0.95rem]">
+          {fr ? "Le déroulé détaillé de l'offre" : 'Detailed offer breakdown'}
+        </a>
+      )}
+    </aside>
+  </div>
+</div>

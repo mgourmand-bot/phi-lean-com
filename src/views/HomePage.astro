@@ -1,0 +1,221 @@
+---
+/**
+ * PAGE D'ACCUEIL (FR « / » et EN « /en/ »)
+ * 1. Hero terrain + double CTA     4. Diagnostic VSM Express
+ * 2. Preuve sociale (KPI + cas)    5. Phi-Lean Press
+ * 3. Les 4 piliers                 6. Fondateur, puis appel à l'action
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import VsmLadder from '@/components/VsmLadder.astro';
+import KpiTile from '@/components/KpiTile.astro';
+import CaseStudyCard from '@/components/CaseStudyCard.astro';
+import VsmExpressOffer from '@/components/VsmExpressOffer.astro';
+import BookCard from '@/components/BookCard.astro';
+import FounderBlock from '@/components/FounderBlock.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import { metrics, caseStudies } from '@/data/proof';
+import { books, whitePapers } from '@/data/publications';
+import { vsmExpress } from '@/data/offers';
+import type { Lang } from '@/i18n/routes';
+import { path, useTranslations } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Phi-Lean – Conseil et formation Lean pour l’usine, les services et la supply chain',
+    description:
+      'Cabinet de conseil Lean fondé par Manuel Gourmand : Lean Manufacturing, Lean Office, Supply Chain & Risk Management, formations, serious games. Diagnostic VSM Express forfaitaire, 100 % déductible.',
+    h1: 'Le Lean qui tient, une fois le consultant parti.',
+    lead:
+      "Phi-Lean aide les usines, les services et les chaînes logistiques à réduire délais et stocks, avec la rigueur d'un chercheur et le pragmatisme d'un ancien directeur de site.",
+    reassurance: `Diagnostic de ${vsmExpress.days} jours, forfaitaire et 100 % déductible de la mission qui suit.`,
+    proofTitle: 'Des résultats mesurés sur le terrain',
+    proofLead:
+      'Chaque mission démarre par une mesure et se termine par une mesure. Voici ce que nos clients ont obtenu, cas anonymisés à leur demande.',
+    casesTitle: 'Études de cas',
+    pillarsTitle: 'Quatre façons de travailler ensemble',
+    pillarsLead:
+      'Du diagnostic à l’autonomie des équipes : intervenir, transmettre, faire vivre l’expérience et documenter ce qui marche.',
+    pressTitle: 'Phi-Lean Press',
+    pressLead:
+      'La marque éditoriale du cabinet : des livres pour comprendre en profondeur, des white papers pour agir dès lundi.',
+    pressWp: 'White papers à télécharger',
+    pressAll: 'Toutes les publications',
+    founderEyebrow: 'Le fondateur',
+  },
+  en: {
+    title: 'Phi-Lean – Lean consulting and training for plants, offices and supply chains',
+    description:
+      'Lean consulting firm founded by Manuel Gourmand: Lean Manufacturing, Lean Office, Supply Chain & Risk Management, training and serious games. Fixed-fee VSM Express Diagnostic, 100% deductible.',
+    h1: 'Lean that lasts after the consultant leaves.',
+    lead:
+      'Phi-Lean helps plants, service operations and supply chains cut lead times and inventory, with the rigour of a researcher and the pragmatism of a former site manager.',
+    reassurance: `A ${vsmExpress.days}-day, fixed-fee diagnostic, 100% deductible from the engagement that follows.`,
+    proofTitle: 'Results measured on the ground',
+    proofLead:
+      'Every engagement starts with a measurement and ends with one. Here is what our clients achieved, anonymised at their request.',
+    casesTitle: 'Case studies',
+    pillarsTitle: 'Four ways to work together',
+    pillarsLead:
+      'From diagnostic to self-sufficient teams: we intervene, transfer skills, let people experience Lean and document what works.',
+    pressTitle: 'Phi-Lean Press',
+    pressLead: "The firm's publishing imprint: books to understand in depth, white papers to act on Monday morning.",
+    pressWp: 'White papers to download',
+    pressAll: 'All publications',
+    founderEyebrow: 'The founder',
+  },
+}[lang];
+
+const pillars = [
+  {
+    key: 'consulting' as const,
+    color: 'border-t-bleu',
+    title: fr ? 'Conseil' : 'Consulting',
+    text: fr
+      ? 'Diagnostic et transformation, sur le terrain avec vos équipes.'
+      : 'Diagnostics and transformation, on the ground with your teams.',
+    items: fr
+      ? ['Usine : Lean Manufacturing', 'Service : Lean Office', 'Supply Chain & Risk Management']
+      : ['Plant: Lean Manufacturing', 'Office: Lean Office', 'Supply Chain & Risk Management'],
+    cta: fr ? 'Nos lignes de conseil' : 'Our consulting lines',
+  },
+  {
+    key: 'training' as const,
+    color: 'border-t-turquoise',
+    title: fr ? 'Formations' : 'Training',
+    text: fr
+      ? 'Des formations opérationnelles, construites sur vos cas réels.'
+      : 'Hands-on courses built around your real cases.',
+    items: fr ? ['VSM, SMED, TPM, kanban', 'Lean Office et management visuel', 'Supply chain, SCRM et S&OP'] : ['VSM, SMED, TPM, kanban', 'Lean Office and visual management', 'Supply chain, SCRM and S&OP'],
+    cta: fr ? 'Le catalogue' : 'The course catalogue',
+  },
+  {
+    key: 'games' as const,
+    color: 'border-t-soleil',
+    title: 'Serious Games',
+    text: fr
+      ? 'Vivre le Lean en trois heures plutôt que l’écouter en trois jours.'
+      : 'Experience Lean in three hours rather than hear about it for three days.',
+    items: ['The Beer Game', 'The Lean Coffee Shop', fr ? 'Animation, kit physique ou Print & Play' : 'Facilitated, physical kit or Print & Play'],
+    cta: fr ? 'Découvrir les jeux' : 'Discover the games',
+  },
+  {
+    key: 'publications' as const,
+    color: 'border-t-bleu-nuit',
+    title: fr ? 'Publications' : 'Publications',
+    text: fr
+      ? 'Les livres, white papers et articles de Phi-Lean Press.'
+      : 'Books, white papers and papers from Phi-Lean Press.',
+    items: fr ? ['3 livres disponibles sur Amazon', 'White papers pratiques', 'Articles scientifiques en libre accès'] : ['3 books on Amazon', 'Practical white papers', 'Open-access scientific papers'],
+    cta: fr ? 'Lire Phi-Lean Press' : 'Read Phi-Lean Press',
+  },
+];
+---
+<BaseLayout lang={lang} routeKey="home" title={c.title} description={c.description}>
+  <!-- 1. HERO -->
+  <section class="relative overflow-hidden border-b border-bordure">
+    <div class="container-pl grid items-center gap-12 py-14 md:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24">
+      <div>
+        <h1 class="text-[2.6rem] font-bold leading-[1.05] tracking-tight text-bleu sm:text-6xl xl:text-[4.25rem]">
+          {c.h1}
+        </h1>
+        <p class="lead mt-7">{c.lead}</p>
+        <div class="mt-9 flex flex-wrap gap-4">
+          <a href={path('contact', lang, '?sujet=vsm-express#formulaire')} class="btn btn-primary">{t('cta.vsm')}</a>
+          <a href={path('consulting', lang)} class="btn btn-secondary">{t('cta.expertise')}</a>
+        </div>
+        <p class="mt-5 max-w-[52ch] text-[0.95rem] text-gris">{c.reassurance}</p>
+      </div>
+      <VsmLadder lang={lang} />
+    </div>
+  </section>
+
+  <!-- 2. PREUVE SOCIALE -->
+  <section class="bg-zebra py-16 md:py-24" aria-labelledby="preuve">
+    <div class="container-pl">
+      <h2 id="preuve" class="section-title">{c.proofTitle}</h2>
+      <p class="lead mt-6">{c.proofLead}</p>
+      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((m) => <KpiTile value={m.value[lang]} label={m.label[lang]} tone={m.tone} />)}
+      </div>
+
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.casesTitle}</h3>
+      <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        {caseStudies.map((study) => <CaseStudyCard study={study} lang={lang} headingLevel="h4" />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. QUATRE PILIERS -->
+  <section class="py-16 md:py-24" aria-labelledby="piliers">
+    <div class="container-pl">
+      <h2 id="piliers" class="section-title">{c.pillarsTitle}</h2>
+      <p class="lead mt-6">{c.pillarsLead}</p>
+      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
+        {pillars.map((p) => (
+          <article class:list={['border-t-[6px] pt-6', p.color]}>
+            <h3 class="text-2xl font-bold text-anthracite">{p.title}</h3>
+            <p class="mt-2 text-lg text-anthracite/85">{p.text}</p>
+            <ul class="list-square mt-4">
+              {p.items.map((i) => <li>{i}</li>)}
+            </ul>
+            <a href={path(p.key, lang)} class="link-pl mt-5 inline-block">{p.cta}</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. OFFRE PIED DANS LA PORTE -->
+  <section class="pb-16 md:pb-24" aria-label={fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic'}>
+    <div class="container-pl">
+      <VsmExpressOffer lang={lang} variant="teaser" />
+    </div>
+  </section>
+
+  <!-- 5. PHI-LEAN PRESS -->
+  <section class="border-y border-bordure bg-zebra py-16 md:py-24" aria-labelledby="press">
+    <div class="container-pl">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <h2 id="press" class="section-title">{c.pressTitle}</h2>
+          <p class="lead mt-6">{c.pressLead}</p>
+        </div>
+        <a href={path('publications', lang)} class="btn btn-secondary">{c.pressAll}</a>
+      </div>
+      <div class="mt-12 grid gap-12 lg:grid-cols-[2fr_1fr]">
+        <div class="grid gap-10 sm:grid-cols-3">
+          {books.map((book) => <BookCard book={book} lang={lang} compact />)}
+        </div>
+        <aside class="border border-bordure bg-white p-6" aria-labelledby="wp-home">
+          <h3 id="wp-home" class="text-lg font-bold text-turquoise-fonce">{c.pressWp}</h3>
+          <ul class="mt-4 divide-y divide-bordure">
+            {whitePapers.map((wp) => (
+              <li class="py-3.5">
+                <a href={path('publications', lang, '#white-papers')} class="font-bold text-anthracite hover:text-bleu hover:underline">
+                  {wp.title[lang]}
+                </a>
+                <p class="mt-1 text-sm text-gris">{wp.pages} pages</p>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FONDATEUR -->
+  <section class="py-16 md:py-24" aria-label={c.founderEyebrow}>
+    <div class="container-pl">
+      <FounderBlock lang={lang} />
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

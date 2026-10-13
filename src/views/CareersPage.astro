@@ -1,0 +1,154 @@
+---
+/**
+ * PAGE REJOINDRE PHI-LEAN (FR « /carrieres/ », EN « /en/careers/ »)
+ * Deux parcours : intégrer l'équipe ou le réseau d'experts associés,
+ * étapes du recrutement, formulaire de candidature.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CareersForm from '@/components/forms/CareersForm.astro';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Rejoindre Phi-Lean : carrières et réseau d’experts Lean',
+    description:
+      'Consultants Lean, experts supply chain, formateurs : rejoignez l’équipe Phi-Lean ou son réseau d’experts associés. Candidature en ligne.',
+    crumb: 'Rejoindre Phi-Lean',
+    h1: 'Rejoindre Phi-Lean',
+    lead:
+      'Nous cherchons des personnes qui aiment le terrain autant que la réflexion, et qui mesurent leur réussite à l’autonomie des équipes qu’elles accompagnent.',
+    tracks: [
+      {
+        id: 'equipe',
+        title: 'Intégrer l’équipe',
+        tone: 'callout-blue',
+        intro: 'Pour des consultants qui veulent grandir dans un cabinet à taille humaine, au contact direct du fondateur.',
+        seek: ['Une première expérience en production, en logistique ou en amélioration continue', 'Le goût de l’animation d’équipes et de la pédagogie', 'De la rigueur dans la mesure et dans l’écrit', 'L’anglais professionnel'],
+        offer: ['Des missions variées : usine, services, supply chain', 'Une montée en compétence encadrée, jusqu’à l’animation de formations', 'La possibilité de publier avec Phi-Lean Press'],
+        cta: 'Postuler à l’équipe',
+      },
+      {
+        id: 'reseau',
+        title: 'Rejoindre le réseau d’experts',
+        tone: 'callout-turq',
+        intro: 'Pour des consultants indépendants et des experts métiers qui interviennent ponctuellement sur nos missions.',
+        seek: ['Une expertise reconnue : Lean, TPM, logistique, achats, risques, qualité...', 'Plusieurs années d’expérience en entreprise ou en conseil', 'Une disponibilité de quelques jours par mois', 'Le partage de notre éthique : le terrain d’abord, des gains mesurés'],
+        offer: ['Des missions proposées selon vos domaines et votre zone', 'Les méthodes, supports et serious games Phi-Lean', 'Une rémunération claire, fixée avant chaque mission'],
+        cta: 'Rejoindre le réseau',
+      },
+    ],
+    seekTitle: 'Ce que nous recherchons',
+    offerTitle: 'Ce que nous proposons',
+    processTitle: 'Comment se passe une candidature',
+    process: [
+      { title: 'Votre dossier', text: 'Formulaire, CV et quelques lignes sur ce que vous voulez apporter.' },
+      { title: 'Un premier échange', text: 'Trente minutes avec Manuel Gourmand, en visio, pour faire connaissance.' },
+      { title: 'Un cas pratique', text: 'Une situation réelle anonymisée, à analyser et à présenter.' },
+      { title: 'La réponse', text: 'Une décision argumentée, quelle qu’elle soit, sous deux semaines.' },
+    ],
+    formTitle: 'Votre candidature',
+    formLead: 'Toutes les candidatures sont lues. Les données sont conservées deux ans au plus, puis supprimées.',
+  },
+  en: {
+    title: 'Join Phi-Lean: careers and Lean expert network',
+    description:
+      'Lean consultants, supply chain experts, trainers: join the Phi-Lean team or its associate expert network. Apply online.',
+    crumb: 'Join Phi-Lean',
+    h1: 'Join Phi-Lean',
+    lead:
+      'We are looking for people who love the shop floor as much as thinking, and who measure their success by the autonomy of the teams they support.',
+    tracks: [
+      {
+        id: 'equipe',
+        title: 'Join the team',
+        tone: 'callout-blue',
+        intro: 'For consultants who want to grow in a human-sized firm, working directly with the founder.',
+        seek: ['First experience in production, logistics or continuous improvement', 'A taste for facilitation and teaching', 'Rigour in measurement and in writing', 'Professional French'],
+        offer: ['Varied engagements: plants, offices, supply chain', 'Supported development, up to delivering training', 'The opportunity to publish with Phi-Lean Press'],
+        cta: 'Apply to the team',
+      },
+      {
+        id: 'reseau',
+        title: 'Join the expert network',
+        tone: 'callout-turq',
+        intro: 'For independent consultants and domain experts who contribute to our engagements on an ad hoc basis.',
+        seek: ['Recognised expertise: Lean, TPM, logistics, purchasing, risk, quality...', 'Several years of industry or consulting experience', 'Availability of a few days per month', 'Shared ethics: the floor first, measured gains'],
+        offer: ['Engagements matched to your fields and location', 'Phi-Lean methods, materials and serious games', 'Clear fees agreed before each engagement'],
+        cta: 'Join the network',
+      },
+    ],
+    seekTitle: 'What we look for',
+    offerTitle: 'What we offer',
+    processTitle: 'How an application works',
+    process: [
+      { title: 'Your application', text: 'Form, CV and a few lines on what you want to bring.' },
+      { title: 'A first conversation', text: 'Thirty minutes with Manuel Gourmand, by video, to get to know each other.' },
+      { title: 'A case study', text: 'A real, anonymised situation to analyse and present.' },
+      { title: 'The answer', text: 'A reasoned decision, whatever it is, within two weeks.' },
+    ],
+    formTitle: 'Your application',
+    formLead: 'Every application is read. Data is kept for two years at most, then deleted.',
+  },
+}[lang];
+---
+<BaseLayout lang={lang} routeKey="careers" title={c.title} description={c.description}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead} />
+
+  <section class="py-16 md:py-24" aria-label={fr ? 'Les deux parcours' : 'The two tracks'}>
+    <div class="container-pl grid gap-8 lg:grid-cols-2">
+      {c.tracks.map((track) => (
+        <article class:list={['callout flex flex-col', track.tone]}>
+          <h2 class="callout-head text-xl">{track.title}</h2>
+          <div class="callout-body flex flex-1 flex-col">
+            <p class="text-lg">{track.intro}</p>
+            <h3 class="mt-6 font-bold text-bleu">{c.seekTitle}</h3>
+            <ul class="list-square mt-2">{track.seek.map((s) => <li>{s}</li>)}</ul>
+            <h3 class="mt-6 font-bold text-bleu">{c.offerTitle}</h3>
+            <ul class="list-square mt-2">{track.offer.map((s) => <li>{s}</li>)}</ul>
+            <div class="mt-auto pt-7">
+              <a href={`?parcours=${track.id}#candidature`} class="btn btn-primary">{track.cta}</a>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="border-y border-bordure bg-zebra py-16 md:py-20" aria-labelledby="processus">
+    <div class="container-pl">
+      <h2 id="processus" class="section-title">{c.processTitle}</h2>
+      <ol class="list-steps mt-10 grid gap-x-10 md:grid-cols-2 lg:grid-cols-4 [&>li+li]:mt-0 [&>li]:mb-8">
+        {c.process.map((step) => (
+          <li>
+            <p class="text-lg font-bold text-anthracite">{step.title}</p>
+            <p class="mt-1 text-anthracite/85">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section id="candidature" class="py-16 md:py-24" aria-labelledby="h-candidature">
+    <div class="container-pl grid gap-12 lg:grid-cols-[1fr_2fr]">
+      <div>
+        <h2 id="h-candidature" class="section-title">{c.formTitle}</h2>
+        <p class="mt-6 text-anthracite/85">{c.formLead}</p>
+        <p class="mt-6 text-[0.95rem]">
+          {fr ? 'Une question avant de postuler ?' : 'A question before applying?'}{' '}
+          <a href={path('contact', lang, '#formulaire')} class="link-pl">{fr ? 'Écrivez-nous' : 'Write to us'}</a>
+        </p>
+      </div>
+      <div class="border border-bordure bg-white p-6 md:p-8">
+        <CareersForm lang={lang} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

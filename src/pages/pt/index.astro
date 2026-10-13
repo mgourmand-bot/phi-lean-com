@@ -1,0 +1,79 @@
+---
+/**
+ * Página portuguesa (PT/BR), atteinte depuis le lien discret du footer.
+ * Une seule page de présentation ; l'interface (menu, pied) reste en anglais.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { site } from '@/config/site';
+import { routes } from '@/i18n/routes';
+import { formatPrice } from '@/i18n/utils';
+import { vsmExpress } from '@/data/offers';
+
+const abs = (p: string) => new URL(p, site.url).href;
+const alternates = [
+  { hreflang: 'pt', href: abs('/pt/') },
+  { hreflang: 'fr-FR', href: abs(routes.home.fr) },
+  { hreflang: 'en-GB', href: abs(routes.home.en) },
+  { hreflang: 'x-default', href: abs(routes.home.fr) },
+];
+
+const offers = [
+  { title: 'Consultoria', text: 'Lean Manufacturing na fábrica, Lean Office nos serviços administrativos, Supply Chain & Risk Management.' },
+  { title: 'Treinamentos', text: 'Cursos operacionais construídos a partir dos seus casos reais: VSM, SMED, TPM, kanban, S&OP.' },
+  { title: 'Serious Games', text: 'The Beer Game e The Lean Coffee Shop, com facilitação, em kit físico ou em Print & Play.' },
+  { title: 'Phi-Lean Press', text: 'Livros, white papers e artigos científicos sobre Lean e cadeia de suprimentos.' },
+];
+---
+<BaseLayout
+  lang="en"
+  htmlLang="pt"
+  alternates={alternates}
+  title="Phi-Lean – Consultoria e formação Lean"
+  description="Consultoria e formação em Lean Management para fábricas, serviços e cadeias de suprimentos. Diagnóstico VSM Express com preço fixo, 100 % dedutível."
+>
+  <section class="border-b border-bordure bg-zebra">
+    <div class="container-pl py-16 md:py-24">
+      <h1 class="max-w-[22ch] text-4xl font-bold tracking-tight text-bleu sm:text-5xl lg:text-6xl">
+        Lean que se sustenta depois que o consultor vai embora.
+      </h1>
+      <div class="stripe-tri mt-7 w-36" aria-hidden="true"></div>
+      <p class="lead mt-7">
+        A Phi-Lean ajuda fábricas, serviços e cadeias de suprimentos a reduzir prazos e estoques, com o rigor de um
+        pesquisador e o pragmatismo de um ex-gerente de planta.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a href={`${routes.contact.en}#rdv`} class="btn btn-primary">Agendar uma conversa</a>
+        <a href={routes.home.en} lang="en" class="btn btn-secondary">English website</a>
+        <a href={routes.home.fr} lang="fr" class="btn btn-secondary">Site en français</a>
+      </div>
+      <p class="mt-5 text-[0.95rem] text-gris">Atendimento em francês e inglês.</p>
+    </div>
+  </section>
+
+  <section class="py-16 md:py-24">
+    <div class="container-pl">
+      <h2 class="section-title">O que fazemos</h2>
+      <div class="mt-10 grid gap-x-10 gap-y-10 md:grid-cols-2">
+        {offers.map((o, i) => (
+          <div class:list={['border-t-[6px] pt-5', ['border-t-bleu', 'border-t-turquoise', 'border-t-soleil', 'border-t-bleu-nuit'][i]]}>
+            <h3 class="text-2xl font-bold text-anthracite">{o.title}</h3>
+            <p class="mt-2 text-lg text-anthracite/85">{o.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="callout callout-sun mt-16">
+        <p class="callout-head">Oferta de entrada</p>
+        <div class="callout-body">
+          <h2 class="text-3xl font-bold text-bleu">Diagnóstico VSM Express</h2>
+          <p class="mt-4 max-w-[60ch] text-lg">
+            Em {vsmExpress.days} dias no local, mapeamos um dos seus fluxos com as suas equipes, medimos onde o tempo se perde
+            e quantificamos os ganhos possíveis. Preço fixo de {formatPrice(vsmExpress.priceHT, 'fr')} (sem impostos), 100 %
+            dedutível da missão seguinte.
+          </p>
+          <a href={`${routes.contact.en}?sujet=vsm-express#formulaire`} class="btn btn-primary mt-6">Solicitar o diagnóstico</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

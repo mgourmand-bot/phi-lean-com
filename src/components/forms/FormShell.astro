@@ -1,0 +1,127 @@
+---
+/**
+ * Enveloppe commune des formulaires (Formspree ou webhook).
+ * - Sans JavaScript : envoi classique (POST) vers l'endpoint.
+ * - Avec JavaScript : envoi en arrière-plan, message de confirmation sur place,
+ *   événement « pl:form-success » émis sur le <form> (utilisé par les white papers).
+ * - Anti-spam : champ piège « _gotcha » (reconnu par Formspree).
+ */
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { useTranslations } from '@/i18n/utils';
+
+interface Props {
+  id: string;
+  endpoint: string;
+  lang: Lang;
+  subject: string;
+  submitLabel?: string;
+  successMessage?: string;
+  multipart?: boolean;
+  class?: string;
+}
+const { id, endpoint, lang, subject, submitLabel, successMessage, multipart = false, class: className = '' } = Astro.props;
+const t = useTranslations(lang);
+---
+<form
+  id={id}
+  action={endpoint || undefined}
+  method="POST"
+  enctype={multipart ? 'multipart/form-data' : undefined}
+  data-ajax-form
+  data-endpoint={endpoint}
+  data-msg-sending={t('form.sending')}
+  data-msg-success={successMessage ?? t('form.success')}
+  data-msg-error={`${t('form.error')} ${site.email}.`}
+  data-msg-not-configured={`${t('form.notConfigured')} ${site.email}.`}
+  class:list={['space-y-5', className]}
+>
+  <input type="hidden" name="_subject" value={subject} />
+  <input type="hidden" name="_language" value={lang} />
+  <input type="hidden" name="page" value="" data-page-url />
+  <div aria-hidden="true" class="absolute -left-[9999px] h-px w-px overflow-hidden">
+    <label>Ne pas remplir <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" /></label>
+  </div>
+
+  <slot />
+
+  <div class="flex items-start gap-3">
+    <input
+      id={`${id}-consent`}
+      name="consentement"
+      type="checkbox"
+      value="oui"
+      required
+      class="mt-1 h-5 w-5 shrink-0 accent-bleu"
+    />
+    <label for={`${id}-consent`} class="text-sm text-anthracite/85">
+      {t('form.consent')}{' '}
+      <a href={lang === 'fr' ? '/confidentialite/' : '/en/privacy/'} class="font-bold text-bleu underline underline-offset-2">
+        {t('form.privacyLink')}
+      </a>
+    </label>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-4">
+    <button type="submit" class="btn btn-primary" data-submit>
+      {submitLabel ?? t('form.send')}
+    </button>
+    <p class="text-sm text-gris">* {t('form.required')}</p>
+  </div>
+  <p data-form-status role="status" aria-live="polite" class="hidden px-4 py-3 text-[0.95rem] font-bold"></p>
+</form>
+
+<script>
+  const forms = document.querySelectorAll<HTMLFormElement>('form[data-ajax-form]');
+
+  forms.forEach((form) => {
+    const status = form.querySelector<HTMLElement>('[data-form-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const pageField = form.querySelector<HTMLInputElement>('[data-page-url]');
+    if (pageField) pageField.value = window.location.href;
+
+    const show = (kind: 'ok' | 'error' | 'info', text: string) => {
+      status.textContent = text;
+      status.className =
+        'px-4 py-3 text-[0.95rem] font-bold ' +
+        (kind === 'ok'
+          ? 'bg-menthe text-turquoise-fonce'
+          : kind === 'error'
+            ? 'bg-corail-pale text-[#9a3412]'
+            : 'bg-ciel text-bleu');
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const endpoint = form.dataset.endpoint;
+      if (!endpoint) {
+        show('error', form.dataset.msgNotConfigured ?? '');
+        return;
+      }
+      const label = submit.textContent;
+      submit.disabled = true;
+      submit.textContent = form.dataset.msgSending ?? '…';
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        form.reset();
+        if (pageField) pageField.value = window.location.href;
+        show('ok', form.dataset.msgSuccess ?? '');
+        form.dispatchEvent(new CustomEvent('pl:form-success', { bubbles: true }));
+      } catch {
+        show('error', form.dataset.msgError ?? '');
+      } finally {
+        submit.disabled = false;
+        submit.textContent = label;
+      }
+    });
+  });
+</script>

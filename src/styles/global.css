@@ -1,0 +1,216 @@
+/*
+ * Phi-Lean – feuille de style globale (Tailwind CSS v4).
+ * Avec Tailwind v4, la configuration se fait ici, dans le bloc @theme :
+ * chaque variable --color-xxx crée les classes bg-xxx, text-xxx, border-xxx...
+ * Palette et typographie : charte graphique Phi-Lean (septembre 2026).
+ */
+@import "tailwindcss";
+
+@theme {
+  /* Typographie : Arial partout, Consolas pour le code (charte) */
+  --font-sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --font-mono: Consolas, "SFMono-Regular", Menlo, monospace;
+
+  /* Couleurs par rôle */
+  --color-bleu: #215f9a;          /* primaire : structure, titres, chiffres neutres */
+  --color-bleu-fonce: #194a78;    /* survol des boutons */
+  --color-bleu-nuit: #133a5e;     /* fonds sombres */
+  --color-turquoise: #0f8a85;     /* positif, gains, puces */
+  --color-turquoise-fonce: #0b6b67; /* turquoise lisible en petit corps */
+  --color-soleil: #d97706;        /* attention, mise en avant */
+  --color-soleil-fonce: #b45309;  /* soleil lisible en petit corps */
+  --color-corail: #e4572e;        /* alerte, chiffres négatifs */
+  --color-anthracite: #212529;    /* texte courant */
+  --color-gris: #6b7280;          /* légendes */
+  --color-gris-clair: #9ca3af;
+
+  /* Teintes de fond assorties */
+  --color-ciel: #eaf3fc;
+  --color-menthe: #e3f4f2;
+  --color-creme: #fff4e0;
+  --color-corail-pale: #fdece7;
+  --color-zebra: #f4f7fb;
+  --color-bordure: #d5e1ec;
+
+  --radius-pl: 2px;
+  --breakpoint-xs: 26rem;
+}
+
+/* ---------- Base ---------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    @apply bg-white font-sans text-anthracite antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    line-height: 1.15;
+  }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--color-ciel); color: var(--color-bleu-nuit); }
+  :focus-visible {
+    outline: 3px solid var(--color-soleil);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+  .on-dark :focus-visible { outline-color: #fff; }
+}
+
+/* ---------- Composants signature ---------- */
+@layer components {
+  .container-pl {
+    @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Liseré tricolore bleu | turquoise | soleil */
+  .stripe-tri {
+    height: 6px;
+    background: linear-gradient(
+      90deg,
+      var(--color-bleu) 0 33.33%,
+      var(--color-turquoise) 33.33% 66.66%,
+      var(--color-soleil) 66.66% 100%
+    );
+  }
+
+  /* Titres de section : bleu, trait turquoise dessous (style « chapitre » de la charte) */
+  .section-title {
+    @apply text-3xl font-bold tracking-tight text-bleu md:text-[2.5rem];
+  }
+  .section-title::after {
+    content: "";
+    display: block;
+    width: 4rem;
+    height: 3px;
+    margin-top: 0.9rem;
+    background: var(--color-turquoise);
+  }
+  .section-title.centered::after { margin-inline: auto; }
+  .on-dark .section-title { @apply text-white; }
+
+  .lead {
+    @apply max-w-[62ch] text-lg text-anthracite/85 md:text-xl;
+    line-height: 1.55;
+  }
+
+  /* Boutons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-pl)] px-5 py-3 text-center text-base font-bold transition-colors duration-150 sm:whitespace-nowrap;
+    min-height: 2.875rem;
+  }
+  /* s'utilisent toujours avec .btn : class="btn btn-primary" */
+  .btn-primary { @apply bg-bleu text-white hover:bg-bleu-fonce; }
+  .btn-secondary { @apply border-2 border-bleu bg-white text-bleu hover:bg-ciel; }
+  .btn-light { @apply bg-white text-bleu hover:bg-ciel; }
+  .btn-ghost-light { @apply border-2 border-white/70 text-white hover:bg-white/10; }
+
+  .link-pl {
+    @apply font-bold text-bleu underline decoration-bordure decoration-2 underline-offset-4 hover:decoration-bleu;
+  }
+
+  /* Puces carrées turquoise (charte) */
+  .list-square > li {
+    position: relative;
+    padding-left: 1.4rem;
+  }
+  .list-square > li + li { margin-top: 0.45rem; }
+  .list-square > li::before {
+    content: "";
+    position: absolute;
+    left: 0.15rem;
+    top: 0.62em;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--color-turquoise);
+  }
+
+  /* Listes numérotées : numéros bleus en gras (charte) */
+  .list-steps { counter-reset: step; }
+  .list-steps > li { counter-increment: step; position: relative; padding-left: 2.6rem; }
+  .list-steps > li + li { margin-top: 1.1rem; }
+  .list-steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -0.1rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: var(--color-bleu);
+    border: 2px solid var(--color-bleu);
+  }
+
+  /* Tuiles chiffres clés : fond teinté, bande supérieure épaisse */
+  .kpi-tile {
+    @apply flex flex-col justify-between gap-2 p-5;
+    border-top: 6px solid var(--kpi-color, var(--color-bleu));
+    background: var(--kpi-tint, var(--color-ciel));
+  }
+  .kpi-tile .kpi-value {
+    @apply text-4xl font-bold leading-none tracking-tight md:text-5xl;
+    color: var(--kpi-color, var(--color-bleu));
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-blue { --kpi-color: var(--color-bleu); --kpi-tint: var(--color-ciel); }
+  .kpi-turq { --kpi-color: var(--color-turquoise); --kpi-tint: var(--color-menthe); }
+  .kpi-sun { --kpi-color: var(--color-soleil); --kpi-tint: var(--color-creme); }
+  .kpi-coral { --kpi-color: var(--color-corail); --kpi-tint: var(--color-corail-pale); }
+
+  /* Encadrés : bandeau plein + corps teinté */
+  .callout { @apply overflow-hidden; }
+  .callout-head { @apply px-5 py-3 text-base font-bold text-white md:px-7; }
+  .callout-body { @apply px-5 py-6 md:px-7 md:py-7; }
+  .callout-blue .callout-head { background: var(--color-bleu); }
+  .callout-blue .callout-body { background: var(--color-ciel); }
+  .callout-turq .callout-head { background: var(--color-turquoise-fonce); }
+  .callout-turq .callout-body { background: var(--color-menthe); }
+  .callout-sun .callout-head { background: var(--color-soleil-fonce); }
+  .callout-sun .callout-body { background: var(--color-creme); }
+
+  /* Tableaux : en-tête bleu, lignes zébrées, bordures douces */
+  .table-pl { @apply w-full border-collapse text-left text-[0.95rem]; }
+  .table-pl th,
+  .table-pl td { @apply border border-bordure px-4 py-3 align-top; }
+  .table-pl thead th { @apply bg-bleu font-bold text-white; }
+  .table-pl tbody tr:nth-child(even) { background: var(--color-zebra); }
+  .table-pl tbody th { @apply bg-transparent font-bold text-anthracite; }
+
+  /* Formulaires */
+  .field-label { @apply mb-1.5 block text-[0.95rem] font-bold text-anthracite; }
+  .field-hint { @apply font-normal text-gris; }
+  .field {
+    @apply block w-full rounded-[var(--radius-pl)] border border-bordure bg-white px-3.5 py-2.5 text-base text-anthracite;
+    min-height: 2.875rem;
+  }
+  .field:focus-visible { outline-offset: 0; border-color: var(--color-bleu); }
+  .field::placeholder { color: var(--color-gris-clair); }
+  textarea.field { min-height: 8rem; resize: vertical; }
+
+  /* Pages de texte (mentions légales, confidentialité) */
+  .prose-pl { @apply max-w-[72ch]; }
+  .prose-pl h2 { @apply mt-12 mb-4 text-2xl font-bold text-bleu; }
+  .prose-pl h3 { @apply mt-8 mb-3 text-lg font-bold text-turquoise-fonce; }
+  .prose-pl p { @apply my-4; }
+  .prose-pl ul { @apply my-4 list-disc pl-6 marker:text-turquoise; }
+  .prose-pl li + li { @apply mt-1.5; }
+  .prose-pl a { @apply font-bold text-bleu underline decoration-bordure decoration-2 underline-offset-4 hover:decoration-bleu; }
+  .prose-pl .todo { @apply bg-creme px-1 font-bold text-soleil-fonce; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

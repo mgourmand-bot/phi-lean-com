@@ -1,0 +1,105 @@
+---
+/**
+ * Pied de page : présentation, liens d'expertise, Phi-Lean Press, cabinet,
+ * mentions légales / RGPD et lien discret vers la page portugaise.
+ */
+import Logo from './ui/Logo.astro';
+import Icon from './ui/Icon.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { site } from '@/config/site';
+import { routes, portugueseRoute, type Lang, type RouteKey } from '@/i18n/routes';
+import { useTranslations, path } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  routeKey?: RouteKey;
+}
+const { lang, routeKey } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+
+const columns = [
+  {
+    title: t('footer.expertise'),
+    links: [
+      { href: routes.consulting[lang], label: t('nav.consulting') },
+      { href: path('consulting', lang, '#vsm-express'), label: lang === 'fr' ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic' },
+      { href: routes.training[lang], label: t('nav.training') },
+      { href: routes.games[lang], label: t('nav.games') },
+    ],
+  },
+  {
+    title: t('footer.press'),
+    links: [
+      { href: path('publications', lang, '#livres'), label: t('footer.books') },
+      { href: path('publications', lang, '#white-papers'), label: t('footer.whitepapers') },
+      { href: path('publications', lang, '#articles'), label: t('footer.papers') },
+    ],
+  },
+  {
+    title: t('footer.firm'),
+    links: [
+      { href: routes.about[lang], label: t('nav.about') },
+      { href: routes.careers[lang], label: t('nav.careers') },
+      { href: routes.contact[lang], label: t('nav.contact') },
+    ],
+  },
+];
+---
+<footer class="on-dark mt-auto bg-bleu-nuit text-white">
+  <div class="stripe-tri border-t-[3px] border-white box-content" aria-hidden="true"></div>
+  <div class="container-pl grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <div class="max-w-sm">
+      <Logo height={46} inverted />
+      <p class="mt-5 text-[0.95rem] text-white/80">{t('footer.pitch')}</p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a href={`mailto:${site.email}`} class="inline-flex items-center gap-2 text-sm font-bold text-white hover:underline">
+          <Icon name="mail" size={18} />
+          {site.email}
+        </a>
+      </div>
+      <a
+        href={site.aiUrl}
+        target="_blank"
+        rel="noopener"
+        class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-white/90 hover:text-white hover:underline"
+      >
+        <Icon name="bolt" size={16} class="text-soleil" />
+        {t('nav.ai')}
+      </a>
+    </div>
+
+    {columns.map((col) => (
+      <div>
+        <h2 class="text-sm font-bold text-white/60">{col.title}</h2>
+        <ul class="mt-4 space-y-2.5">
+          {col.links.map((link) => (
+            <li>
+              <a href={link.href} class="text-[0.95rem] text-white hover:underline hover:underline-offset-4">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+
+  <div class="border-t border-white/15">
+    <div class="container-pl flex flex-col gap-4 py-6 text-sm text-white/65 md:flex-row md:items-center md:justify-between">
+      <p>
+        © {year} {site.name} – The True <em>Philosophie</em> of Lean. {t('footer.rights')}
+      </p>
+      <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
+        <li><a href={routes.legal[lang]} class="hover:text-white hover:underline">{t('footer.legal')}</a></li>
+        <li><a href={routes.privacy[lang]} class="hover:text-white hover:underline">{t('footer.privacy')}</a></li>
+        <li><LanguageSwitcher lang={lang} routeKey={routeKey} tone="dark" /></li>
+        <li>
+          <a href={portugueseRoute} hreflang="pt" lang="pt" class="text-white/50 hover:text-white hover:underline">
+            {t('footer.pt')}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>

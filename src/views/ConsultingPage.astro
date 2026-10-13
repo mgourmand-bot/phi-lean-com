@@ -1,0 +1,219 @@
+---
+/**
+ * PAGE CONSEIL & DIAGNOSTIC VSM (FR « /conseil/ », EN « /en/consulting/ »)
+ * Ligne Usine, Ligne Service, Supply Chain & Risk Management,
+ * démarche d'intervention, puis le détail du Diagnostic VSM Express et sa FAQ.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import VsmExpressOffer from '@/components/VsmExpressOffer.astro';
+import CaseStudyCard from '@/components/CaseStudyCard.astro';
+import { consultingLines, vsmExpress } from '@/data/offers';
+import { caseStudies } from '@/data/proof';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+import { path, formatPrice } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Conseil Lean : usine, services, supply chain et Diagnostic VSM Express',
+    description:
+      'Lean Manufacturing, Lean Office et Supply Chain Risk Management : trois lignes de conseil pour réduire délais, stocks et risques. Diagnostic VSM Express forfaitaire, 100 % déductible.',
+    crumb: 'Conseil',
+    h1: 'Conseil et diagnostic de flux',
+    lead:
+      'Trois lignes d’intervention, une même méthode : partir du terrain, mesurer le flux réel, puis construire avec vos équipes une organisation qu’elles sauront faire vivre seules.',
+    asideTitle: 'Par où commencer ?',
+    asideText: 'Par une mesure. Le Diagnostic VSM Express cartographie un flux en 3 jours et chiffre les gains.',
+    asideCta: 'Voir le diagnostic',
+    symptoms: 'Vous reconnaissez la situation',
+    levers: 'Nos leviers',
+    deliverables: 'Ce que vous obtenez',
+    discuss: 'En parler',
+    methodTitle: 'Notre démarche',
+    methodLead: 'Le même enchaînement, quelle que soit la ligne : il garantit que les gains se mesurent et qu’ils durent.',
+    method: [
+      { title: 'Mesurer', text: 'Marche terrain, cartographie du flux réel, données collectées sur place plutôt que supposées.' },
+      { title: 'Co-construire', text: 'L’état futur se dessine avec ceux qui feront le travail, pas pour eux.' },
+      { title: 'Expérimenter', text: 'Des chantiers courts, sur un périmètre pilote, pour prouver avant de généraliser.' },
+      { title: 'Ancrer', text: 'Standards, rituels et indicateurs transmis : votre encadrement reprend la main.' },
+    ],
+    caseLabel: 'Exemple de mission',
+    vsmTitle: 'Le Diagnostic VSM Express en détail',
+    faqTitle: 'Questions fréquentes',
+  },
+  en: {
+    title: 'Lean consulting: plants, offices, supply chain and the VSM Express Diagnostic',
+    description:
+      'Lean Manufacturing, Lean Office and Supply Chain Risk Management: three consulting lines to cut lead times, inventory and risk. Fixed-fee VSM Express Diagnostic, 100% deductible.',
+    crumb: 'Consulting',
+    h1: 'Consulting and value stream diagnostics',
+    lead:
+      'Three lines of work, one method: start on the ground, measure the real flow, then build with your teams an organisation they can sustain on their own.',
+    asideTitle: 'Where to start?',
+    asideText: 'With a measurement. The VSM Express Diagnostic maps one value stream in 3 days and sizes the gains.',
+    asideCta: 'See the diagnostic',
+    symptoms: 'Sound familiar?',
+    levers: 'Our levers',
+    deliverables: 'What you get',
+    discuss: 'Discuss it with us',
+    methodTitle: 'Our approach',
+    methodLead: 'The same sequence whatever the line, so that gains are measured and last.',
+    method: [
+      { title: 'Measure', text: 'Gemba walk, real-flow mapping, data collected on site rather than assumed.' },
+      { title: 'Co-design', text: 'The future state is designed with the people who will do the work, not for them.' },
+      { title: 'Experiment', text: 'Short workshops on a pilot scope, to prove before rolling out.' },
+      { title: 'Embed', text: 'Standards, routines and KPIs handed over: your managers take back control.' },
+    ],
+    caseLabel: 'Example engagement',
+    vsmTitle: 'The VSM Express Diagnostic in detail',
+    faqTitle: 'Frequently asked questions',
+  },
+}[lang];
+
+const lineColor = {
+  usine: { border: 'border-t-bleu', text: 'text-bleu', topic: 'conseil-usine' },
+  service: { border: 'border-t-turquoise', text: 'text-turquoise-fonce', topic: 'conseil-service' },
+  supply: { border: 'border-t-soleil', text: 'text-soleil-fonce', topic: 'conseil-supply' },
+} as const;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic',
+    serviceType: 'Value Stream Mapping',
+    provider: { '@id': `${site.url}/#organization` },
+    areaServed: 'FR',
+    offers: {
+      '@type': 'Offer',
+      price: vsmExpress.priceHT,
+      priceCurrency: 'EUR',
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: vsmExpress.priceHT, priceCurrency: 'EUR', valueAddedTaxIncluded: false },
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: vsmExpress.faq[lang].map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+];
+---
+<BaseLayout lang={lang} routeKey="consulting" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+    <nav slot="actions" aria-label={fr ? 'Sur cette page' : 'On this page'} class="mt-8 flex flex-wrap gap-3">
+      {consultingLines.map((line) => (
+        <a href={`#${line.anchor[lang]}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">
+          {line.title[lang]}
+        </a>
+      ))}
+    </nav>
+    <div slot="aside" class="callout callout-sun">
+      <p class="callout-head">{c.asideTitle}</p>
+      <div class="callout-body">
+        <p>{c.asideText}</p>
+        <p class="mt-3 text-2xl font-bold text-anthracite">
+          {formatPrice(vsmExpress.priceHT, lang)} <span class="text-base text-gris">{fr ? 'HT' : 'excl. VAT'}</span>
+        </p>
+        <a href="#vsm-express" class="btn btn-primary mt-5">{c.asideCta}</a>
+      </div>
+    </div>
+  </PageHero>
+
+  {consultingLines.map((line, index) => {
+    const study = caseStudies.find((s) => s.line === line.id);
+    const color = lineColor[line.id];
+    return (
+      <section
+        id={line.anchor[lang]}
+        class:list={['py-16 md:py-24', index % 2 === 1 && 'bg-zebra']}
+        aria-labelledby={`h-${line.id}`}
+      >
+        <div class="container-pl">
+          <div class:list={['border-t-[6px] pt-8', color.border]}>
+            <p class:list={['text-lg font-bold', color.text]}>{line.subtitle[lang]}</p>
+            <h2 id={`h-${line.id}`} class="mt-1 text-3xl font-bold tracking-tight text-bleu md:text-[2.5rem]">{line.title[lang]}</h2>
+            <p class="lead mt-5">{line.intro[lang]}</p>
+          </div>
+
+          <div class="mt-12 grid gap-10 lg:grid-cols-3">
+            <div>
+              <h3 class="text-lg font-bold text-anthracite">{c.symptoms}</h3>
+              <ul class="list-square mt-4">{line.symptoms[lang].map((s) => <li>{s}</li>)}</ul>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-anthracite">{c.levers}</h3>
+              <ul class="list-square mt-4">{line.levers[lang].map((s) => <li>{s}</li>)}</ul>
+            </div>
+            <div class="callout callout-turq self-start">
+              <p class="callout-head">{c.deliverables}</p>
+              <div class="callout-body">
+                <ul class="list-square">{line.deliverables[lang].map((s) => <li>{s}</li>)}</ul>
+                <a href={path('contact', lang, `?sujet=${color.topic}#formulaire`)} class="btn btn-primary mt-6">{c.discuss}</a>
+              </div>
+            </div>
+          </div>
+
+          {study && (
+            <div class="mt-14">
+              <p class="mb-4 text-sm font-bold text-gris">{c.caseLabel}</p>
+              <div class="max-w-3xl">
+                <CaseStudyCard study={study} lang={lang} />
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  })}
+
+  <section class="border-y border-bordure bg-white py-16 md:py-24" aria-labelledby="demarche">
+    <div class="container-pl">
+      <h2 id="demarche" class="section-title">{c.methodTitle}</h2>
+      <p class="lead mt-6">{c.methodLead}</p>
+      <ol class="list-steps mt-12 grid gap-x-10 md:grid-cols-2 lg:grid-cols-4 [&>li+li]:mt-0 [&>li]:mb-8">
+        {c.method.map((m) => (
+          <li>
+            <p class="text-lg font-bold text-anthracite">{m.title}</p>
+            <p class="mt-1 text-anthracite/85">{m.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section id="vsm-express" class="bg-zebra py-16 md:py-24" aria-labelledby="vsm-title">
+    <div class="container-pl">
+      <h2 id="vsm-title" class="section-title">{c.vsmTitle}</h2>
+      <div class="mt-10">
+        <VsmExpressOffer lang={lang} variant="full" headingLevel="h3" />
+      </div>
+
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.faqTitle}</h3>
+      <div class="mt-6 divide-y divide-bordure border-y border-bordure bg-white">
+        {vsmExpress.faq[lang].map((f) => (
+          <details class="group px-5 py-4 md:px-7">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-anthracite [&::-webkit-details-marker]:hidden">
+              {f.q}
+              <span class="text-2xl leading-none text-bleu transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+            </summary>
+            <p class="mt-3 max-w-[70ch] text-anthracite/85">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

@@ -1,0 +1,125 @@
+---
+/**
+ * Candidature : deux parcours (rejoindre l'équipe / réseau d'experts associés).
+ * Le CV est envoyé en pièce jointe (Formspree : offre payante requise pour
+ * les fichiers ; un webhook Make / n8n les accepte aussi).
+ */
+import FormShell from './FormShell.astro';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const expertises = fr
+  ? ['Lean Manufacturing', 'Lean Office', 'Supply chain et logistique', 'Risk management', 'Formation et animation', 'Serious games', 'Automatisation et IA']
+  : ['Lean Manufacturing', 'Lean Office', 'Supply chain and logistics', 'Risk management', 'Training and facilitation', 'Serious games', 'Automation and AI'];
+const experience = fr
+  ? ['Moins de 3 ans', '3 à 7 ans', '8 à 15 ans', 'Plus de 15 ans']
+  : ['Less than 3 years', '3 to 7 years', '8 to 15 years', 'More than 15 years'];
+const L = {
+  track: fr ? 'Vous souhaitez' : 'You would like to',
+  trackTeam: fr ? 'Rejoindre l’équipe Phi-Lean' : 'Join the Phi-Lean team',
+  trackNetwork: fr ? 'Intégrer le réseau d’experts associés' : 'Join the associate expert network',
+  name: fr ? 'Prénom et nom' : 'Full name',
+  email: fr ? 'E-mail' : 'E-mail',
+  linkedin: fr ? 'Profil LinkedIn' : 'LinkedIn profile',
+  location: fr ? 'Ville de résidence' : 'Home city',
+  years: fr ? 'Expérience Lean ou opérations' : 'Lean or operations experience',
+  expertise: fr ? 'Domaines d’expertise' : 'Areas of expertise',
+  cv: fr ? 'CV (PDF, 5 Mo maximum)' : 'CV (PDF, 5 MB max)',
+  message: fr ? 'Ce que vous aimeriez apporter à Phi-Lean' : 'What you would like to bring to Phi-Lean',
+  choose: fr ? 'Choisir…' : 'Choose…',
+  submit: fr ? 'Envoyer ma candidature' : 'Send my application',
+  success: fr
+    ? 'Merci, votre candidature est bien arrivée. Manuel Gourmand lit chaque dossier et vous répond personnellement.'
+    : 'Thank you, your application has arrived. Manuel Gourmand reads every application and will reply personally.',
+};
+---
+<FormShell
+  id="careers-form"
+  endpoint={site.forms.careers}
+  lang={lang}
+  subject={fr ? 'Candidature – phi-lean.com' : 'Application – phi-lean.com (EN)'}
+  submitLabel={L.submit}
+  successMessage={L.success}
+  multipart
+>
+  <fieldset>
+    <legend class="field-label">{L.track} *</legend>
+    <div class="mt-2 grid gap-3 sm:grid-cols-2">
+      <label class="flex cursor-pointer items-center gap-3 border border-bordure bg-white px-4 py-3 has-[:checked]:border-bleu has-[:checked]:bg-ciel">
+        <input type="radio" name="parcours" value="equipe" required checked class="h-5 w-5 accent-bleu" />
+        <span class="font-bold">{L.trackTeam}</span>
+      </label>
+      <label class="flex cursor-pointer items-center gap-3 border border-bordure bg-white px-4 py-3 has-[:checked]:border-bleu has-[:checked]:bg-ciel">
+        <input type="radio" name="parcours" value="reseau" class="h-5 w-5 accent-bleu" />
+        <span class="font-bold">{L.trackNetwork}</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    <div>
+      <label for="cr-name" class="field-label">{L.name} *</label>
+      <input id="cr-name" name="nom" type="text" autocomplete="name" required class="field" />
+    </div>
+    <div>
+      <label for="cr-email" class="field-label">{L.email} *</label>
+      <input id="cr-email" name="email" type="email" autocomplete="email" required class="field" />
+    </div>
+    <div>
+      <label for="cr-linkedin" class="field-label">{L.linkedin} *</label>
+      <input id="cr-linkedin" name="linkedin" type="url" placeholder="https://www.linkedin.com/in/…" required class="field" />
+    </div>
+    <div>
+      <label for="cr-location" class="field-label">{L.location} *</label>
+      <input id="cr-location" name="ville" type="text" autocomplete="address-level2" required class="field" />
+    </div>
+    <div class="sm:col-span-2">
+      <label for="cr-years" class="field-label">{L.years} *</label>
+      <select id="cr-years" name="experience" required class="field">
+        <option value="">{L.choose}</option>
+        {experience.map((e) => <option>{e}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend class="field-label">{L.expertise}</legend>
+    <div class="mt-2 grid gap-x-6 gap-y-2.5 sm:grid-cols-2">
+      {expertises.map((e, i) => (
+        <label class="flex items-center gap-3 text-[0.97rem]">
+          <input type="checkbox" name="expertises" value={e} id={`cr-exp-${i}`} class="h-5 w-5 accent-bleu" />
+          {e}
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div>
+    <label for="cr-cv" class="field-label">{L.cv}</label>
+    <input id="cr-cv" name="cv" type="file" accept="application/pdf,.pdf" class="field file:mr-4 file:border-0 file:bg-ciel file:px-3 file:py-1.5 file:font-bold file:text-bleu" />
+  </div>
+  <div>
+    <label for="cr-message" class="field-label">{L.message} *</label>
+    <textarea id="cr-message" name="message" rows="5" required class="field"></textarea>
+  </div>
+</FormShell>
+
+<script>
+  const track = new URLSearchParams(window.location.search).get('parcours');
+  if (track) {
+    const radio = document.querySelector<HTMLInputElement>(`input[name="parcours"][value="${CSS.escape(track)}"]`);
+    if (radio) radio.checked = true;
+  }
+  const cv = document.querySelector<HTMLInputElement>('#cr-cv');
+  cv?.addEventListener('change', () => {
+    const file = cv.files?.[0];
+    const tooBig = document.documentElement.lang === 'en' ? 'This file is over 5 MB.' : 'Ce fichier dépasse 5 Mo.';
+    cv.setCustomValidity(file && file.size > 5 * 1024 * 1024 ? tooBig : '');
+  });
+</script>
