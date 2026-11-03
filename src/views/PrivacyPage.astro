@@ -2,8 +2,9 @@
 /**
  * POLITIQUE DE CONFIDENTIALITÉ / RGPD (FR « /confidentialite/ », EN « /en/privacy/ »)
  * Rédigée d'après le fonctionnement réel du site : aucun cookie de mesure
- * d'audience, Calendly chargé seulement à la demande, formulaires via Formspree
- * ou webhook, paiements sur Stripe. Modèle à faire valider juridiquement.
+ * d'audience, Calendly et LinkedIn chargés seulement à la demande, formulaires
+ * transmis par e-mail via FormSubmit, paiements sur Stripe.
+ * Modèle à faire valider juridiquement.
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
@@ -27,9 +28,7 @@ const updated = new Date().toLocaleDateString(fr ? 'fr-FR' : 'en-GB', { year: 'n
     lang={lang}
     crumb={fr ? 'Confidentialité' : 'Privacy'}
     title={fr ? 'Confidentialité et données personnelles' : 'Privacy and personal data'}
-    lead={fr
-      ? 'Nous collectons le moins de données possible, uniquement pour vous répondre, et nous ne les vendons jamais.'
-      : 'We collect as little data as possible, only to reply to you, and we never sell it.'}
+    lead={fr ? 'Nous collectons le moins de données possible, uniquement pour vous répondre, et nous ne les vendons jamais.' : 'We collect as little data as possible, only to reply to you, and we never sell it.'}
   />
   <section class="py-16 md:py-20">
     <div class="container-pl prose-pl">
@@ -41,59 +40,35 @@ const updated = new Date().toLocaleDateString(fr ? 'fr-FR' : 'en-GB', { year: 'n
             {site.name}, <span class="todo">[forme juridique, adresse]</span>, représentée par {site.founder.name}. Contact :
             <a href={`mailto:${site.email}`}>{site.email}</a>.
           </p>
-
           <h2>Données collectées et finalités</h2>
           <h3>Formulaire de contact</h3>
-          <p>
-            Identité, coordonnées professionnelles, entreprise, fonction, besoin et message, pour répondre à votre demande et
-            préparer une éventuelle proposition. Base légale : mesures précontractuelles prises à votre demande.
-          </p>
+          <p>Identité, coordonnées professionnelles, entreprise, fonction, besoin et message, pour répondre à votre demande et préparer une éventuelle proposition. Base légale : mesures précontractuelles prises à votre demande.</p>
           <h3>Candidatures</h3>
-          <p>
-            Identité, coordonnées, profil LinkedIn, CV et message, pour étudier votre candidature. Base légale : mesures
-            précontractuelles. Conservation : deux ans au plus après le dernier contact.
-          </p>
-          <h3>White papers</h3>
-          <p>
-            E-mail professionnel et entreprise, pour vous transmettre le document demandé. Base légale : votre consentement.
-            Aucune inscription à une lettre d’information sans accord séparé.
-          </p>
+          <p>Identité, coordonnées, profil LinkedIn, CV et message, pour étudier votre candidature. Base légale : mesures précontractuelles. Conservation : deux ans au plus après le dernier contact.</p>
+          <h3>Téléchargement des articles</h3>
+          <p>Les articles de la Phi-Lean Press se téléchargent librement : aucune donnée personnelle n’est demandée.</p>
           <h3>Achats de kits et Print & Play</h3>
-          <p>
-            Le paiement s’effectue sur Stripe Checkout : Phi-Lean ne voit ni ne conserve vos données bancaires. Les pièces
-            comptables sont conservées dix ans (obligation légale).
-          </p>
-
+          <p>Le paiement s’effectue sur Stripe Checkout : Phi-Lean ne voit ni ne conserve vos données bancaires. Les pièces comptables sont conservées dix ans (obligation légale).</p>
           <h2>Destinataires et sous-traitants</h2>
           <ul>
-            <li>Formulaires : <span class="todo">[Formspree, Inc. (États-Unis) ou votre outil de webhook]</span></li>
+            <li>Formulaires : FormSubmit (formsubmit.co), qui transmet le contenu des formulaires par e-mail à Phi-Lean</li>
             <li>Prise de rendez-vous : Calendly LLC (États-Unis), uniquement si vous choisissez d’afficher l’agenda</li>
             <li>Paiements : Stripe Payments Europe Ltd. (Irlande)</li>
             <li>Hébergement : <span class="todo">[hébergeur]</span></li>
           </ul>
-          <p>
-            Les transferts hors de l’Union européenne s’appuient sur le Data Privacy Framework UE–États-Unis ou sur les clauses
-            contractuelles types de la Commission européenne.
-          </p>
-
+          <p>Certains de ces services peuvent traiter des données hors de l’Union européenne ; ces transferts s’appuient sur le Data Privacy Framework UE–États-Unis ou sur les clauses contractuelles types de la Commission européenne.</p>
           <h2>Durées de conservation</h2>
           <ul>
             <li>Demandes de contact et prospects : trois ans après le dernier échange</li>
             <li>Candidatures : deux ans au plus</li>
             <li>Données de facturation : dix ans</li>
           </ul>
-
           <h2>Cookies</h2>
-          <p>
-            Ce site ne dépose aucun cookie de mesure d’audience ni de publicité. L’agenda Calendly, qui utilise ses propres
-            cookies, ne se charge que lorsque vous cliquez sur « Afficher l’agenda ». Le paiement Stripe se déroule sur le
-            domaine de Stripe, soumis à sa propre politique.
-          </p>
-
+          <p>Ce site ne dépose aucun cookie de mesure d’audience ni de publicité. L’agenda Calendly, qui utilise ses propres cookies, ne se charge que lorsque vous le demandez. Les vidéos sont hébergées sur ce site. Le paiement Stripe se déroule sur le domaine de Stripe, soumis à sa propre politique.</p>
           <h2>Vos droits</h2>
           <p>
-            Vous disposez d’un droit d’accès, de rectification, d’effacement, de limitation, d’opposition et de portabilité de
-            vos données, ainsi que du droit de retirer votre consentement à tout moment. Écrivez à
+            Vous disposez d’un droit d’accès, de rectification, d’effacement, de limitation, d’opposition et de portabilité de vos
+            données, ainsi que du droit de retirer votre consentement à tout moment. Écrivez à
             <a href={`mailto:${site.email}`}>{site.email}</a> ; nous répondons sous un mois. Vous pouvez aussi introduire une
             réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>.
           </p>
@@ -102,55 +77,38 @@ const updated = new Date().toLocaleDateString(fr ? 'fr-FR' : 'en-GB', { year: 'n
         <>
           <p class="text-sm text-gris">Last updated: {updated}</p>
           <h2>Data controller</h2>
-          <p>
-            {site.name}, <span class="todo">[legal form, address]</span>, represented by {site.founder.name}. Contact:
-            <a href={`mailto:${site.email}`}>{site.email}</a>.
-          </p>
-
+          <p>{site.name}, <span class="todo">[legal form, address]</span>, represented by {site.founder.name}. Contact: <a href={`mailto:${site.email}`}>{site.email}</a>.</p>
           <h2>Data collected and purposes</h2>
           <h3>Contact form</h3>
-          <p>
-            Identity, business contact details, company, job title, needs and message, to answer your request and prepare a
-            possible proposal. Legal basis: pre-contractual steps taken at your request.
-          </p>
+          <p>Identity, business contact details, company, job title, needs and message, to answer your request and prepare a possible proposal. Legal basis: pre-contractual steps taken at your request.</p>
           <h3>Applications</h3>
-          <p>
-            Identity, contact details, LinkedIn profile, CV and message, to review your application. Legal basis:
-            pre-contractual steps. Retention: two years at most after the last contact.
-          </p>
-          <h3>White papers</h3>
-          <p>Work e-mail and company, to send you the requested document. Legal basis: your consent. No newsletter without separate consent.</p>
+          <p>Identity, contact details, LinkedIn profile, CV and message, to review your application. Legal basis: pre-contractual steps. Retention: two years at most after the last contact.</p>
+          <h3>Article downloads</h3>
+          <p>Phi-Lean Press articles are free to download: no personal data is requested.</p>
           <h3>Kit and Print & Play purchases</h3>
           <p>Payment takes place on Stripe Checkout: Phi-Lean never sees or stores your card details. Accounting records are kept for ten years (legal obligation).</p>
-
           <h2>Recipients and processors</h2>
           <ul>
-            <li>Forms: <span class="todo">[Formspree, Inc. (USA) or your webhook tool]</span></li>
+            <li>Forms: FormSubmit (formsubmit.co), which forwards form content to Phi-Lean by e-mail</li>
             <li>Scheduling: Calendly LLC (USA), only if you choose to display the calendar</li>
             <li>Payments: Stripe Payments Europe Ltd. (Ireland)</li>
             <li>Hosting: <span class="todo">[host]</span></li>
           </ul>
-          <p>Transfers outside the EU rely on the EU–US Data Privacy Framework or the European Commission’s standard contractual clauses.</p>
-
+          <p>Some of these services may process data outside the EU; such transfers rely on the EU–US Data Privacy Framework or the European Commission’s standard contractual clauses.</p>
           <h2>Retention periods</h2>
           <ul>
             <li>Enquiries and prospects: three years after the last exchange</li>
             <li>Applications: two years at most</li>
             <li>Billing data: ten years</li>
           </ul>
-
           <h2>Cookies</h2>
-          <p>
-            This site sets no analytics or advertising cookies. The Calendly calendar, which uses its own cookies, only loads when
-            you click “Show the calendar”. Stripe payments take place on Stripe’s domain under its own policy.
-          </p>
-
+          <p>This site sets no analytics or advertising cookies. The Calendly calendar, which uses its own cookies, only loads when you ask for it. Videos are hosted on this site. Stripe payments take place on Stripe’s domain under its own policy.</p>
           <h2>Your rights</h2>
           <p>
             You have the right to access, rectify, erase, restrict, object to and port your data, and to withdraw consent at any
             time. Write to <a href={`mailto:${site.email}`}>{site.email}</a>; we reply within one month. You may also lodge a
-            complaint with the <a href="https://www.cnil.fr/en" target="_blank" rel="noopener">CNIL</a>, the French data
-            protection authority.
+            complaint with the <a href="https://www.cnil.fr/en" target="_blank" rel="noopener">CNIL</a>, the French data protection
+            authority.
           </p>
         </>
       )}

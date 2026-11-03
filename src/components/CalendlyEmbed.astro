@@ -1,7 +1,9 @@
 ---
 /**
- * Agenda Calendly en iframe, chargé uniquement à la demande du visiteur
- * (Calendly dépose ses propres cookies : pas de chargement sans action, RGPD).
+ * Prise de rendez-vous.
+ * - Lien Calendly renseigné (site.calendlyUrl / PUBLIC_CALENDLY_URL) : agenda en iframe,
+ *   chargé seulement à la demande du visiteur (Calendly dépose ses propres cookies).
+ * - Pas encore de lien : proposition de créneau par e-mail, pré-rédigée.
  */
 import Icon from './ui/Icon.astro';
 import { site } from '@/config/site';
@@ -10,31 +12,43 @@ import { useTranslations } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
-  url?: string;
 }
-const { lang, url = site.calendlyUrl } = Astro.props;
+const { lang } = Astro.props;
 const t = useTranslations(lang);
+const url = site.calendlyUrl;
+const fr = lang === 'fr';
+const mailto =
+  `mailto:${site.email}?subject=${encodeURIComponent(fr ? 'Demande de rendez-vous' : 'Meeting request')}` +
+  `&body=${encodeURIComponent(fr ? 'Bonjour,\n\nJe vous propose les créneaux suivants pour un premier échange de 30 minutes :\n- \n- \n\nCordialement,' : 'Hello,\n\nHere are a few time slots for a first 30-minute call:\n- \n- \n\nBest regards,')}`;
 ---
-<div class="flex flex-col border border-bordure bg-white" data-calendly data-url={url} data-title={t('calendly.title')}>
-  <div class="flex min-h-[26rem] flex-1 flex-col items-start justify-center gap-5 bg-zebra p-6 sm:p-8" data-calendly-placeholder>
-    <Icon name="calendar" size={36} class="text-bleu" />
-    <p class="max-w-[46ch] text-[0.97rem] text-anthracite/85">{t('calendly.notice')}</p>
-    <div class="flex flex-wrap items-center gap-4">
-      <button type="button" class="btn btn-primary" data-calendly-load>
-        {t('calendly.load')}
-      </button>
-      <a href={url} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
-        {t('calendly.open')}
-        <Icon name="external" size={16} />
-      </a>
+{url ? (
+  <div class="flex flex-col border border-bordure bg-white" data-calendly data-url={url} data-title={t('calendly.title')}>
+    <div class="flex min-h-[26rem] flex-1 flex-col items-start justify-center gap-5 bg-zebra p-6 sm:p-8">
+      <Icon name="calendar" size={36} class="text-bleu" />
+      <p class="max-w-[46ch] text-[0.97rem] text-anthracite/85">{t('calendly.notice')}</p>
+      <div class="flex flex-wrap items-center gap-4">
+        <button type="button" class="btn btn-primary" data-calendly-load>{t('calendly.load')}</button>
+        <a href={url} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
+          {t('calendly.open')}
+          <Icon name="external" size={16} />
+        </a>
+      </div>
     </div>
   </div>
-</div>
+) : (
+  <div class="flex min-h-[20rem] flex-col items-start justify-center gap-5 border border-bordure bg-zebra p-6 sm:p-8">
+    <Icon name="calendar" size={36} class="text-bleu" />
+    <p class="max-w-[46ch] text-[0.97rem] text-anthracite/85">{t('calendly.fallback')}</p>
+    <a href={mailto} class="btn btn-primary">
+      <Icon name="mail" size={18} />
+      {t('calendly.fallbackCta')}
+    </a>
+  </div>
+)}
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-calendly]').forEach((box) => {
-    const button = box.querySelector<HTMLButtonElement>('[data-calendly-load]');
-    button?.addEventListener('click', () => {
+    box.querySelector<HTMLButtonElement>('[data-calendly-load]')?.addEventListener('click', () => {
       const src = new URL(box.dataset.url ?? '');
       src.searchParams.set('embed_type', 'Inline');
       src.searchParams.set('embed_domain', window.location.hostname);
@@ -42,7 +56,6 @@ const t = useTranslations(lang);
       const iframe = document.createElement('iframe');
       iframe.src = src.toString();
       iframe.title = box.dataset.title ?? 'Calendly';
-      iframe.loading = 'lazy';
       iframe.className = 'block h-[44rem] w-full border-0';
       box.replaceChildren(iframe);
       iframe.focus();

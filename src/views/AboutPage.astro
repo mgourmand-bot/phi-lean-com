@@ -1,52 +1,40 @@
 ---
 /**
- * PAGE À PROPOS & CABINET (FR « /a-propos/ », EN « /en/about/ »)
- * Rigueur académique et expertise terrain, sens de la signature,
- * fondateur, engagements, écosystème Phi-Lean / Press / .ai.
+ * PAGE LE CABINET (FR « /a-propos/ », EN « /en/about/ »)
+ * #approche             : terrain et transmission, signature, engagements
+ * #fondateur            : Manuel Gourmand
+ * #zones-d-intervention : carte du monde et zoom Europe, deux bases
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import CtaBand from '@/components/sections/CtaBand.astro';
 import FounderBlock from '@/components/FounderBlock.astro';
+import PresenceMap from '@/components/PresenceMap.astro';
 import Icon from '@/components/ui/Icon.astro';
+import { primaryCountries, secondaryCountries } from '@/data/presence';
 import { site } from '@/config/site';
 import type { Lang } from '@/i18n/routes';
-import { path } from '@/i18n/utils';
+import { path, anchorId } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
 const fr = lang === 'fr';
+const listFmt = new Intl.ListFormat(fr ? 'fr' : 'en', { type: 'conjunction' });
 
 const c = {
   fr: {
-    title: 'Le cabinet Phi-Lean : rigueur académique et expertise terrain',
+    title: 'Le cabinet Phi-Lean : approche, fondateur et zones d’intervention',
     description:
-      'Phi-Lean, cabinet de conseil Lean fondé par Manuel Gourmand (MSc Lean Enterprise, ancien Site Manager, enseignant-chercheur). Notre approche, nos engagements, notre écosystème.',
+      'Phi-Lean, cabinet de conseil Lean fondé par Manuel Gourmand (MSc Lean Enterprise, ancien Site Manager, enseigne en écoles de commerce et d’ingénierie). Basé à Liverdun (Grand Est) et à Royal Tunbridge Wells (Kent).',
     crumb: 'Le cabinet',
-    h1: 'Rigueur académique, expertise terrain',
-    lead:
-      'Phi-Lean réunit deux cultures qui se parlent trop peu : celle du chercheur, qui veut des preuves, et celle du directeur de site, qui veut des résultats lundi matin.',
+    h1: 'Le terrain d’abord, la transmission ensuite',
+    lead: 'Phi-Lean réunit deux expériences qui se répondent : celle du directeur d’usine, qui veut des résultats lundi matin, et celle de l’enseignant, qui veut que chacun comprenne pourquoi ça marche.',
+    approachTitle: 'Notre approche',
     poles: [
-      {
-        title: 'Rigueur académique',
-        tone: 'border-t-bleu',
-        points: [
-          'Des méthodes issues de la recherche, pas des modes',
-          'Des mesures avant et après chaque chantier',
-          'Des enseignements publiés et ouverts à la critique',
-        ],
-      },
-      {
-        title: 'Expertise terrain',
-        tone: 'border-t-turquoise',
-        points: [
-          'L’expérience de la direction d’un site de production',
-          'Le temps passé à l’atelier, au bureau, à l’entrepôt',
-          'Des recommandations que vos équipes peuvent appliquer',
-        ],
-      },
+      { title: 'Expertise terrain', tone: 'border-t-bleu', points: ['L’expérience de la direction et du démarrage d’une usine', 'Le temps passé à l’atelier, au bureau, à l’entrepôt', 'Des recommandations que vos équipes peuvent appliquer'] },
+      { title: 'Transmission', tone: 'border-t-turquoise', points: ['Des méthodes éprouvées, pas des modes', 'Des mesures avant et après chaque chantier', 'Des équipes formées pour continuer sans nous'] },
     ],
     whyTitle: 'Pourquoi « Philosophie » ?',
     why: [
@@ -60,35 +48,35 @@ const c = {
       { title: 'L’autonomie pour objectif', text: 'Nous réussissons quand vos équipes n’ont plus besoin de nous.' },
       { title: 'Des prix lisibles', text: 'Forfaits annoncés, frais refacturés au réel, sans surprise.' },
     ],
+    founderTitle: 'Le fondateur',
+    presenceTitle: "Zones d'intervention",
+    presenceLead: 'Deux bases, en France et au Royaume-Uni, et des missions partout où vos flux nous emmènent.',
+    legendPrimary: 'Pays principaux',
+    legendSecondary: 'Interventions ponctuelles et déplacements',
+    basesTitle: 'Nos deux bases',
+    travel: 'Disponibles pour des missions au Brésil, aux États-Unis et au Canada.',
+    languages: 'Langues de travail : français, anglais et portugais.',
     ecosystemTitle: 'Un écosystème, trois marques',
     ecosystem: [
-      { name: 'Phi-Lean', text: 'Conseil, formation et serious games en Lean Management.', href: path('consulting', 'fr'), external: false },
-      { name: 'Phi-Lean Press', text: 'Livres, white papers et articles de recherche.', href: path('publications', 'fr'), external: false },
-      { name: 'Phi-Lean.ai', text: 'Intelligence artificielle et automatisation au service du flux.', href: site.aiUrl, external: true },
+      { name: 'Phi-Lean', text: 'Conseil, formation et serious games en Lean.', href: path('consulting', 'fr'), externalLink: false },
+      { name: 'Phi-Lean Press', text: 'Livres et articles.', href: path('publications', 'fr'), externalLink: false },
+      { name: 'Phi-Lean.ai', text: 'Intelligence artificielle et automatisation au service du flux.', href: site.aiUrl, externalLink: true },
     ],
     joinTitle: 'Envie de travailler avec nous ?',
     joinText: 'Consultants, experts métiers, formateurs : le cabinet s’entoure de profils qui partagent cette double exigence.',
     joinCta: 'Rejoindre Phi-Lean',
   },
   en: {
-    title: 'About Phi-Lean: academic rigour and hands-on expertise',
+    title: 'About Phi-Lean: approach, founder and where we work',
     description:
-      'Phi-Lean, a Lean consulting firm founded by Manuel Gourmand (MSc Lean Enterprise, former Site Manager, lecturer and researcher). Our approach, commitments and ecosystem.',
+      'Phi-Lean, a Lean consulting firm founded by Manuel Gourmand (MSc Lean Enterprise, former Site Manager, teaches at business and engineering schools). Based in Liverdun (Grand Est, France) and Royal Tunbridge Wells (Kent, UK).',
     crumb: 'The firm',
-    h1: 'Academic rigour, hands-on expertise',
-    lead:
-      'Phi-Lean brings together two cultures that rarely talk: the researcher, who wants evidence, and the site manager, who wants results on Monday morning.',
+    h1: 'The shop floor first, then passing it on',
+    lead: 'Phi-Lean brings together two complementary experiences: the plant manager, who wants results on Monday morning, and the teacher, who wants everyone to understand why it works.',
+    approachTitle: 'Our approach',
     poles: [
-      {
-        title: 'Academic rigour',
-        tone: 'border-t-bleu',
-        points: ['Methods grounded in research, not fashion', 'Measurements before and after every workshop', 'Lessons published and open to challenge'],
-      },
-      {
-        title: 'Hands-on expertise',
-        tone: 'border-t-turquoise',
-        points: ['Experience running a production site', 'Time spent in the workshop, the office, the warehouse', 'Recommendations your teams can actually apply'],
-      },
+      { title: 'Hands-on expertise', tone: 'border-t-bleu', points: ['Experience running and starting up a plant', 'Time spent in the workshop, the office, the warehouse', 'Recommendations your teams can actually apply'] },
+      { title: 'Passing it on', tone: 'border-t-turquoise', points: ['Proven methods, not fashions', 'Measurements before and after every workshop', 'Teams trained to carry on without us'] },
     ],
     whyTitle: 'Why “Philosophie”?',
     why: [
@@ -102,11 +90,19 @@ const c = {
       { title: 'Self-sufficiency as the goal', text: 'We succeed when your teams no longer need us.' },
       { title: 'Clear pricing', text: 'Fixed fees stated upfront, expenses at cost, no surprises.' },
     ],
+    founderTitle: 'The founder',
+    presenceTitle: 'Where we work',
+    presenceLead: 'Two bases, in France and the United Kingdom, and engagements wherever your flows take us.',
+    legendPrimary: 'Main countries',
+    legendSecondary: 'Occasional work and travel',
+    basesTitle: 'Our two bases',
+    travel: 'Available for engagements in Brazil, the United States and Canada.',
+    languages: 'Working languages: French, English and Portuguese.',
     ecosystemTitle: 'One ecosystem, three brands',
     ecosystem: [
-      { name: 'Phi-Lean', text: 'Lean management consulting, training and serious games.', href: path('consulting', 'en'), external: false },
-      { name: 'Phi-Lean Press', text: 'Books, white papers and research papers.', href: path('publications', 'en'), external: false },
-      { name: 'Phi-Lean.ai', text: 'Artificial intelligence and automation in service of the flow.', href: site.aiUrl, external: true },
+      { name: 'Phi-Lean', text: 'Lean consulting, training and serious games.', href: path('consulting', 'en'), externalLink: false },
+      { name: 'Phi-Lean Press', text: 'Books and articles.', href: path('publications', 'en'), externalLink: false },
+      { name: 'Phi-Lean.ai', text: 'Artificial intelligence and automation in service of the flow.', href: site.aiUrl, externalLink: true },
     ],
     joinTitle: 'Want to work with us?',
     joinText: 'Consultants, domain experts, trainers: the firm surrounds itself with people who share this dual standard.',
@@ -119,61 +115,98 @@ const jsonLd = {
   '@type': 'AboutPage',
   name: c.title,
   about: { '@id': `${site.url}/#organization` },
-  mainEntity: {
-    '@type': 'Person',
-    '@id': `${site.url}/#founder`,
-    name: site.founder.name,
-    jobTitle: site.founder.jobTitle[lang],
-    worksFor: { '@id': `${site.url}/#organization` },
-  },
+  mainEntity: { '@type': 'Person', '@id': `${site.url}/#founder`, name: site.founder.name, jobTitle: site.founder.jobTitle[lang], worksFor: { '@id': `${site.url}/#organization` } },
 };
 ---
 <BaseLayout lang={lang} routeKey="about" title={c.title} description={c.description} jsonLd={jsonLd}>
-  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead} />
-
-  <section class="py-16 md:py-24" aria-label={c.h1}>
-    <div class="container-pl grid gap-10 md:grid-cols-2">
-      {c.poles.map((pole) => (
-        <div class:list={['border-t-[6px] bg-zebra p-7 md:p-9', pole.tone]}>
-          <h2 class="text-2xl font-bold text-bleu md:text-3xl">{pole.title}</h2>
-          <ul class="list-square mt-6 text-lg">{pole.points.map((p) => <li>{p}</li>)}</ul>
-        </div>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+    <nav slot="actions" aria-label={fr ? 'Sur cette page' : 'On this page'} class="mt-8 flex flex-wrap gap-3">
+      {[
+        { a: 'approach' as const, l: c.approachTitle },
+        { a: 'founder' as const, l: c.founderTitle },
+        { a: 'presence' as const, l: c.presenceTitle },
+      ].map((x) => (
+        <a href={`#${anchorId(x.a, lang)}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{x.l}</a>
       ))}
-    </div>
-  </section>
+    </nav>
+  </PageHero>
 
-  <section class="pb-16 md:pb-24" aria-labelledby="pourquoi">
+  <!-- APPROCHE -->
+  <section id={anchorId('approach', lang)} class="py-16 md:py-24" aria-labelledby="h-approche">
     <div class="container-pl">
-      <div class="callout callout-blue max-w-4xl">
-        <h2 id="pourquoi" class="callout-head text-lg">{c.whyTitle}</h2>
-        <div class="callout-body space-y-4 text-lg">
-          {c.why.map((p) => <p>{p}</p>)}
-        </div>
+      <h2 id="h-approche" class="section-title">{c.approachTitle}</h2>
+      <div class="mt-10 grid gap-10 md:grid-cols-2">
+        {c.poles.map((pole) => (
+          <div class:list={['border-t-[6px] bg-zebra p-7 md:p-9', pole.tone]}>
+            <h3 class="text-2xl font-bold text-bleu md:text-3xl">{pole.title}</h3>
+            <ul class="list-square mt-6 text-lg">{pole.points.map((p) => <li>{p}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+      <div class="callout callout-blue mt-12 max-w-4xl">
+        <h3 class="callout-head text-lg">{c.whyTitle}</h3>
+        <div class="callout-body space-y-4 text-lg">{c.why.map((p) => <p>{p}</p>)}</div>
+      </div>
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.commitmentsTitle}</h3>
+      <div class="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {c.commitments.map((item) => (
+          <div class="border-l-4 border-turquoise pl-5">
+            <p class="text-lg font-bold text-anthracite">{item.title}</p>
+            <p class="mt-1 text-anthracite/85">{item.text}</p>
+          </div>
+        ))}
       </div>
     </div>
   </section>
 
-  <section class="border-y border-bordure bg-zebra py-16 md:py-24" aria-label={site.founder.name}>
+  <!-- FONDATEUR -->
+  <section id={anchorId('founder', lang)} class="border-y border-bordure bg-zebra py-16 md:py-24" aria-label={c.founderTitle}>
     <div class="container-pl">
       <FounderBlock lang={lang} showLink={false} />
     </div>
   </section>
 
-  <section class="py-16 md:py-24" aria-labelledby="engagements">
+  <!-- ZONES D'INTERVENTION -->
+  <section id={anchorId('presence', lang)} class="py-16 md:py-24" aria-labelledby="h-zones">
     <div class="container-pl">
-      <h2 id="engagements" class="section-title">{c.commitmentsTitle}</h2>
-      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {c.commitments.map((item) => (
-          <div class="border-l-4 border-turquoise pl-5">
-            <h3 class="text-lg font-bold text-anthracite">{item.title}</h3>
-            <p class="mt-1 text-anthracite/85">{item.text}</p>
+      <h2 id="h-zones" class="section-title">{c.presenceTitle}</h2>
+      <p class="lead mt-6">{c.presenceLead}</p>
+
+      <ul class="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-[0.95rem]" aria-label={fr ? 'Légende' : 'Legend'}>
+        <li class="flex items-start gap-2.5">
+          <span class="mt-1 h-4 w-6 shrink-0 bg-bleu" aria-hidden="true"></span>
+          <span><span class="font-bold">{c.legendPrimary}</span> : {listFmt.format(primaryCountries.map((x) => x.name[lang]))}</span>
+        </li>
+        <li class="flex items-start gap-2.5">
+          <span class="mt-1 h-4 w-6 shrink-0 bg-[#9cc0e4]" aria-hidden="true"></span>
+          <span><span class="font-bold">{c.legendSecondary}</span> : {listFmt.format(secondaryCountries.map((x) => x.name[lang]))}</span>
+        </li>
+      </ul>
+
+      <div class="mt-8"><PresenceMap lang={lang} /></div>
+
+      <div class="mt-10 grid gap-6 lg:grid-cols-[1fr_1fr_1.1fr]">
+        {site.offices.map((o) => (
+          <div class="border border-bordure border-t-[6px] border-t-soleil bg-white p-6">
+            <p class="text-sm text-gris">{c.basesTitle}</p>
+            <p class="mt-1 text-2xl font-bold text-anthracite">{o.city}</p>
+            <p class="text-anthracite/85">{o.region[lang]}</p>
           </div>
         ))}
+        <div class="border-l-4 border-turquoise bg-menthe p-6">
+          <p class="font-bold text-turquoise-fonce">{c.travel}</p>
+          <p class="mt-2">{c.languages}</p>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <h2 class="section-title mt-20">{c.ecosystemTitle}</h2>
-      <div class="mt-10 overflow-x-auto">
-        <table class="table-pl min-w-[36rem]">
+  <!-- ÉCOSYSTÈME ET CARRIÈRES -->
+  <section class="border-t border-bordure bg-zebra py-16 md:py-20" aria-labelledby="h-ecosysteme">
+    <div class="container-pl">
+      <h2 id="h-ecosysteme" class="section-title">{c.ecosystemTitle}</h2>
+      <div class="relative mt-10 overflow-x-auto">
+        <table class="table-pl min-w-[36rem] bg-white">
           <thead>
             <tr>
               <th scope="col">{fr ? 'Marque' : 'Brand'}</th>
@@ -185,14 +218,14 @@ const jsonLd = {
             {c.ecosystem.map((e) => (
               <tr>
                 <th scope="row" class="whitespace-nowrap">
-                  {e.external && <Icon name="bolt" size={16} class="mr-1 inline text-soleil" />}
+                  {e.externalLink && <Icon name="bolt" size={16} class="mr-1 inline text-soleil" />}
                   {e.name}
                 </th>
                 <td>{e.text}</td>
                 <td class="whitespace-nowrap">
-                  <a href={e.href} class="link-pl" {...(e.external ? { target: '_blank', rel: 'noopener' } : {})}>
+                  <a href={e.href} class="link-pl" {...(e.externalLink ? { target: '_blank', rel: 'noopener' } : {})}>
                     {fr ? 'Découvrir' : 'Explore'}
-                    {e.external && <span class="sr-only">{fr ? ' (nouvel onglet)' : ' (opens in a new tab)'}</span>}
+                    {e.externalLink && <span class="sr-only">{fr ? ' (nouvel onglet)' : ' (opens in a new tab)'}</span>}
                   </a>
                 </td>
               </tr>
@@ -201,7 +234,7 @@ const jsonLd = {
         </table>
       </div>
 
-      <div class="mt-20 flex flex-col gap-6 border-t-[6px] border-soleil bg-creme p-7 md:flex-row md:items-center md:justify-between md:p-9">
+      <div class="mt-16 flex flex-col gap-6 border-t-[6px] border-soleil bg-creme p-7 md:flex-row md:items-center md:justify-between md:p-9">
         <div>
           <h2 class="text-2xl font-bold text-anthracite">{c.joinTitle}</h2>
           <p class="mt-2 max-w-[60ch]">{c.joinText}</p>

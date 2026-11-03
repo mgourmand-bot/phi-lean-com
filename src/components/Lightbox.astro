@@ -1,0 +1,48 @@
+---
+/**
+ * Visionneuse d'image plein écran (agrandir une couverture de livre).
+ * Tout élément portant data-lightbox-src l'ouvre au clic.
+ * Échap, le bouton ou un clic à côté de l'image la referment.
+ */
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+<dialog
+  id="pl-lightbox"
+  class="m-auto max-h-none max-w-none overflow-visible bg-transparent p-0 backdrop:bg-bleu-nuit/85"
+  aria-label={lang === 'fr' ? 'Image agrandie' : 'Enlarged image'}
+>
+  <div class="relative">
+    <img data-lightbox-img alt="" class="block h-auto max-h-[90dvh] w-auto max-w-[92vw] bg-white shadow-2xl" />
+    <form method="dialog" class="absolute -top-3 -right-3">
+      <button
+        type="submit"
+        class="grid h-11 w-11 place-items-center rounded-full border-2 border-white bg-bleu text-2xl leading-none font-bold text-white hover:bg-bleu-fonce"
+        aria-label={lang === 'fr' ? 'Fermer' : 'Close'}
+      >
+        ×
+      </button>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('pl-lightbox') as HTMLDialogElement | null;
+  const img = dialog?.querySelector<HTMLImageElement>('[data-lightbox-img]');
+  if (dialog && img) {
+    document.querySelectorAll<HTMLElement>('[data-lightbox-src]').forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        img.src = trigger.dataset.lightboxSrc ?? '';
+        img.alt = trigger.dataset.lightboxAlt ?? '';
+        dialog.showModal();
+      });
+    });
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+  }
+</script>

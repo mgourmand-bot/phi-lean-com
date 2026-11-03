@@ -1,0 +1,39 @@
+---
+/**
+ * « Libérer le goulot » : capacité de chaque poste, le goulot en corail.
+ * Barres proportionnelles, valeurs écrites en clair (lisible sans la couleur).
+ */
+import { vsmExplained } from '@/data/offers';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { steps, unit, result, moral } = vsmExplained.bottleneck;
+const max = Math.max(...steps.map((s) => s.rate));
+const min = Math.min(...steps.map((s) => s.rate));
+const fr = lang === 'fr';
+---
+<figure class="border border-bordure bg-white p-5 sm:p-6">
+  <figcaption class="font-bold text-bleu">{fr ? 'Une bouteille se vide au rythme de son goulot' : 'A bottle empties at the pace of its neck'}</figcaption>
+  <ul class="mt-5 space-y-3">
+    {steps.map((s) => {
+      const neck = s.rate === min;
+      return (
+        <li class="grid grid-cols-[6.5rem_1fr] items-center gap-3 text-[0.95rem]">
+          <span class:list={['font-bold', neck ? 'text-[#b8401f]' : 'text-anthracite']}>{s.name[lang]}</span>
+          <span class="flex items-center gap-3">
+            <span class:list={['block h-6', neck ? 'bg-corail' : 'bg-bleu']} style={`width:${(s.rate / max) * 72}%`}></span>
+            <span class:list={['whitespace-nowrap', neck && 'font-bold text-[#b8401f]']}>
+              {s.rate} {neck ? (fr ? ': le goulot' : ': the bottleneck') : ''}
+            </span>
+          </span>
+        </li>
+      );
+    })}
+  </ul>
+  <p class="mt-2 text-sm text-gris">{unit[lang]}. {fr ? 'Exemple illustratif.' : 'Illustrative example.'}</p>
+  <p class="mt-4 border-l-4 border-corail bg-corail-pale px-4 py-3 font-bold text-anthracite">{result[lang]}</p>
+  <p class="mt-3 text-[0.95rem] text-anthracite/85">{moral[lang]}</p>
+</figure>

@@ -1,0 +1,47 @@
+---
+/**
+ * Bandeau des logos partenaires, chacun menant à sa section de la page Partenaires.
+ * Les logos conçus pour fond sombre (Farming Futura) sont posés sur une tuile bleu nuit.
+ */
+import { partners } from '@/data/partners';
+import type { Lang } from '@/i18n/routes';
+import { anchorPath } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  showShort?: boolean;
+}
+const { lang, showShort = true } = Astro.props;
+/** Hauteur d'affichage par logo, pour un poids visuel équivalent. */
+const sizeClass: Record<string, string> = {
+  factbird: 'h-8',
+  enerlexia: 'h-11',
+  procid: 'h-6',
+  'start-and-grow': 'h-14',
+  'farming-futura': 'h-7',
+};
+---
+<ul class="grid grid-cols-2 gap-px border border-bordure bg-bordure md:grid-cols-3 xl:grid-cols-5">
+  {partners.map((p) => (
+    <li class:list={[p.dark ? 'bg-bleu-nuit' : 'bg-white']}>
+      <a
+        href={anchorPath('partners', p.anchor, lang)}
+        class:list={['flex h-full flex-col items-center justify-center gap-3 px-5 py-7 text-center', p.dark ? 'hover:bg-bleu' : 'hover:bg-zebra']}
+      >
+        <span class="flex h-14 items-center justify-center gap-3">
+          <img
+            src={p.logo}
+            alt={p.showName ? '' : p.name}
+            width={p.logoWidth}
+            height={p.logoHeight}
+            class:list={['w-auto max-w-[12rem] object-contain', sizeClass[p.id] ?? 'h-10']}
+            loading="lazy"
+            decoding="async"
+          />
+          {p.showName && <span class="text-xl font-bold text-[#1d5fa0]">{p.name}</span>}
+        </span>
+        {showShort && <span class:list={['text-sm', p.dark ? 'text-white/80' : 'text-gris']}>{p.short[lang]}</span>}
+      </a>
+    </li>
+  ))}
+</ul>

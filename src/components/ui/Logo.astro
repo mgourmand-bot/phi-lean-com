@@ -1,42 +1,28 @@
 ---
 /**
- * Logo Phi-Lean.
- * La charte interdit de redessiner le logo : on affiche le PNG d'origine
- * déposé dans public/brand/phi-lean-logo.png. Tant qu'il est absent,
- * un simple repère texte (non stylisé) tient la place.
+ * Logo officiel Phi-Lean (PNG d'origine, jamais redessiné).
+ * Sur fond sombre, il est posé sur une pastille blanche : le « -Lean »
+ * anthracite resterait sinon illisible.
  */
 import { site } from '@/config/site';
-import { publicFileExists } from '@/lib/files';
 
 interface Props {
   height?: number; // hauteur affichée en px
-  inverted?: boolean; // version sur fond sombre
+  inverted?: boolean;
   class?: string;
+  eager?: boolean;
 }
-const { height = 44, inverted = false, class: className = '' } = Astro.props;
-const hasLogo = publicFileExists(site.logo.src);
+const { height = 52, inverted = false, class: className = '', eager = false } = Astro.props;
 const width = Math.round((height * site.logo.width) / site.logo.height);
 ---
-{hasLogo ? (
-  <img
-    src={site.logo.src}
-    width={width}
-    height={height}
-    alt={`${site.name} – ${site.tagline}`}
-    class:list={[className, inverted && 'rounded-[var(--radius-pl)] bg-white p-1.5']}
-    decoding="async"
-  />
-) : (
-  <span
-    class:list={['inline-flex flex-col leading-none', className]}
-    style={`height:${height}px`}
-    title="Déposez le logo officiel dans public/brand/phi-lean-logo.png"
-  >
-    <span class:list={['text-[1.55rem] font-bold tracking-tight', inverted ? 'text-white' : 'text-bleu']}>
-      Phi-Lean
-    </span>
-    <span class:list={['mt-1 text-[0.68rem]', inverted ? 'text-white/75' : 'text-gris']}>
-      The True <em>Philosophie</em> of Lean
-    </span>
-  </span>
-)}
+<img
+  src={site.logo.src}
+  width={width}
+  height={height}
+  alt={`${site.name} – ${site.tagline}`}
+  class:list={['block', className, inverted && 'box-content rounded-[var(--radius-pl)] bg-white px-3 py-2']}
+  style={`height:${height}px;width:auto`}
+  decoding="async"
+  loading={eager ? 'eager' : 'lazy'}
+  fetchpriority={eager ? 'high' : undefined}
+/>

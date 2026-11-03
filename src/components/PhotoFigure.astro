@@ -1,0 +1,30 @@
+---
+/** Photo de session, en deux tailles (800 / 1600 px), avec légende. */
+import type { Photo } from '@/data/games';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  photo: Photo;
+  lang: Lang;
+  sizes?: string;
+  class?: string;
+  imgClass?: string;
+  caption?: boolean;
+}
+const { photo, lang, sizes = '(min-width: 1024px) 50vw, 100vw', class: className = '', imgClass = '', caption = true } = Astro.props;
+const small = photo.src.replace(/\.webp$/, '-800.webp');
+---
+<figure class:list={['m-0', className]}>
+  <img
+    src={small}
+    srcset={`${small} 800w, ${photo.src} ${photo.width}w`}
+    sizes={sizes}
+    width={photo.width}
+    height={photo.height}
+    alt={photo.alt[lang]}
+    class:list={['block h-auto w-full bg-zebra object-cover', imgClass]}
+    loading="lazy"
+    decoding="async"
+  />
+  {caption && <figcaption class="mt-2 text-sm text-gris">{photo.alt[lang]}</figcaption>}
+</figure>

@@ -1,15 +1,17 @@
 ---
 /**
- * En-tête : logo, menu, passerelle Phi-Lean.ai, sélecteur FR|EN, CTA « Prendre RDV ».
- * Menu complet à partir de 1280 px, panneau déroulant en dessous.
+ * En-tête : logo, menus déroulants, passerelle Phi-Lean.ai, FR|EN, « Prendre RDV ».
+ * - Ordinateur (≥ 1280 px) : le sous-menu apparaît au survol ou au clavier (Tab).
+ *   Clic sur le menu = page principale ; clic sur un sous-menu = section dédiée.
+ * - Mobile et tablette : panneau avec menus et sous-menus dépliés.
  */
 import Logo from './ui/Logo.astro';
 import Icon from './ui/Icon.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { site } from '@/config/site';
+import { navigation, childHref } from '@/config/navigation';
 import { routes, type Lang, type RouteKey } from '@/i18n/routes';
-import { useTranslations, path } from '@/i18n/utils';
-import type { UiKey } from '@/i18n/ui';
+import { useTranslations, anchorPath } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
@@ -17,41 +19,51 @@ interface Props {
 }
 const { lang, routeKey } = Astro.props;
 const t = useTranslations(lang);
-
-const nav: { key: RouteKey; label: UiKey }[] = [
-  { key: 'consulting', label: 'nav.consulting' },
-  { key: 'training', label: 'nav.training' },
-  { key: 'games', label: 'nav.games' },
-  { key: 'publications', label: 'nav.publications' },
-  { key: 'about', label: 'nav.about' },
-];
-const meetingHref = path('contact', lang, '#rdv');
+const meetingHref = anchorPath('contact', 'meeting', lang);
 ---
-<header class="sticky top-0 z-40 border-b border-bordure bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+<header class="sticky top-0 z-40 border-b border-bordure bg-white">
   <div class="stripe-tri" aria-hidden="true"></div>
-  <div class="container-pl flex h-[4.75rem] items-center justify-between gap-6">
+  <div class="container-pl flex h-[5rem] items-center justify-between gap-6">
     <a href={routes.home[lang]} class="shrink-0" aria-label={`${site.name}, ${lang === 'fr' ? 'accueil' : 'home'}`}>
-      <Logo height={44} />
+      <Logo height={56} eager />
     </a>
 
-    <nav aria-label={t('nav.main')} class="hidden xl:block">
-      <ul class="flex items-center gap-1">
-        {nav.map((item) => {
-          const active = routeKey === item.key;
+    <nav aria-label={t('nav.main')} class="hidden xl:block" data-desktop-nav>
+      <ul class="flex items-center">
+        {navigation.map((item) => {
+          const active = routeKey !== undefined && item.activeFor.includes(routeKey);
           return (
-            <li>
+            <li class="group relative">
               <a
-                href={routes[item.key][lang]}
-                aria-current={active ? 'page' : undefined}
+                href={routes[item.route][lang]}
+                aria-current={routeKey === item.route ? 'page' : undefined}
                 class:list={[
-                  'relative block whitespace-nowrap px-2.5 py-2 text-[0.95rem] font-bold transition-colors',
+                  'relative flex items-center gap-1 whitespace-nowrap px-3 py-2 text-[0.95rem] font-bold transition-colors',
                   active ? 'text-bleu' : 'text-anthracite hover:text-bleu',
-                  'after:absolute after:inset-x-2.5 after:-bottom-[1.05rem] after:h-[3px]',
+                  'after:absolute after:inset-x-3 after:-bottom-[1.15rem] after:h-[3px]',
                   active ? 'after:bg-turquoise' : 'after:bg-transparent',
                 ]}
               >
-                {t(item.label)}
+                {item.label[lang]}
+                <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true" class="mt-0.5 text-gris transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180">
+                  <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </a>
+              <div
+                class="invisible absolute top-full left-0 z-50 pt-[1.1rem] opacity-0 transition duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+                data-submenu
+              >
+                <ul class="w-[19rem] border border-bordure border-t-[3px] border-t-turquoise bg-white py-2 shadow-[0_14px_28px_-14px_rgba(19,58,94,0.45)]">
+                  {item.children.map((child) => (
+                    <li>
+                      <a href={childHref(child, lang)} class="block px-5 py-2.5 hover:bg-ciel focus-visible:bg-ciel">
+                        <span class="block font-bold text-anthracite">{child.label[lang]}</span>
+                        {child.hint && <span class="mt-0.5 block text-sm text-gris">{child.hint[lang]}</span>}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </li>
           );
         })}
@@ -95,28 +107,32 @@ const meetingHref = path('contact', lang, '#rdv');
     </div>
   </div>
 
-  <div id="mobile-nav" class="border-t border-bordure bg-white xl:hidden" hidden>
-    <nav aria-label={t('nav.main')} class="container-pl py-4">
+  <div id="mobile-nav" class="max-h-[calc(100dvh-5.4rem)] overflow-y-auto border-t border-bordure bg-white xl:hidden" hidden>
+    <nav aria-label={t('nav.main')} class="container-pl py-3">
       <ul class="divide-y divide-bordure">
-        {nav.map((item) => (
-          <li>
+        {navigation.map((item) => (
+          <li class="py-3">
             <a
-              href={routes[item.key][lang]}
-              aria-current={routeKey === item.key ? 'page' : undefined}
-              class:list={[
-                'flex py-3.5 text-lg font-bold',
-                routeKey === item.key ? 'text-bleu' : 'text-anthracite',
-              ]}
+              href={routes[item.route][lang]}
+              aria-current={routeKey === item.route ? 'page' : undefined}
+              class:list={['block py-1 text-lg font-bold', routeKey !== undefined && item.activeFor.includes(routeKey) ? 'text-bleu' : 'text-anthracite']}
             >
-              {t(item.label)}
+              {item.label[lang]}
             </a>
+            <ul class="mt-1 border-l-2 border-turquoise pl-4">
+              {item.children.map((child) => (
+                <li>
+                  <a href={childHref(child, lang)} class="block py-1.5 text-[0.97rem] text-anthracite/85 hover:text-bleu">{child.label[lang]}</a>
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
-        <li>
-          <a href={routes.careers[lang]} class="flex py-3.5 text-lg font-bold text-anthracite">{t('nav.careers')}</a>
+        <li class="py-3">
+          <a href={routes.contact[lang]} class="block py-1 text-lg font-bold text-anthracite">{t('nav.contact')}</a>
         </li>
       </ul>
-      <div class="mt-5 flex flex-wrap items-center gap-4">
+      <div class="mt-4 flex flex-wrap items-center gap-4 pb-2">
         <a href={meetingHref} class="btn btn-primary">
           <Icon name="calendar" size={18} />
           {t('cta.meeting')}
@@ -132,23 +148,39 @@ const meetingHref = path('contact', lang, '#rdv');
 </header>
 
 <script>
+  // Menu mobile
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const panel = document.getElementById('mobile-nav');
   if (toggle && panel) {
+    const isOpen = () => !panel.hasAttribute('hidden');
     const setOpen = (open: boolean) => {
-      panel.hidden = !open;
+      panel.toggleAttribute('hidden', !open);
       toggle.setAttribute('aria-expanded', String(open));
       toggle.setAttribute('aria-label', (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? '');
-      toggle.querySelector<HTMLElement>('[data-icon-open]')!.hidden = open;
-      toggle.querySelector<HTMLElement>('[data-icon-close]')!.hidden = !open;
+      toggle.querySelector<HTMLElement>('[data-icon-open]')?.toggleAttribute('hidden', open);
+      toggle.querySelector<HTMLElement>('[data-icon-close]')?.toggleAttribute('hidden', !open);
     };
-    toggle.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
+    // Un clic sur un lien d'ancre de la même page referme le panneau
+    panel.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false);
+    });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !panel.hasAttribute('hidden')) {
+      if (e.key === 'Escape' && isOpen()) {
         setOpen(false);
         toggle.focus();
       }
     });
     window.matchMedia('(min-width: 80rem)').addEventListener('change', (e) => e.matches && setOpen(false));
   }
+
+  // Sous-menus (ordinateur) : Échap referme le menu ouvert au clavier
+  const desktopNav = document.querySelector<HTMLElement>('[data-desktop-nav]');
+  desktopNav?.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const item = (e.target as HTMLElement).closest('li.group');
+    const trigger = item?.querySelector<HTMLAnchorElement>(':scope > a');
+    trigger?.focus();
+    trigger?.blur();
+  });
 </script>

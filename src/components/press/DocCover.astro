@@ -1,0 +1,24 @@
+---
+/**
+ * Couverture typographique de remplacement (format A4), tant que la vignette
+ * de première page n'est pas fournie. Aux couleurs de la charte.
+ */
+interface Props {
+  title: string;
+  kicker?: string;
+  tone?: 'blue' | 'turq' | 'sun';
+}
+const { title, kicker = 'Phi-Lean Press', tone = 'blue' } = Astro.props;
+const band = { blue: 'bg-bleu', turq: 'bg-turquoise', sun: 'bg-soleil' }[tone];
+---
+<div class="flex aspect-[1/1.414] w-full flex-col bg-white" aria-hidden="true">
+  <div class:list={['h-3', band]}></div>
+  <div class="flex flex-1 flex-col justify-between p-[9%]">
+    <span class="text-[0.7rem] font-bold text-gris">{kicker}</span>
+    <div>
+      <div class="stripe-tri mb-4 w-12 !h-1"></div>
+      <p class="text-lg leading-tight font-bold text-bleu">{title}</p>
+    </div>
+    <span class="text-[0.75rem] text-anthracite/80">Manuel Gourmand</span>
+  </div>
+</div>

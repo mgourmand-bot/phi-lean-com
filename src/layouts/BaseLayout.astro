@@ -9,6 +9,7 @@ import Footer from '@/components/Footer.astro';
 import { site } from '@/config/site';
 import { routes, hreflang, ogLocale, portugueseRoute, type Lang, type RouteKey } from '@/i18n/routes';
 import { useTranslations } from '@/i18n/utils';
+import { primaryCountries, secondaryCountries } from '@/data/presence';
 
 interface Alternate {
   hreflang: string;
@@ -68,18 +69,24 @@ const organization = {
   email: site.email,
   description:
     lang === 'fr'
-      ? 'Cabinet de conseil et de formation en Lean Management : Lean Manufacturing, Lean Office, Supply Chain et Risk Management.'
-      : 'Lean management consulting and training firm: Lean Manufacturing, Lean Office, Supply Chain and Risk Management.',
+      ? 'Cabinet de conseil et de formation en Lean : optimisation des flux de l’usine (Lean Flux Usine) et de la supply chain (Lean Flux Supply Chain, gestion des risques).'
+      : 'Lean consulting and training firm: optimising plant flows (Lean Plant Flow) and supply chain flows (Lean Supply Chain Flow, risk management).',
   founder: {
     '@type': 'Person',
     '@id': `${site.url}/#founder`,
     name: site.founder.name,
     jobTitle: site.founder.jobTitle[lang],
-    hasCredential: 'MSc Lean Enterprise',
+    image: abs(site.founder.photo),
+    knowsLanguage: ['fr', 'en', 'pt'],
   },
-  knowsAbout: ['Lean Management', 'Lean Manufacturing', 'Lean Office', 'Value Stream Mapping', 'Supply Chain Risk Management', 'Serious Games'],
+  location: site.offices.map((o) => ({
+    '@type': 'Place',
+    address: { '@type': 'PostalAddress', addressLocality: o.city, addressRegion: o.region.en.split(',')[0], addressCountry: o.country },
+    geo: { '@type': 'GeoCoordinates', latitude: o.lat, longitude: o.lon },
+  })),
+  knowsAbout: ['Lean Management', 'Lean Manufacturing', 'Value Stream Mapping', 'Supply Chain Management', 'Supply Chain Risk Management', 'OEE', 'Serious Games'],
   knowsLanguage: ['fr', 'en', 'pt'],
-  areaServed: [{ '@type': 'Country', name: 'France' }, 'Europe'],
+  areaServed: [...primaryCountries, ...secondaryCountries].map((c) => ({ '@type': 'Country', name: c.name.en })),
   sameAs: [site.aiUrl, site.founder.linkedin].filter(Boolean),
 };
 const structuredData = [organization, ...(Array.isArray(jsonLd) ? jsonLd : [jsonLd])];
@@ -111,8 +118,9 @@ const chromeLang = htmlLang ? lang : undefined;
     <meta name="twitter:card" content="summary_large_image" />
 
     <meta name="theme-color" content="#215f9a" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/icon-192.png" sizes="192x192" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 

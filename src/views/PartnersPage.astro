@@ -1,0 +1,373 @@
+---
+/**
+ * PAGE PARTENAIRES (FR « /partenaires/ », EN « /en/partners/ »)
+ * #factbird       : Factbird OEE (TRS, énergie, apport de Phi-Lean)
+ * #enerlexia      : autoconsommation collective et gestion énergétique
+ * #procid         : automatisme et informatique industrielle
+ * #start-and-grow : réseau de dirigeants ENIM-Alumni
+ * #farming-futura : agriculture Lean & Green, Ferme du Futur (Phi-Lean fait partie du réseau)
+ * Informations tirées des sites publics des partenaires (sources en bas de page).
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import PartnerLogos from '@/components/PartnerLogos.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { partners } from '@/data/partners';
+import type { Lang } from '@/i18n/routes';
+import { anchorId, anchorPath } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const byId = Object.fromEntries(partners.map((p) => [p.id, p]));
+const external = { target: '_blank', rel: 'noopener' };
+
+const c = {
+  fr: {
+    title: 'Partenaires : Factbird OEE, EnerLexia, Procid, Start & Grow, Farming Futura',
+    description:
+      'Les partenaires de Phi-Lean : Factbird pour mesurer le TRS et l’énergie en temps réel, EnerLexia pour l’autoconsommation et la gestion énergétique, Procid pour l’automatisme industriel, Start & Grow pour le réseau de dirigeants, Farming Futura pour l’agriculture Lean & Green.',
+    crumb: 'Partenaires',
+    h1: 'Des partenaires pour aller plus loin',
+    lead: 'Mesurer ce que font vraiment vos lignes, maîtriser l’énergie, automatiser, entreprendre, réinventer l’agriculture : nous travaillons avec des partenaires choisis pour prolonger le travail sur les flux.',
+    visit: 'Site du partenaire',
+    fbTitle: 'Factbird OEE : le TRS et l’énergie en temps réel',
+    fbIntro:
+      "Factbird est une solution danoise de suivi de la production. Des capteurs prêts à l'emploi s'installent sur vos lignes en moins d'une heure, sans arrêter la production, et le logiciel calcule en continu le TRS (taux de rendement synthétique, OEE en anglais). Fini les relevés à la main : opérateurs, encadrement et direction voient les mêmes chiffres, au même moment.",
+    fb1Title: 'Améliorer le TRS',
+    trs: [
+      { name: 'Disponibilité', q: 'La ligne tourne-t-elle quand elle le devrait ?' },
+      { name: 'Performance', q: 'Tourne-t-elle à la bonne cadence ?' },
+      { name: 'Qualité', q: 'Les pièces sont-elles bonnes du premier coup ?' },
+    ],
+    trsFormula: 'TRS = Disponibilité × Performance × Qualité',
+    fb1Points: [
+      'Comptage automatique de la production, par capteurs (Factbird DUO) ou par connexion aux automates',
+      'Arrêts détectés automatiquement, puis qualifiés par les opérateurs depuis leur écran',
+      'Pareto des causes d’arrêt et cascade des pertes de TRS, ligne par ligne',
+      'Plans d’action suivis en PDCA, directement dans l’outil',
+      'Factbird VIEW : la vidéo associée aux données de production, pour revoir ce qui s’est passé',
+    ],
+    fb1Figure: '+9 points de TRS',
+    fb1FigureText: 'en moyenne dans les 90 premiers jours, et +19 % de productivité, d’après les données clients publiées par Factbird.',
+    duoAlt: 'Le boîtier Factbird DUO, qui relie les capteurs de la ligne au logiciel.',
+    fb2Title: 'Optimiser l’énergie',
+    fb2Intro:
+      'Les mêmes boîtiers mesurent ce que consomment vos machines : électricité, air comprimé, eau, gaz. Rapportée à ce qui est produit, la consommation devient un indicateur de performance comme un autre.',
+    fb2Points: [
+      'Pinces ampèremétriques posées sur l’alimentation des machines sans les arrêter, ou compteurs d’énergie de précision',
+      'Consommation par ligne et par produit, mise en regard du volume produit',
+      'Consommation à l’arrêt et en veille rendue visible : souvent la première source d’économies',
+      'Estimation de l’empreinte carbone par produit, utile au reporting RSE',
+    ],
+    fb2Figure: '-30 %',
+    fb2FigureText: 'de consommation d’énergie chez Danfoss avec le compteur d’énergie Factbird (étude de cas publiée par Factbird).',
+    viewAlt: 'La caméra Factbird VIEW, qui associe la vidéo aux données de production.',
+    fb3Title: 'Ce que Phi-Lean apporte',
+    fb3Intro: 'Un outil de mesure ne change rien tout seul. Nous vous aidons à en faire un levier de performance durable :',
+    fb3Steps: [
+      { title: 'Choisir les lignes pilotes', text: 'Là où le TRS pèse le plus sur vos délais et vos coûts.' },
+      { title: 'Déployer et paramétrer', text: 'Catégories d’arrêts, objectifs, écrans : un outil qui parle votre langage.' },
+      { title: 'Former les équipes', text: 'Opérateurs et encadrement : lire le TRS, qualifier un arrêt, réagir.' },
+      { title: 'Installer les routines', text: 'Point quotidien, résolution de problèmes, plans d’action qui avancent.' },
+    ],
+    fbCta: 'Parler de Factbird avec nous',
+    eTitle: 'EnerLexia : autoconsommation collective et gestion énergétique',
+    eText:
+      "Basée à Metz, EnerLexia est spécialiste de l'autoconsommation collective et de la gestion énergétique dans le Grand Est. Elle réalise les études de faisabilité, joue le rôle de Personne Morale Organisatrice (PMO) des opérations d'autoconsommation collective, de la structure juridique à l'interface avec le gestionnaire de réseau, et accompagne la gestion énergétique au quotidien. Elle travaille avec des collectivités, des entreprises et des agriculteurs du quart nord-est de la France.",
+    eWhy: 'Avec Factbird, vous savez ce que consomme chaque machine ; avec EnerLexia, vous agissez sur la façon dont l’énergie est produite et partagée localement.',
+    pTitle: 'Procid : automatisme et informatique industrielle',
+    pText:
+      'Basée à Dieulouard, en Meurthe-et-Moselle, PROCID intègre et fournit des solutions d’automatisme industriel et d’informatique pour les entreprises.',
+    pWhy: 'Quand un chantier Lean demande de connecter une machine, de récupérer une donnée d’automate ou d’automatiser un poste, PROCID apporte le savoir-faire technique.',
+    sTitle: 'Start & Grow : le réseau des dirigeants ENIM-Alumni',
+    sText:
+      'Start & Grow est un groupe professionnel d’ENIM-Alumni (ANIENIM), l’association des ingénieurs diplômés de l’École nationale d’ingénieurs de Metz. Il réunit dirigeants, décideurs, entrepreneurs, repreneurs et créateurs d’entreprise autour d’afterworks, de conférences thématiques, de visites d’entreprises et de retours d’expérience.',
+    sWhy: 'Un lieu d’échange entre dirigeants, où l’amélioration des flux et la croissance de l’entreprise se discutent concrètement.',
+    ffTitle: 'Farming Futura : l’agriculture Lean & Green, et la Ferme du Futur',
+    ffMember: 'Phi-Lean fait partie du réseau',
+    ffIntro:
+      'Farming Futura est un réseau à but non lucratif de praticiens, de chercheurs et d’experts de l’industrie qui conçoit les systèmes agricoles « Lean & Green » de demain. Sa mission : aider les petites exploitations à réduire leurs gaspillages, à accéder aux financements et à se développer durablement. Le réseau a été fondé par la professeure Pauline Found, coautrice de Staying Lean (prix de recherche Shingo 2009), et réunit notamment l’université de Cardiff, Seedleaves, Micro Acres Wales, ServerGro et CCR Energy.',
+    ffProjectTitle: 'La Ferme du Futur : quand les data centres nourrissent l’agriculture',
+    ffProjectText:
+      'Un data centre produit de la chaleur jour et nuit, le plus souvent perdue. Une ferme d’intérieur a besoin de chaleur toute l’année. La Ferme du Futur relie les deux : la chaleur récupérée sur les serveurs alimente des cultures en environnement contrôlé, pour produire localement et en toute saison, avec une énergie qui aurait sinon été gaspillée. ServerGro, partenaire du réseau, conçoit précisément ces systèmes qui associent data centres et fermes d’intérieur.',
+    ffRoleTitle: 'Le rôle de Phi-Lean : les flux internes et la supply chain',
+    ffRoleIntro: 'Une ferme innovante reste une usine du vivant : elle doit tenir ses délais, ses rendements et ses coûts. Phi-Lean y apporte l’organisation des flux :',
+    ffRolePoints: [
+      'Cartographie des flux internes, du semis à la récolte puis au conditionnement',
+      'Dimensionnement des postes, des stocks et des cadences pour une production régulière',
+      'Organisation de la supply chain : approvisionnements, logistique et distribution locale des récoltes',
+      'Standards de travail et management visuel, pour que le système tienne au quotidien',
+    ],
+    ffWhy: 'Le Lean est né dans l’usine ; Farming Futura l’applique à l’agriculture. Les mêmes principes de flux servent une production alimentaire locale, sobre en énergie et en gaspillages.',
+    why: 'Pourquoi ce partenariat',
+    sourcesTitle: 'Sources',
+    sourcesNote: 'Les chiffres cités sont publiés par Factbird et décrivent des résultats observés chez ses clients ; ils ne constituent pas un engagement de résultat de Phi-Lean.',
+  },
+  en: {
+    title: 'Partners: Factbird OEE, EnerLexia, Procid, Start & Grow, Farming Futura',
+    description:
+      "Phi-Lean's partners: Factbird to measure OEE and energy in real time, EnerLexia for energy self-consumption and management, Procid for industrial automation, Start & Grow for the business leaders' network, Farming Futura for Lean & Green farming.",
+    crumb: 'Partners',
+    h1: 'Partners to go further',
+    lead: 'Measuring what your lines really do, managing energy, automating, growing a business, reinventing farming: we work with carefully chosen partners to extend our work on flows.',
+    visit: "Partner's website",
+    fbTitle: 'Factbird OEE: real-time OEE and energy',
+    fbIntro:
+      'Factbird is a Danish production monitoring solution. Ready-to-use sensors are installed on your lines in under an hour, without stopping production, and the software calculates OEE (overall equipment effectiveness) continuously. No more manual records: operators, managers and executives see the same figures at the same time.',
+    fb1Title: 'Improving OEE',
+    trs: [
+      { name: 'Availability', q: 'Is the line running when it should?' },
+      { name: 'Performance', q: 'Is it running at the right speed?' },
+      { name: 'Quality', q: 'Are parts right first time?' },
+    ],
+    trsFormula: 'OEE = Availability × Performance × Quality',
+    fb1Points: [
+      'Automatic production counting, through sensors (Factbird DUO) or PLC connections',
+      'Stops detected automatically, then categorised by operators from their screen',
+      'Pareto of stop causes and OEE loss waterfall, line by line',
+      'Action plans tracked as PDCA, directly in the tool',
+      'Factbird VIEW: video linked to production data, to replay what happened',
+    ],
+    fb1Figure: '+9 OEE points',
+    fb1FigureText: 'on average in the first 90 days, and +19% productivity, according to customer data published by Factbird.',
+    duoAlt: 'The Factbird DUO unit, which connects line sensors to the software.',
+    fb2Title: 'Optimising energy',
+    fb2Intro:
+      'The same units measure what your machines consume: electricity, compressed air, water, gas. Related to output, consumption becomes a performance indicator like any other.',
+    fb2Points: [
+      'Clamp-on current sensors fitted to machine supplies without stopping them, or precision energy meters',
+      'Consumption per line and per product, set against the volume produced',
+      'Idle and standby consumption made visible: often the first source of savings',
+      'Estimated carbon footprint per product, useful for ESG reporting',
+    ],
+    fb2Figure: '-30%',
+    fb2FigureText: 'energy consumption at Danfoss with the Factbird energy meter (case study published by Factbird).',
+    viewAlt: 'The Factbird VIEW camera, which links video to production data.',
+    fb3Title: 'What Phi-Lean brings',
+    fb3Intro: 'A measurement tool changes nothing on its own. We help you turn it into a lasting performance lever:',
+    fb3Steps: [
+      { title: 'Choose pilot lines', text: 'Where OEE weighs most on your lead times and costs.' },
+      { title: 'Deploy and configure', text: 'Stop categories, targets, screens: a tool that speaks your language.' },
+      { title: 'Train the teams', text: 'Operators and managers: read OEE, categorise a stop, respond.' },
+      { title: 'Set up routines', text: 'Daily huddle, problem solving, action plans that move forward.' },
+    ],
+    fbCta: 'Talk to us about Factbird',
+    eTitle: 'EnerLexia: collective self-consumption and energy management',
+    eText:
+      'Based in Metz, EnerLexia specialises in collective energy self-consumption and energy management in the Grand Est region of France. It carries out feasibility studies, acts as the organising legal entity (PMO) for collective self-consumption schemes, from legal structure to the interface with the grid operator, and supports day-to-day energy management. It works with local authorities, businesses and farmers in north-eastern France.',
+    eWhy: 'With Factbird you know what each machine consumes; with EnerLexia you act on how energy is produced and shared locally.',
+    pTitle: 'Procid: industrial automation and IT',
+    pText: 'Based in Dieulouard, in Meurthe-et-Moselle (France), PROCID integrates and supplies industrial automation and IT solutions for businesses.',
+    pWhy: 'When a Lean project requires connecting a machine, retrieving PLC data or automating a workstation, PROCID brings the technical know-how.',
+    sTitle: "Start & Grow: the ENIM-Alumni business leaders' network",
+    sText:
+      'Start & Grow is a professional group of ENIM-Alumni (ANIENIM), the association of graduate engineers from the École nationale d’ingénieurs de Metz. It brings together business leaders, decision-makers, entrepreneurs, buyers and founders through afterworks, themed talks, company visits and experience sharing.',
+    sWhy: 'A place for business leaders to exchange, where improving flows and growing a company are discussed in practical terms.',
+    ffTitle: 'Farming Futura: Lean & Green farming, and the Farm of the Future',
+    ffMember: 'Phi-Lean is part of the network',
+    ffIntro:
+      'Farming Futura is a not-for-profit network of practitioners, researchers and industry experts designing tomorrow’s “Lean & Green” farming systems. Its mission: helping small farms cut waste, unlock funding and grow sustainably. The network was founded by Professor Pauline Found, co-author of Staying Lean (Shingo Research Prize 2009), and brings together Cardiff University, Seedleaves, Micro Acres Wales, ServerGro and CCR Energy, among others.',
+    ffProjectTitle: 'The Farm of the Future: when data centres feed farming',
+    ffProjectText:
+      'A data centre produces heat day and night, most of it wasted. An indoor farm needs heat all year round. The Farm of the Future links the two: heat recovered from servers supports crops grown in a controlled environment, producing locally and in every season with energy that would otherwise be lost. ServerGro, a partner of the network, designs exactly these systems combining data centres and indoor farms.',
+    ffRoleTitle: 'Phi-Lean’s role: internal flows and the supply chain',
+    ffRoleIntro: 'An innovative farm is still a factory of living things: it has to meet its lead times, yields and costs. Phi-Lean brings flow organisation:',
+    ffRolePoints: [
+      'Mapping internal flows, from sowing to harvest and packing',
+      'Sizing workstations, stocks and rhythms for steady production',
+      'Organising the supply chain: purchasing, logistics and local distribution of the harvest',
+      'Standard work and visual management, so the system holds up day to day',
+    ],
+    ffWhy: 'Lean was born in the factory; Farming Futura applies it to farming. The same flow principles serve local food production that is lean on energy and waste.',
+    why: 'Why this partnership',
+    sourcesTitle: 'Sources',
+    sourcesNote: 'The figures quoted are published by Factbird and describe results observed at its customers; they are not a result commitment by Phi-Lean.',
+  },
+}[lang];
+
+const sources = [
+  { label: 'Factbird, OEE software', url: 'https://factbird.com/solutions/oee-software' },
+  { label: 'Factbird, utility monitoring', url: 'https://www.factbird.com/solutions/utility-monitoring' },
+  { label: 'Factbird DUO', url: 'https://factbird.com/product/factbird-duo' },
+  { label: 'EnerLexia, PMO', url: 'https://enerlexia.fr/pmo.html' },
+  { label: 'ANIENIM, Start&Grow', url: 'https://www.anienim.asso.fr/fr/group/start-grow/136' },
+  { label: 'Farming Futura', url: 'https://farmingfutura.org/' },
+  { label: 'UK IPO, marque ServerGro', url: 'https://www.ipo.gov.uk/tm/t-tmj/tm-journals/2026-004/UK00004319339.html' },
+];
+---
+<BaseLayout lang={lang} routeKey="partners" title={c.title} description={c.description}>
+  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead} />
+
+  <section class="py-10" aria-label={c.crumb}>
+    <div class="container-pl"><PartnerLogos lang={lang} /></div>
+  </section>
+
+  <!-- FACTBIRD -->
+  <section id={anchorId('factbird', lang)} class="py-16 md:py-20" aria-labelledby="h-factbird">
+    <div class="container-pl">
+      <div class="border-t-[6px] border-bleu pt-8">
+        <img src={byId.factbird.logo} alt="Factbird" width="600" height="99" class="h-9 w-auto" loading="lazy" />
+        <h2 id="h-factbird" class="mt-6 text-4xl font-bold tracking-tight text-bleu md:text-5xl">{c.fbTitle}</h2>
+        <p class="lead mt-5">{c.fbIntro}</p>
+      </div>
+
+      <div class="mt-14 grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:items-start">
+        <div>
+          <h3 class="text-2xl font-bold text-anthracite">{c.fb1Title}</h3>
+          <p class="mt-4 inline-block bg-ciel px-3 py-1.5 font-bold text-bleu">{c.trsFormula}</p>
+          <dl class="mt-5 grid gap-3 sm:grid-cols-3">
+            {c.trs.map((x) => (
+              <div class="border-t-[3px] border-bleu bg-zebra p-4">
+                <dt class="font-bold text-bleu">{x.name}</dt>
+                <dd class="mt-1 text-[0.95rem]">{x.q}</dd>
+              </div>
+            ))}
+          </dl>
+          <ul class="list-square mt-7">{c.fb1Points.map((p) => <li>{p}</li>)}</ul>
+        </div>
+        <div class="space-y-5">
+          <figure class="m-0 border border-bordure bg-white">
+            <img src="/images/partenaires/factbird-duo.webp" alt={c.duoAlt} width="1100" height="683" class="block h-auto w-full" loading="lazy" decoding="async" />
+            <figcaption class="border-t border-bordure px-4 py-2 text-sm text-gris">{c.duoAlt}</figcaption>
+          </figure>
+          <div class="kpi-tile kpi-turq">
+            <p class="kpi-value">{c.fb1Figure}</p>
+            <p class="text-[0.95rem]">{c.fb1FigureText}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-16 grid gap-10 lg:grid-cols-[1.25fr_1fr] lg:items-start">
+        <div>
+          <h3 class="text-2xl font-bold text-anthracite">{c.fb2Title}</h3>
+          <p class="mt-4 max-w-[64ch] text-lg">{c.fb2Intro}</p>
+          <ul class="list-square mt-6">{c.fb2Points.map((p) => <li>{p}</li>)}</ul>
+          <p class="mt-6 text-[0.95rem]">
+            {c.eWhy} <a href={`#${anchorId('enerlexia', lang)}`} class="link-pl">EnerLexia</a>
+          </p>
+        </div>
+        <div class="space-y-5">
+          <figure class="m-0 border border-bordure bg-white">
+            <img src="/images/partenaires/factbird-view.webp" alt={c.viewAlt} width="1100" height="548" class="block h-auto w-full" loading="lazy" decoding="async" />
+            <figcaption class="border-t border-bordure px-4 py-2 text-sm text-gris">{c.viewAlt}</figcaption>
+          </figure>
+          <div class="kpi-tile kpi-turq">
+            <p class="kpi-value">{c.fb2Figure}</p>
+            <p class="text-[0.95rem]">{c.fb2FigureText}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-16 callout callout-blue">
+        <h3 class="callout-head text-lg">{c.fb3Title}</h3>
+        <div class="callout-body">
+          <p class="text-lg">{c.fb3Intro}</p>
+          <ol class="list-steps mt-8 grid gap-x-8 md:grid-cols-2 lg:grid-cols-4 [&>li]:mb-6 [&>li+li]:mt-0">
+            {c.fb3Steps.map((s) => (
+              <li>
+                <p class="font-bold text-anthracite">{s.title}</p>
+                <p class="mt-1 text-[0.97rem] text-anthracite/85">{s.text}</p>
+              </li>
+            ))}
+          </ol>
+          <div class="mt-2 flex flex-wrap items-center gap-5">
+            <a href={anchorPath('contact', 'form', lang, '?sujet=factbird')} class="btn btn-primary">{c.fbCta}</a>
+            <a href={byId.factbird.url} {...external} class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+              factbird.com <Icon name="external" size={15} />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTRES PARTENAIRES -->
+  {[
+    { id: 'enerlexia', anchor: 'enerlexia' as const, title: c.eTitle, text: c.eText, why: c.eWhy, band: 'border-t-turquoise' },
+    { id: 'procid', anchor: 'procid' as const, title: c.pTitle, text: c.pText, why: c.pWhy, band: 'border-t-[#8c0000]' },
+    { id: 'start-and-grow', anchor: 'startGrow' as const, title: c.sTitle, text: c.sText, why: c.sWhy, band: 'border-t-soleil' },
+  ].map((p, i) => {
+    const partner = byId[p.id];
+    return (
+      <section id={anchorId(p.anchor, lang)} class:list={['py-16 md:py-20', i % 2 === 0 ? 'border-t border-bordure bg-zebra' : 'border-t border-bordure']} aria-labelledby={`h-${p.id}`}>
+        <div class="container-pl grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start">
+          <div class:list={['flex min-h-40 items-center justify-center border border-bordure border-t-[6px] bg-white p-8', p.band]}>
+            {p.id === 'enerlexia' ? (
+              <img src="/images/partenaires/enerlexia-banniere.webp" alt="EnerLexia, pour une énergie plus verte, plus futée" width="800" height="200" class="h-auto w-full" loading="lazy" />
+            ) : (
+              <img src={partner.logo} alt={partner.name} width={partner.logoWidth} height={partner.logoHeight} class="h-auto max-h-24 w-full object-contain" loading="lazy" />
+            )}
+          </div>
+          <div>
+            <h2 id={`h-${p.id}`} class="text-3xl font-bold tracking-tight text-bleu">{p.title}</h2>
+            <p class="mt-5 max-w-[68ch] text-lg">{p.text}</p>
+            <div class="mt-6 max-w-[68ch] border-l-4 border-turquoise bg-white px-5 py-4">
+              <p class="font-bold text-turquoise-fonce">{c.why}</p>
+              <p class="mt-1">{p.why}</p>
+            </div>
+            <a href={partner.url} {...external} class="mt-6 inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+              {c.visit} : {partner.urlLabel} <Icon name="external" size={15} />
+            </a>
+          </div>
+        </div>
+      </section>
+    );
+  })}
+
+  <!-- FARMING FUTURA -->
+  <section id={anchorId('farmingFutura', lang)} class="border-t border-bordure py-16 md:py-20" aria-labelledby="h-farming-futura">
+    <div class="container-pl">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:items-start">
+        <div>
+          <div class="flex min-h-40 items-center justify-center border-t-[6px] border-t-soleil bg-bleu-nuit p-8">
+            <img src={byId['farming-futura'].logo} alt="Farming Futura" width="1179" height="195" class="h-auto w-full" loading="lazy" />
+          </div>
+          <p class="mt-4 inline-flex items-center gap-2 bg-menthe px-3 py-1.5 text-sm font-bold text-turquoise-fonce">
+            <Icon name="check" size={16} />
+            {c.ffMember}
+          </p>
+        </div>
+        <div>
+          <h2 id="h-farming-futura" class="text-3xl font-bold tracking-tight text-bleu">{c.ffTitle}</h2>
+          <p class="mt-5 max-w-[68ch] text-lg">{c.ffIntro}</p>
+          <a href={byId['farming-futura'].url} {...external} class="mt-5 inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+            {c.visit} : {byId['farming-futura'].urlLabel} <Icon name="external" size={15} />
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-12 grid gap-6 lg:grid-cols-2">
+        <div class="callout callout-turq">
+          <h3 class="callout-head text-lg">{c.ffProjectTitle}</h3>
+          <div class="callout-body"><p class="text-[1.05rem]">{c.ffProjectText}</p></div>
+        </div>
+        <div class="callout callout-blue">
+          <h3 class="callout-head text-lg">{c.ffRoleTitle}</h3>
+          <div class="callout-body">
+            <p>{c.ffRoleIntro}</p>
+            <ul class="list-square mt-4">{c.ffRolePoints.map((x) => <li>{x}</li>)}</ul>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 max-w-[80ch] border-l-4 border-turquoise bg-zebra px-5 py-4">
+        <p class="font-bold text-turquoise-fonce">{c.why}</p>
+        <p class="mt-1">{c.ffWhy}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="border-t border-bordure py-10" aria-labelledby="h-sources">
+    <div class="container-pl text-sm text-gris">
+      <h2 id="h-sources" class="font-bold text-anthracite">{c.sourcesTitle}</h2>
+      <p class="mt-2 max-w-[80ch]">{c.sourcesNote}</p>
+      <ul class="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+        {sources.map((s) => <li><a href={s.url} {...external} class="underline underline-offset-2 hover:text-bleu">{s.label}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

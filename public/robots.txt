@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://phi-lean.com/sitemap-index.xml
+Sitemap: https://www.phi-lean.com/sitemap-index.xml

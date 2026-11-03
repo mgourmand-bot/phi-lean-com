@@ -1,11 +1,9 @@
 ---
 /**
- * Formulaire de contact qualifié : identifie le besoin, la taille et
- * l'échéance pour préparer le premier échange.
+ * Formulaire de contact qualifié (envoyé par e-mail via FormSubmit).
  * Pré-remplissage possible par l'URL : /contact/?sujet=vsm-express&detail=...
  */
 import FormShell from './FormShell.astro';
-import { site } from '@/config/site';
 import type { Lang } from '@/i18n/routes';
 
 interface Props {
@@ -16,11 +14,11 @@ const fr = lang === 'fr';
 
 const topics = [
   { value: 'vsm-express', label: fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic' },
-  { value: 'conseil-usine', label: fr ? 'Conseil – Ligne Usine (Lean Manufacturing)' : 'Consulting – Plant (Lean Manufacturing)' },
-  { value: 'conseil-service', label: fr ? 'Conseil – Ligne Service (Lean Office)' : 'Consulting – Office (Lean Office)' },
-  { value: 'conseil-supply', label: fr ? 'Conseil – Supply Chain & Risk Management' : 'Consulting – Supply Chain & Risk Management' },
+  { value: 'lean-flux-usine', label: fr ? 'Conseil : Lean Flux Usine' : 'Consulting: Lean Plant Flow' },
+  { value: 'lean-flux-supply-chain', label: fr ? 'Conseil : Lean Flux Supply Chain et gestion des risques' : 'Consulting: Lean Supply Chain Flow and risk management' },
+  { value: 'factbird', label: fr ? 'Factbird : TRS et énergie' : 'Factbird: OEE and energy' },
   { value: 'formation', label: fr ? 'Formation' : 'Training' },
-  { value: 'serious-game', label: fr ? 'Serious Game (animation ou kit)' : 'Serious Game (session or kit)' },
+  { value: 'serious-game', label: fr ? 'Serious Game (animation, kit ou Print & Play)' : 'Serious Game (session, kit or Print & Play)' },
   { value: 'publication', label: fr ? 'Phi-Lean Press, conférence, presse' : 'Phi-Lean Press, speaking, media' },
   { value: 'autre', label: fr ? 'Autre demande' : 'Other request' },
 ];
@@ -49,21 +47,15 @@ const L = {
   submit: fr ? 'Envoyer ma demande' : 'Send my request',
 };
 ---
-<FormShell
-  id="contact-form"
-  endpoint={site.forms.contact}
-  lang={lang}
-  subject={fr ? 'Nouvelle demande – phi-lean.com' : 'New enquiry – phi-lean.com (EN)'}
-  submitLabel={L.submit}
->
+<FormShell id="contact-form" lang={lang} subject={fr ? 'Nouvelle demande – phi-lean.com' : 'New enquiry – phi-lean.com (EN)'} submitLabel={L.submit}>
   <div class="grid gap-5 sm:grid-cols-2">
     <div>
       <label for="cf-firstname" class="field-label">{L.firstName} *</label>
-      <input id="cf-firstname" name="prenom" type="text" autocomplete="given-name" required class="field" />
+      <input id="cf-firstname" name="Prénom" type="text" autocomplete="given-name" required class="field" />
     </div>
     <div>
       <label for="cf-lastname" class="field-label">{L.lastName} *</label>
-      <input id="cf-lastname" name="nom" type="text" autocomplete="family-name" required class="field" />
+      <input id="cf-lastname" name="Nom" type="text" autocomplete="family-name" required class="field" />
     </div>
     <div>
       <label for="cf-email" class="field-label">{L.email} *</label>
@@ -71,26 +63,26 @@ const L = {
     </div>
     <div>
       <label for="cf-phone" class="field-label">{L.phone} <span class="field-hint">{L.optional}</span></label>
-      <input id="cf-phone" name="telephone" type="tel" autocomplete="tel" class="field" />
+      <input id="cf-phone" name="Téléphone" type="tel" autocomplete="tel" class="field" />
     </div>
     <div>
       <label for="cf-company" class="field-label">{L.company} *</label>
-      <input id="cf-company" name="entreprise" type="text" autocomplete="organization" required class="field" />
+      <input id="cf-company" name="Entreprise" type="text" autocomplete="organization" required class="field" />
     </div>
     <div>
       <label for="cf-role" class="field-label">{L.role} *</label>
-      <input id="cf-role" name="fonction" type="text" autocomplete="organization-title" required class="field" />
+      <input id="cf-role" name="Fonction" type="text" autocomplete="organization-title" required class="field" />
     </div>
     <div>
       <label for="cf-size" class="field-label">{L.size} *</label>
-      <select id="cf-size" name="taille" required class="field">
+      <select id="cf-size" name="Taille" required class="field">
         <option value="">{L.choose}</option>
         {sizes.map((s) => <option>{s}</option>)}
       </select>
     </div>
     <div>
       <label for="cf-horizon" class="field-label">{L.horizon} *</label>
-      <select id="cf-horizon" name="echeance" required class="field">
+      <select id="cf-horizon" name="Échéance" required class="field">
         <option value="">{L.choose}</option>
         {horizons.map((h) => <option>{h}</option>)}
       </select>
@@ -98,7 +90,7 @@ const L = {
   </div>
   <div>
     <label for="cf-topic" class="field-label">{L.topic} *</label>
-    <select id="cf-topic" name="besoin" required class="field">
+    <select id="cf-topic" name="Besoin" required class="field">
       <option value="">{L.choose}</option>
       {topics.map((topic) => <option value={topic.value}>{topic.label}</option>)}
     </select>
@@ -106,7 +98,7 @@ const L = {
   <div>
     <label for="cf-message" class="field-label">{L.message} *</label>
     <p id="cf-message-hint" class="mb-2 text-sm text-gris">{L.messageHint}</p>
-    <textarea id="cf-message" name="message" rows="6" required aria-describedby="cf-message-hint" class="field"></textarea>
+    <textarea id="cf-message" name="Message" rows="6" required aria-describedby="cf-message-hint" class="field"></textarea>
   </div>
 </FormShell>
 

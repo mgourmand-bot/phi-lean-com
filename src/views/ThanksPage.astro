@@ -1,0 +1,36 @@
+---
+/** Page de remerciement après un envoi de formulaire classique (candidature avec CV). */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/i18n/routes';
+import { path } from '@/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+---
+<BaseLayout
+  lang={lang}
+  routeKey="thanks"
+  title={fr ? 'Merci, votre message est bien parti' : 'Thank you, your message has been sent'}
+  description={fr ? 'Confirmation d’envoi de votre message à Phi-Lean.' : 'Confirmation that your message to Phi-Lean has been sent.'}
+  noindex
+>
+  <section class="py-24 md:py-32">
+    <div class="container-pl max-w-3xl">
+      <span class="grid h-14 w-14 place-items-center bg-menthe text-turquoise-fonce"><Icon name="check" size={30} /></span>
+      <h1 class="mt-6 text-4xl font-bold text-bleu md:text-5xl">{fr ? 'Merci, votre message est bien parti.' : 'Thank you, your message has been sent.'}</h1>
+      <p class="mt-5 text-lg">
+        {fr
+          ? 'Manuel Gourmand le lit personnellement et vous répond sous 48 heures ouvrées.'
+          : 'Manuel Gourmand reads it personally and will reply within two working days.'}
+      </p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a href={path('home', lang)} class="btn btn-primary">{fr ? 'Retour à l’accueil' : 'Back to the home page'}</a>
+        <a href={path('publications', lang)} class="btn btn-secondary">{fr ? 'Lire la Phi-Lean Press' : 'Read Phi-Lean Press'}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

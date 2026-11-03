@@ -1,5 +1,15 @@
 import { ui, type UiKey } from './ui';
-import { routes, defaultLang, type Lang, type RouteKey } from './routes';
+import { routes, anchors, defaultLang, type Lang, type RouteKey, type AnchorKey } from './routes';
+
+/** URL localisée d'une section : page + ancre traduite. */
+export function anchorPath(key: RouteKey, anchor: AnchorKey, lang: Lang, query = ''): string {
+  return routes[key][lang] + query + '#' + anchors[anchor][lang];
+}
+
+/** Identifiant d'ancre traduit (pour l'attribut id d'une section). */
+export function anchorId(anchor: AnchorKey, lang: Lang): string {
+  return anchors[anchor][lang];
+}
 
 /** Langue déduite de l'URL (/en/... = anglais, sinon français). */
 export function getLangFromUrl(url: URL): Lang {

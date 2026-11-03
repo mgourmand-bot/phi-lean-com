@@ -1,19 +1,20 @@
 ---
 /**
- * PAGE CONSEIL & DIAGNOSTIC VSM (FR « /conseil/ », EN « /en/consulting/ »)
- * Ligne Usine, Ligne Service, Supply Chain & Risk Management,
- * démarche d'intervention, puis le détail du Diagnostic VSM Express et sa FAQ.
+ * PAGE CONSEIL (FR « /conseil/ », EN « /en/consulting/ »)
+ * Deux métiers visibles dès l'ouverture : Lean Flux Usine et Lean Flux Supply Chain.
+ * #usine        : la VSM expliquée simplement, leviers, livrables
+ * #supply-chain : flux logistiques et focus Supply Chain Risk Management
+ * #vsm-express  : l'offre d'entrée et sa FAQ
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import PageHero from '@/components/sections/PageHero.astro';
 import CtaBand from '@/components/sections/CtaBand.astro';
 import VsmExpressOffer from '@/components/VsmExpressOffer.astro';
-import CaseStudyCard from '@/components/CaseStudyCard.astro';
-import { consultingLines, vsmExpress } from '@/data/offers';
-import { caseStudies } from '@/data/proof';
+import BottleneckChart from '@/components/BottleneckChart.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { plantLine, supplyLine, vsmExplained, scrmSteps, vsmExpress } from '@/data/offers';
 import { site } from '@/config/site';
-import type { Lang } from '@/i18n/routes';
-import { path, formatPrice } from '@/i18n/utils';
+import { routes, type Lang } from '@/i18n/routes';
+import { anchorId, anchorPath } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
@@ -23,75 +24,90 @@ const fr = lang === 'fr';
 
 const c = {
   fr: {
-    title: 'Conseil Lean : usine, services, supply chain et Diagnostic VSM Express',
+    title: 'Conseil Lean : Lean Flux Usine et Lean Flux Supply Chain',
     description:
-      'Lean Manufacturing, Lean Office et Supply Chain Risk Management : trois lignes de conseil pour réduire délais, stocks et risques. Diagnostic VSM Express forfaitaire, 100 % déductible.',
+      "Deux métiers : le Lean appliqué à l'usine, avec la VSM pour point de départ, et le Lean appliqué à la supply chain, avec un focus sur la gestion des risques (SCRM). Diagnostic VSM Express 100 % déductible.",
     crumb: 'Conseil',
-    h1: 'Conseil et diagnostic de flux',
-    lead:
-      'Trois lignes d’intervention, une même méthode : partir du terrain, mesurer le flux réel, puis construire avec vos équipes une organisation qu’elles sauront faire vivre seules.',
-    asideTitle: 'Par où commencer ?',
-    asideText: 'Par une mesure. Le Diagnostic VSM Express cartographie un flux en 3 jours et chiffre les gains.',
-    asideCta: 'Voir le diagnostic',
+    h1: 'Deux métiers, une même méthode : suivre le flux',
+    lead: "De l'atelier au réseau de fournisseurs, on part du terrain, on mesure où le produit attend, et on construit avec vos équipes un flux qu'elles sauront faire vivre seules.",
+    discover: 'Découvrir',
     symptoms: 'Vous reconnaissez la situation',
     levers: 'Nos leviers',
     deliverables: 'Ce que vous obtenez',
-    discuss: 'En parler',
-    methodTitle: 'Notre démarche',
-    methodLead: 'Le même enchaînement, quelle que soit la ligne : il garantit que les gains se mesurent et qu’ils durent.',
+    vsmTitle: 'La VSM expliquée simplement',
+    vsmBenefits: 'Trois bénéfices',
+    vsmSteps: 'Concrètement, trois étapes avec vos équipes',
+    vsmCta: 'Demander un Diagnostic VSM Express',
+    factbird: 'Mesurer le TRS en continu, ligne par ligne, avec notre partenaire Factbird.',
+    factbirdCta: 'Factbird OEE',
+    scrmTitle: 'Focus : Supply Chain Risk Management',
+    scrmLead: "Une chaîne logistique tendue est efficace… jusqu'au jour où un maillon casse. La gestion des risques consiste à savoir à l'avance où elle cassera, ce que cela coûtera, et ce qui est prêt pour y faire face.",
+    experience: 'Une expérience vécue',
+    experienceText: "Manuel Gourmand a piloté une supply chain internationale depuis le Brésil : pour nous, la gestion des risques n'est pas un exercice théorique.",
+    supplyCta: 'Parler de votre supply chain',
+    methodTitle: 'Notre démarche, quel que soit le métier',
     method: [
       { title: 'Mesurer', text: 'Marche terrain, cartographie du flux réel, données collectées sur place plutôt que supposées.' },
       { title: 'Co-construire', text: 'L’état futur se dessine avec ceux qui feront le travail, pas pour eux.' },
       { title: 'Expérimenter', text: 'Des chantiers courts, sur un périmètre pilote, pour prouver avant de généraliser.' },
       { title: 'Ancrer', text: 'Standards, rituels et indicateurs transmis : votre encadrement reprend la main.' },
     ],
-    caseLabel: 'Exemple de mission',
-    vsmTitle: 'Le Diagnostic VSM Express en détail',
+    vsmExpressTitle: 'Pour commencer : le Diagnostic VSM Express',
     faqTitle: 'Questions fréquentes',
   },
   en: {
-    title: 'Lean consulting: plants, offices, supply chain and the VSM Express Diagnostic',
+    title: 'Lean consulting: Lean Plant Flow and Lean Supply Chain Flow',
     description:
-      'Lean Manufacturing, Lean Office and Supply Chain Risk Management: three consulting lines to cut lead times, inventory and risk. Fixed-fee VSM Express Diagnostic, 100% deductible.',
+      'Two lines of work: Lean applied to the plant, starting from value stream mapping, and Lean applied to the supply chain, with a focus on supply chain risk management (SCRM). 100% deductible VSM Express Diagnostic.',
     crumb: 'Consulting',
-    h1: 'Consulting and value stream diagnostics',
-    lead:
-      'Three lines of work, one method: start on the ground, measure the real flow, then build with your teams an organisation they can sustain on their own.',
-    asideTitle: 'Where to start?',
-    asideText: 'With a measurement. The VSM Express Diagnostic maps one value stream in 3 days and sizes the gains.',
-    asideCta: 'See the diagnostic',
+    h1: 'Two lines of work, one method: follow the flow',
+    lead: 'From the workshop to the supplier network, we start on the ground, measure where the product waits, and build with your teams a flow they can sustain on their own.',
+    discover: 'Discover',
     symptoms: 'Sound familiar?',
     levers: 'Our levers',
     deliverables: 'What you get',
-    discuss: 'Discuss it with us',
-    methodTitle: 'Our approach',
-    methodLead: 'The same sequence whatever the line, so that gains are measured and last.',
+    vsmTitle: 'Value stream mapping, explained simply',
+    vsmBenefits: 'Three benefits',
+    vsmSteps: 'In practice, three steps with your teams',
+    vsmCta: 'Request a VSM Express Diagnostic',
+    factbird: 'Measure OEE continuously, line by line, with our partner Factbird.',
+    factbirdCta: 'Factbird OEE',
+    scrmTitle: 'Focus: Supply Chain Risk Management',
+    scrmLead: 'A lean supply chain is efficient… until the day a link breaks. Risk management means knowing in advance where it will break, what it will cost, and what is ready to cope.',
+    experience: 'First-hand experience',
+    experienceText: 'Manuel Gourmand ran an international supply chain from Brazil: for us, risk management is not a theoretical exercise.',
+    supplyCta: 'Talk about your supply chain',
+    methodTitle: 'Our approach, whatever the line of work',
     method: [
       { title: 'Measure', text: 'Gemba walk, real-flow mapping, data collected on site rather than assumed.' },
       { title: 'Co-design', text: 'The future state is designed with the people who will do the work, not for them.' },
       { title: 'Experiment', text: 'Short workshops on a pilot scope, to prove before rolling out.' },
       { title: 'Embed', text: 'Standards, routines and KPIs handed over: your managers take back control.' },
     ],
-    caseLabel: 'Example engagement',
-    vsmTitle: 'The VSM Express Diagnostic in detail',
+    vsmExpressTitle: 'To get started: the VSM Express Diagnostic',
     faqTitle: 'Frequently asked questions',
   },
 }[lang];
 
-const lineColor = {
-  usine: { border: 'border-t-bleu', text: 'text-bleu', topic: 'conseil-usine' },
-  service: { border: 'border-t-turquoise', text: 'text-turquoise-fonce', topic: 'conseil-service' },
-  supply: { border: 'border-t-soleil', text: 'text-soleil-fonce', topic: 'conseil-supply' },
-} as const;
+const lines = [
+  { line: plantLine, anchor: 'usine' as const, band: 'border-t-bleu', accent: 'text-bleu' },
+  { line: supplyLine, anchor: 'supply' as const, band: 'border-t-turquoise', accent: 'text-turquoise-fonce' },
+];
 
 const jsonLd = [
+  ...[plantLine, supplyLine].map((line) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: line.title[lang],
+    description: line.tagline[lang],
+    provider: { '@id': `${site.url}/#organization` },
+  })),
   {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic',
     serviceType: 'Value Stream Mapping',
     provider: { '@id': `${site.url}/#organization` },
-    areaServed: 'FR',
     offers: {
       '@type': 'Offer',
       price: vsmExpress.priceHT,
@@ -102,87 +118,168 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: vsmExpress.faq[lang].map((f) => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
+    mainEntity: vsmExpress.faq[lang].map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
   },
 ];
 ---
 <BaseLayout lang={lang} routeKey="consulting" title={c.title} description={c.description} jsonLd={jsonLd}>
-  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
-    <nav slot="actions" aria-label={fr ? 'Sur cette page' : 'On this page'} class="mt-8 flex flex-wrap gap-3">
-      {consultingLines.map((line) => (
-        <a href={`#${line.anchor[lang]}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">
-          {line.title[lang]}
-        </a>
-      ))}
-    </nav>
-    <div slot="aside" class="callout callout-sun">
-      <p class="callout-head">{c.asideTitle}</p>
-      <div class="callout-body">
-        <p>{c.asideText}</p>
-        <p class="mt-3 text-2xl font-bold text-anthracite">
-          {formatPrice(vsmExpress.priceHT, lang)} <span class="text-base text-gris">{fr ? 'HT' : 'excl. VAT'}</span>
-        </p>
-        <a href="#vsm-express" class="btn btn-primary mt-5">{c.asideCta}</a>
+  <!-- Les deux métiers, visibles dès l'ouverture -->
+  <section class="border-b border-bordure bg-zebra">
+    <div class="container-pl py-12 md:py-16">
+      <nav aria-label={fr ? "Fil d'Ariane" : 'Breadcrumb'} class="mb-5 text-sm text-gris">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li><a href={routes.home[lang]} class="hover:text-bleu hover:underline">{fr ? 'Accueil' : 'Home'}</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" class="font-bold text-anthracite">{c.crumb}</li>
+        </ol>
+      </nav>
+      <h1 class="max-w-[24ch] text-4xl font-bold tracking-tight text-bleu sm:text-5xl">{c.h1}</h1>
+      <p class="lead mt-5">{c.lead}</p>
+      <div class="mt-10 grid gap-5 md:grid-cols-2">
+        {lines.map(({ line, anchor, band, accent }) => (
+          <a href={`#${anchorId(anchor, lang)}`} class:list={['group flex flex-col border border-bordure border-t-[8px] bg-white p-7 transition-colors hover:border-bleu md:p-8', band]}>
+            <span class:list={['text-3xl font-bold tracking-tight md:text-4xl', accent]}>{line.title[lang]}</span>
+            <span class="mt-3 text-lg font-bold text-anthracite">{line.tagline[lang]}</span>
+            <span class="mt-3 text-anthracite/85">{line.deliverables[lang].join(' ; ')}.</span>
+            <span class="mt-auto inline-flex items-center gap-2 pt-6 font-bold text-bleu group-hover:underline">
+              {c.discover}
+              <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+          </a>
+        ))}
       </div>
     </div>
-  </PageHero>
+  </section>
 
-  {consultingLines.map((line, index) => {
-    const study = caseStudies.find((s) => s.line === line.id);
-    const color = lineColor[line.id];
-    return (
-      <section
-        id={line.anchor[lang]}
-        class:list={['py-16 md:py-24', index % 2 === 1 && 'bg-zebra']}
-        aria-labelledby={`h-${line.id}`}
-      >
-        <div class="container-pl">
-          <div class:list={['border-t-[6px] pt-8', color.border]}>
-            <p class:list={['text-lg font-bold', color.text]}>{line.subtitle[lang]}</p>
-            <h2 id={`h-${line.id}`} class="mt-1 text-3xl font-bold tracking-tight text-bleu md:text-[2.5rem]">{line.title[lang]}</h2>
-            <p class="lead mt-5">{line.intro[lang]}</p>
-          </div>
-
-          <div class="mt-12 grid gap-10 lg:grid-cols-3">
-            <div>
-              <h3 class="text-lg font-bold text-anthracite">{c.symptoms}</h3>
-              <ul class="list-square mt-4">{line.symptoms[lang].map((s) => <li>{s}</li>)}</ul>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-anthracite">{c.levers}</h3>
-              <ul class="list-square mt-4">{line.levers[lang].map((s) => <li>{s}</li>)}</ul>
-            </div>
-            <div class="callout callout-turq self-start">
-              <p class="callout-head">{c.deliverables}</p>
-              <div class="callout-body">
-                <ul class="list-square">{line.deliverables[lang].map((s) => <li>{s}</li>)}</ul>
-                <a href={path('contact', lang, `?sujet=${color.topic}#formulaire`)} class="btn btn-primary mt-6">{c.discuss}</a>
-              </div>
-            </div>
-          </div>
-
-          {study && (
-            <div class="mt-14">
-              <p class="mb-4 text-sm font-bold text-gris">{c.caseLabel}</p>
-              <div class="max-w-3xl">
-                <CaseStudyCard study={study} lang={lang} />
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-    );
-  })}
-
-  <section class="border-y border-bordure bg-white py-16 md:py-24" aria-labelledby="demarche">
+  <!-- LEAN FLUX USINE -->
+  <section id={anchorId('usine', lang)} class="py-16 md:py-24" aria-labelledby="h-usine">
     <div class="container-pl">
-      <h2 id="demarche" class="section-title">{c.methodTitle}</h2>
-      <p class="lead mt-6">{c.methodLead}</p>
-      <ol class="list-steps mt-12 grid gap-x-10 md:grid-cols-2 lg:grid-cols-4 [&>li+li]:mt-0 [&>li]:mb-8">
+      <div class="border-t-[6px] border-bleu pt-8">
+        <h2 id="h-usine" class="text-4xl font-bold tracking-tight text-bleu md:text-5xl">{plantLine.title[lang]}</h2>
+        <p class="mt-3 text-xl font-bold text-anthracite">{plantLine.tagline[lang]}</p>
+        <p class="lead mt-5">{plantLine.intro[lang]}</p>
+      </div>
+
+      <!-- La VSM expliquée simplement -->
+      <div class="mt-14 grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-start">
+        <div>
+          <h3 class="text-2xl font-bold text-anthracite">{c.vsmTitle}</h3>
+          <p class="mt-4 text-xl font-bold text-bleu">{vsmExplained.question[lang]}</p>
+          <p class="mt-4 max-w-[60ch] text-anthracite/90">{vsmExplained.definition[lang]}</p>
+          <div class="mt-7 grid grid-cols-2 gap-3">
+            <div class="kpi-tile kpi-sun">
+              <p class="kpi-value">{vsmExplained.example.lead[lang]}</p>
+              <p class="text-[0.95rem]">{vsmExplained.example.leadLabel[lang]}</p>
+            </div>
+            <div class="kpi-tile kpi-turq">
+              <p class="kpi-value">{vsmExplained.example.work[lang]}</p>
+              <p class="text-[0.95rem]">{vsmExplained.example.workLabel[lang]}</p>
+            </div>
+          </div>
+          <p class="mt-5 text-lg font-bold text-anthracite">{vsmExplained.example.conclusion[lang]}</p>
+          <p class="mt-1 text-sm text-gris">{vsmExplained.example.note[lang]}</p>
+        </div>
+        <BottleneckChart lang={lang} />
+      </div>
+
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.vsmBenefits}</h3>
+      <div class="mt-6 grid gap-6 md:grid-cols-3">
+        {vsmExplained.benefits[lang].map((b) => (
+          <div class="border-t-[3px] border-bleu bg-ciel p-6">
+            <p class="text-2xl font-bold text-bleu">{b.title}</p>
+            <p class="mt-2 text-anthracite/90">{b.text}</p>
+          </div>
+        ))}
+      </div>
+
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.vsmSteps}</h3>
+      <ol class="list-steps mt-6 grid gap-x-10 md:grid-cols-3 [&>li]:mb-6 [&>li+li]:mt-0">
+        {vsmExplained.steps[lang].map((s) => (
+          <li>
+            <p class="text-lg font-bold text-anthracite">{s.title}</p>
+            <p class="mt-1 text-anthracite/85">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="mt-12 grid gap-10 lg:grid-cols-3">
+        <div>
+          <h3 class="text-lg font-bold text-anthracite">{c.symptoms}</h3>
+          <ul class="list-square mt-4">{plantLine.symptoms[lang].map((s) => <li>{s}</li>)}</ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-anthracite">{c.levers}</h3>
+          <ul class="list-square mt-4">{plantLine.levers[lang].map((s) => <li>{s}</li>)}</ul>
+          <p class="mt-5 flex items-start gap-2 text-[0.95rem]">
+            <Icon name="bolt" size={18} class="mt-0.5 text-soleil" />
+            <span>{c.factbird} <a href={anchorPath('partners', 'factbird', lang)} class="link-pl">{c.factbirdCta}</a></span>
+          </p>
+        </div>
+        <div class="callout callout-blue self-start">
+          <p class="callout-head">{c.deliverables}</p>
+          <div class="callout-body">
+            <ul class="list-square">{plantLine.deliverables[lang].map((s) => <li>{s}</li>)}</ul>
+            <a href={`#${anchorId('vsmExpress', lang)}`} class="btn btn-primary mt-6 !whitespace-normal">{c.vsmCta}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEAN FLUX SUPPLY CHAIN -->
+  <section id={anchorId('supply', lang)} class="border-y border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-supply">
+    <div class="container-pl">
+      <div class="border-t-[6px] border-turquoise pt-8">
+        <h2 id="h-supply" class="text-4xl font-bold tracking-tight text-turquoise-fonce md:text-5xl">{supplyLine.title[lang]}</h2>
+        <p class="mt-3 text-xl font-bold text-anthracite">{supplyLine.tagline[lang]}</p>
+        <p class="lead mt-5">{supplyLine.intro[lang]}</p>
+      </div>
+
+      <div class="mt-12 grid gap-10 lg:grid-cols-2">
+        <div>
+          <h3 class="text-lg font-bold text-anthracite">{c.symptoms}</h3>
+          <ul class="list-square mt-4">{supplyLine.symptoms[lang].map((s) => <li>{s}</li>)}</ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-anthracite">{c.levers}</h3>
+          <ul class="list-square mt-4">{supplyLine.levers[lang].map((s) => <li>{s}</li>)}</ul>
+        </div>
+      </div>
+
+      <div class="mt-14 border border-bordure bg-white p-6 md:p-10">
+        <h3 class="text-3xl font-bold tracking-tight text-bleu">{c.scrmTitle}</h3>
+        <p class="mt-4 max-w-[68ch] text-lg">{c.scrmLead}</p>
+        <ol class="list-steps mt-10 grid gap-x-8 md:grid-cols-2 lg:grid-cols-5 [&>li]:mb-6 [&>li+li]:mt-0">
+          {scrmSteps[lang].map((s) => (
+            <li>
+              <p class="text-lg font-bold text-anthracite">{s.title}</p>
+              <p class="mt-1 text-[0.97rem] text-anthracite/85">{s.text}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="mt-10 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+        <div class="border-l-4 border-soleil bg-creme p-6">
+          <p class="font-bold text-soleil-fonce">{c.experience}</p>
+          <p class="mt-2 text-lg">{c.experienceText}</p>
+        </div>
+        <div class="callout callout-turq">
+          <p class="callout-head">{c.deliverables}</p>
+          <div class="callout-body">
+            <ul class="list-square">{supplyLine.deliverables[lang].map((s) => <li>{s}</li>)}</ul>
+            <a href={anchorPath('contact', 'form', lang, '?sujet=lean-flux-supply-chain')} class="btn btn-primary mt-6">{c.supplyCta}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DÉMARCHE -->
+  <section class="py-16 md:py-20" aria-labelledby="h-demarche">
+    <div class="container-pl">
+      <h2 id="h-demarche" class="section-title">{c.methodTitle}</h2>
+      <ol class="list-steps mt-10 grid gap-x-10 md:grid-cols-2 lg:grid-cols-4 [&>li]:mb-8 [&>li+li]:mt-0">
         {c.method.map((m) => (
           <li>
             <p class="text-lg font-bold text-anthracite">{m.title}</p>
@@ -193,13 +290,13 @@ const jsonLd = [
     </div>
   </section>
 
-  <section id="vsm-express" class="bg-zebra py-16 md:py-24" aria-labelledby="vsm-title">
+  <!-- DIAGNOSTIC VSM EXPRESS -->
+  <section id={anchorId('vsmExpress', lang)} class="border-t border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-vsm-express">
     <div class="container-pl">
-      <h2 id="vsm-title" class="section-title">{c.vsmTitle}</h2>
+      <h2 id="h-vsm-express" class="section-title">{c.vsmExpressTitle}</h2>
       <div class="mt-10">
         <VsmExpressOffer lang={lang} variant="full" headingLevel="h3" />
       </div>
-
       <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.faqTitle}</h3>
       <div class="mt-6 divide-y divide-bordure border-y border-bordure bg-white">
         {vsmExpress.faq[lang].map((f) => (

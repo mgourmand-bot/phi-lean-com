@@ -10,7 +10,7 @@ export type TrainingDomain = 'usine' | 'service' | 'logistique';
 export const domains: Record<TrainingDomain, Localized> = {
   usine: { fr: 'Usine', en: 'Plant' },
   service: { fr: 'Service', en: 'Office' },
-  logistique: { fr: 'Logistique', en: 'Logistics' },
+  logistique: { fr: 'Supply chain', en: 'Supply chain' },
 };
 
 export interface Training {

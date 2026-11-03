@@ -1,17 +1,19 @@
 ---
 /**
  * PAGE PHI-LEAN PRESS (FR et EN « /publications/ »)
- * Livres (Amazon), white papers (contre e-mail), articles scientifiques (PDF libre).
+ * #livres   : couverture agrandissable + résumé d'accroche
+ * #articles : première page (clic = téléchargement direct) + résumé d'accroche
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHero from '@/components/sections/PageHero.astro';
 import CtaBand from '@/components/sections/CtaBand.astro';
-import BookCard from '@/components/BookCard.astro';
-import WhitePaperCard from '@/components/WhitePaperCard.astro';
-import Icon from '@/components/ui/Icon.astro';
-import { books, whitePapers, papers } from '@/data/publications';
+import BookCard from '@/components/press/BookCard.astro';
+import ArticleCard from '@/components/press/ArticleCard.astro';
+import Lightbox from '@/components/Lightbox.astro';
+import { books, articlesFor } from '@/data/publications';
 import { site } from '@/config/site';
 import type { Lang } from '@/i18n/routes';
+import { anchorId } from '@/i18n/utils';
 import { publicFileExists } from '@/lib/files';
 
 interface Props {
@@ -22,137 +24,93 @@ const fr = lang === 'fr';
 
 const c = {
   fr: {
-    title: 'Phi-Lean Press : livres, white papers et articles sur le Lean',
+    title: 'Phi-Lean Press : livres et articles sur le Lean et la supply chain',
     description:
-      'Les publications de Manuel Gourmand et du cabinet Phi-Lean : livres disponibles sur Amazon, white papers pratiques à télécharger, articles scientifiques en libre accès.',
+      'Les publications de Manuel Gourmand : « Prendre le virage de l’IA », guide pour dirigeants de TPE et PME (Amazon, 15 novembre 2026), un e-book gratuit et des articles en téléchargement libre.',
     crumb: 'Phi-Lean Press',
-    h1: 'Phi-Lean Press',
-    lead:
-      'Ce que nous apprenons en mission, nous le publions. Des livres pour prendre du recul, des white papers pour passer à l’action, des articles pour ceux qui veulent les preuves.',
-    nav: { books: 'Livres', wp: 'White papers', papers: 'Articles scientifiques' },
-    booksTitle: 'Livres',
-    booksLead: 'Disponibles en version papier et numérique sur Amazon.',
-    wpTitle: 'White papers',
-    wpLead: 'Des guides courts et concrets. Laissez votre adresse professionnelle pour les recevoir.',
-    papersTitle: 'Articles scientifiques',
-    papersLead: 'Travaux de recherche en accès libre, au format PDF auteur.',
-    pdf: 'Télécharger le PDF',
-    soon: 'PDF bientôt disponible',
-    todo: 'Référence à compléter',
-    doi: 'Lire sur le site de l’éditeur',
+    lead: 'Ce que nous apprenons sur le terrain, nous le publions. Des livres pour prendre du recul, des articles à télécharger librement pour nourrir la réflexion.',
+    books: 'Livres',
+    booksLead: 'Cliquez sur une couverture pour l’agrandir.',
+    articles: 'Articles',
+    articlesLead: 'En libre accès : cliquez sur la première page pour télécharger l’article, sans inscription.',
   },
   en: {
-    title: 'Phi-Lean Press: books, white papers and papers on Lean',
+    title: 'Phi-Lean Press: books and articles on Lean and supply chain',
     description:
-      'Publications by Manuel Gourmand and Phi-Lean: books available on Amazon, practical white papers to download, open-access scientific papers.',
+      'Publications by Manuel Gourmand: “Prendre le virage de l’IA”, a guide for small business leaders (Amazon, 15 November 2026), a free e-book and articles free to download.',
     crumb: 'Phi-Lean Press',
-    h1: 'Phi-Lean Press',
-    lead:
-      'What we learn in the field, we publish. Books to step back, white papers to take action, papers for those who want the evidence.',
-    nav: { books: 'Books', wp: 'White papers', papers: 'Scientific papers' },
-    booksTitle: 'Books',
-    booksLead: 'Available in print and e-book on Amazon.',
-    wpTitle: 'White papers',
-    wpLead: 'Short, practical guides. Leave your work e-mail to receive them.',
-    papersTitle: 'Scientific papers',
-    papersLead: 'Open-access research, as author PDFs.',
-    pdf: 'Download the PDF',
-    soon: 'PDF coming soon',
-    todo: 'Reference to be completed',
-    doi: "Read on the publisher's site",
+    lead: 'What we learn in the field, we publish. Books to step back, and articles free to download to feed your thinking.',
+    books: 'Books',
+    booksLead: 'Click a cover to enlarge it.',
+    articles: 'Articles',
+    articlesLead: 'Open access: click the first page to download the article, no sign-up needed.',
   },
 }[lang];
 
+const list = articlesFor(lang);
+const tones = ['blue', 'turq', 'sun'] as const;
+
 const jsonLd = [
-  ...books
-    .filter((b) => !b.placeholder)
-    .map((b) => ({
+  ...books.map((b) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: b.title,
+    alternativeHeadline: b.subtitle,
+    inLanguage: b.lang,
+    isbn: b.isbn,
+    datePublished: b.releaseDate,
+    image: b.cover ? new URL(b.cover, site.url).href : undefined,
+    author: { '@type': 'Person', '@id': `${site.url}/#founder`, name: site.founder.name },
+    publisher: { '@type': 'Organization', name: 'Phi-Lean Press' },
+    isAccessibleForFree: Boolean(b.file),
+  })),
+  ...list
+    .filter((a) => publicFileExists(a.file))
+    .map((a) => ({
       '@context': 'https://schema.org',
-      '@type': 'Book',
-      name: b.title[lang],
-      author: { '@id': `${site.url}/#founder`, '@type': 'Person', name: site.founder.name },
+      '@type': 'Article',
+      headline: a.title,
+      inLanguage: a.lang,
+      author: { '@type': 'Person', name: site.founder.name },
       publisher: { '@type': 'Organization', name: 'Phi-Lean Press' },
-      url: b.amazonUrl[lang] || b.amazonUrl.fr || undefined,
-    })),
-  ...papers
-    .filter((p) => !p.placeholder)
-    .map((p) => ({
-      '@context': 'https://schema.org',
-      '@type': 'ScholarlyArticle',
-      headline: p.title,
-      author: p.authors,
-      datePublished: p.year ? String(p.year) : undefined,
       isAccessibleForFree: true,
+      url: new URL(a.file, site.url).href,
     })),
 ];
 ---
 <BaseLayout lang={lang} routeKey="publications" title={c.title} description={c.description} jsonLd={jsonLd}>
-  <PageHero lang={lang} crumb={c.crumb} title={c.h1} lead={c.lead}>
+  <PageHero lang={lang} crumb={c.crumb} title="Phi-Lean Press" lead={c.lead}>
     <nav slot="actions" aria-label={fr ? 'Sur cette page' : 'On this page'} class="mt-8 flex flex-wrap gap-3">
-      <a href="#livres" class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.nav.books}</a>
-      <a href="#white-papers" class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.nav.wp}</a>
-      <a href="#articles" class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.nav.papers}</a>
+      <a href={`#${anchorId('books', lang)}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.books}</a>
+      <a href={`#${anchorId('articles', lang)}`} class="border border-bordure bg-white px-4 py-2 text-[0.95rem] font-bold text-bleu hover:border-bleu">{c.articles}</a>
     </nav>
   </PageHero>
 
-  <section id="livres" class="py-16 md:py-24" aria-labelledby="h-livres">
+  <section id={anchorId('books', lang)} class="py-16 md:py-24" aria-labelledby="h-livres">
     <div class="container-pl">
-      <h2 id="h-livres" class="section-title">{c.booksTitle}</h2>
-      <p class="lead mt-6">{c.booksLead}</p>
-      <div class="mt-12 grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
-        {books.map((book) => <BookCard book={book} lang={lang} />)}
+      <h2 id="h-livres" class="section-title">{c.books}</h2>
+      <p class="mt-5 text-gris">{c.booksLead}</p>
+      <div class="mt-12 space-y-14">
+        {books.map((book, i) => (
+          <div class:list={[i > 0 && 'border-t border-bordure pt-14']}>
+            <BookCard book={book} lang={lang} />
+          </div>
+        ))}
       </div>
     </div>
   </section>
 
-  <section id="white-papers" class="border-y border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-wp">
+  <section id={anchorId('articles', lang)} class="border-t border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-articles">
     <div class="container-pl">
-      <h2 id="h-wp" class="section-title">{c.wpTitle}</h2>
-      <p class="lead mt-6">{c.wpLead}</p>
-      <div class="mt-12 grid items-start gap-6 lg:grid-cols-3">
-        {whitePapers.map((paper) => <WhitePaperCard paper={paper} lang={lang} />)}
+      <h2 id="h-articles" class="section-title">{c.articles}</h2>
+      <p class="mt-5 text-gris">{c.articlesLead}</p>
+      <div class="mt-12 grid gap-x-12 gap-y-12 lg:grid-cols-2">
+        {list.map((article, i) => (
+          <div class="border-b border-bordure pb-12 lg:[&:nth-last-child(-n+2)]:border-0 lg:[&:nth-last-child(-n+2)]:pb-0">
+            <ArticleCard article={article} lang={lang} tone={tones[i % 3]} />
+          </div>
+        ))}
       </div>
-    </div>
-  </section>
-
-  <section id="articles" class="py-16 md:py-24" aria-labelledby="h-articles">
-    <div class="container-pl">
-      <h2 id="h-articles" class="section-title">{c.papersTitle}</h2>
-      <p class="lead mt-6">{c.papersLead}</p>
-      <ul class="mt-10 divide-y divide-bordure border-y border-bordure">
-        {papers.map((paper) => {
-          const hasPdf = publicFileExists(paper.file);
-          return (
-            <li class="grid gap-4 py-7 md:grid-cols-[1fr_auto] md:gap-10">
-              <div>
-                {paper.placeholder && (
-                  <p class="mb-2 inline-flex bg-creme px-2 py-0.5 text-xs font-bold text-soleil-fonce">{c.todo}</p>
-                )}
-                <h3 class="text-lg font-bold text-anthracite">{paper.title}</h3>
-                <p class="mt-1 text-[0.95rem] text-gris">
-                  {paper.authors}, <em>{paper.venue}</em>{paper.year ? `, ${paper.year}` : ''}
-                </p>
-                <p class="mt-3 max-w-[72ch] text-[0.97rem] text-anthracite/85">{paper.abstract[lang]}</p>
-              </div>
-              <div class="flex flex-col items-start gap-3 md:items-end">
-                {hasPdf ? (
-                  <a href={paper.file} class="btn btn-secondary" download>
-                    <Icon name="download" size={18} />
-                    {c.pdf}
-                  </a>
-                ) : (
-                  <p class="text-sm font-bold text-gris">{c.soon}</p>
-                )}
-                {paper.doi && (
-                  <a href={`https://doi.org/${paper.doi}`} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
-                    {c.doi} <Icon name="external" size={14} />
-                  </a>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ul>
     </div>
   </section>
 
@@ -160,7 +118,8 @@ const jsonLd = [
     lang={lang}
     title={fr ? 'Une conférence, une intervention, une interview ?' : 'A talk, a lecture, an interview?'}
     text={fr
-      ? 'Manuel Gourmand intervient en entreprise, en école et en conférence, en français comme en anglais.'
-      : 'Manuel Gourmand speaks at companies, schools and conferences, in French and in English.'}
+      ? 'Manuel Gourmand intervient en entreprise, en école et en conférence, en français, en anglais et en portugais.'
+      : 'Manuel Gourmand speaks at companies, schools and conferences, in French, English and Portuguese.'}
   />
+  <Lightbox lang={lang} />
 </BaseLayout>

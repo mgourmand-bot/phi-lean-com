@@ -1,0 +1,140 @@
+---
+/**
+ * La maison Phi-Lean, dessinée en HTML/CSS (texte net à toutes les tailles).
+ * - Au chargement, elle se monte de la base vers le cap (désactivé si
+ *   l'utilisateur a demandé moins d'animations).
+ * - Chaque étage est un lien vers son explication (#maison-<étage>).
+ * - Quand une explication est lue, la page met data-active sur la maison :
+ *   l'étage concerné reste net, les autres s'estompent.
+
+ * Proportions et textes : planche « version executive » (piliers « Servir plus »
+ * et « Servir mieux », chapiteau plus large que le fût).
+ * Les couleurs suivent la planche d'origine : bleu pour la structure,
+ * bleu nuit pour le socle, orange pour le cap et la boucle qui le relie au socle.
+ */
+import { house } from '@/data/house';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const d = house.drawing;
+const fr = lang === 'fr';
+const label = fr
+  ? 'La maison Phi-Lean. En bas, le socle : des équipes épanouies et compétentes, à moindres coûts. Au-dessus, deux piliers : servir plus, avec plus de capacité, et servir mieux, avec plus de valeur ajoutée, tous deux à moindres coûts. Une poutre les relie : Systems Thinking, la pensée systémique. Le toit : profitables aujourd’hui et demain. Au-dessus du toit, l’objectif ultime, relié au socle par une boucle.'
+  : 'The Phi-Lean house. At the bottom, the foundation: fulfilled and competent teams, at lower cost. Above it, two pillars: serve more, with more capacity, and serve better, with more added value, both at lower cost. A beam ties them together: systems thinking. The roof: profitable today and tomorrow. Above the roof, the ultimate goal, linked to the foundation by a loop.';
+---
+<figure class="maison m-0" data-maison aria-label={label} role="img">
+  <div class="maison-frame relative px-6" aria-hidden="true">
+    <!-- Boucle cap ↔ socle -->
+    <span class="maison-loop maison-loop-left"></span>
+    <span class="maison-loop maison-loop-right"></span>
+
+    <a href="#maison-cap" data-level="cap" style="--d:640ms" class="maison-level maison-cap mx-auto flex w-[50%] items-center justify-center rounded-full border-2 border-dashed border-soleil bg-white text-center font-bold text-soleil-fonce" tabindex="-1">
+      {d.cap[lang]}
+    </a>
+
+    <a href="#maison-resultat" data-level="resultat" style="--d:480ms" class="maison-level maison-roof mt-5 flex items-end justify-center bg-bleu pb-[2.4%] text-center font-bold text-white" tabindex="-1">
+      <span class="maison-roof-text">{d.roof[lang]}</span>
+    </a>
+
+    <a href="#maison-methode" data-level="methode" style="--d:320ms" class="maison-level mx-auto mt-2 flex h-12 w-[96%] items-center justify-center border-2 border-bleu bg-white font-bold text-bleu sm:h-14 sm:text-lg" tabindex="-1">
+      {d.beam[lang]}
+    </a>
+
+    <a href="#maison-leviers" data-level="leviers" style="--d:160ms" class="maison-level mt-2 grid grid-cols-2 gap-[10%] px-[3%] sm:gap-[20%] sm:px-[5%]" tabindex="-1">
+      {[
+        { head: d.pillarLeftHead[lang], body: d.pillarLeft[lang] },
+        { head: d.pillarRightHead[lang], body: d.pillarRight[lang] },
+      ].map((p) => (
+        <span class="flex flex-col">
+          <span class="flex h-9 items-center justify-center bg-bleu px-1 text-center text-sm leading-tight font-bold text-white sm:h-10 sm:text-base">{p.head}</span>
+          <span class="mx-[6%] flex h-24 flex-col items-center justify-center border border-t-0 border-bleu bg-ciel px-1 text-center sm:h-28">
+            <span class="text-[0.95rem] leading-tight font-bold text-bleu sm:text-[1.05rem]">{p.body}</span>
+            <span class="mt-1 text-[0.7rem] text-gris sm:text-xs">{d.lowerCost[lang]}</span>
+          </span>
+        </span>
+      ))}
+    </a>
+
+    <a href="#maison-socle" data-level="socle" style="--d:0ms" class="maison-level maison-base relative z-10 flex flex-col items-center justify-center bg-bleu-nuit text-center text-white" tabindex="-1">
+      <span class="font-bold sm:text-lg">{d.base[lang]}</span>
+      <span class="text-[0.7rem] text-white/75 sm:text-xs">{d.lowerCost[lang]}</span>
+    </a>
+  </div>
+</figure>
+
+<style>
+  .maison {
+    --cap-h: 3.25rem;
+    --base-h: 4rem;
+    --loop: var(--color-soleil);
+  }
+  .maison-cap { height: var(--cap-h); }
+  .maison-base { height: var(--base-h); }
+  .maison-roof {
+    aspect-ratio: 4.2 / 1;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  }
+  .maison-roof-text { font-size: clamp(0.8rem, 2.6vw, 1.15rem); }
+  @media (min-width: 40rem) {
+    .maison-roof { aspect-ratio: 5.4 / 1; }
+  }
+  @media (min-width: 64rem) {
+    .maison-roof-text { font-size: clamp(0.85rem, 1.2vw, 1.1rem); }
+  }
+
+  /* Boucle orange : du socle vers le cap, des deux côtés (flèche vers le cap) */
+  .maison-loop {
+    position: absolute;
+    top: calc(var(--cap-h) / 2);
+    bottom: calc(var(--base-h) / 2);
+    /* s'arrête à la pointe de la flèche, contre le bord du cap (50 % de la largeur utile) */
+    width: calc(1.15rem - 9px + 0.25 * (100% - 3rem));
+    border: 2px solid var(--loop);
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .maison-loop-left { left: 0.35rem; border-right: 0; }
+  .maison-loop-right { right: 0.35rem; border-left: 0; }
+  .maison-loop::after {
+    content: "";
+    position: absolute;
+    top: -7px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+  }
+  .maison-loop-left::after { right: -9px; border-left: 9px solid var(--loop); }
+  .maison-loop-right::after { left: -9px; border-right: 9px solid var(--loop); }
+
+  .maison-level { transition: opacity 0.25s ease; }
+
+  /* Lecture en cours : l'étage lu reste net, les autres s'estompent */
+  .maison[data-active] .maison-level { opacity: 0.22; }
+  .maison[data-active] .maison-loop { opacity: 0.22; }
+  .maison[data-active="socle"] [data-level="socle"],
+  .maison[data-active="leviers"] [data-level="leviers"],
+  .maison[data-active="methode"] [data-level="methode"],
+  .maison[data-active="resultat"] [data-level="resultat"],
+  .maison[data-active="cap"] [data-level="cap"] { opacity: 1; }
+  .maison[data-active="cap"] .maison-loop,
+  .maison[data-active="socle"] .maison-loop { opacity: 1; }
+
+  /* Montage de la base vers le cap, une seule fois au chargement */
+  @media (prefers-reduced-motion: no-preference) {
+    .maison-level {
+      animation: maison-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+      animation-delay: var(--d, 0ms);
+    }
+    .maison-loop {
+      animation: maison-fade 0.6s ease-out 0.85s backwards;
+    }
+  }
+  @keyframes maison-rise {
+    from { opacity: 0; transform: translateY(14px); }
+  }
+  @keyframes maison-fade {
+    from { opacity: 0; }
+  }
+</style>

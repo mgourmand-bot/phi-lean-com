@@ -1,0 +1,97 @@
+---
+/**
+ * Livre Phi-Lean Press : couverture (clic = agrandissement) et, à côté,
+ * un résumé qui donne envie de lire, façon fiche Amazon.
+ */
+import Icon from '../ui/Icon.astro';
+import DocCover from './DocCover.astro';
+import type { Book } from '@/data/publications';
+import type { Lang } from '@/i18n/routes';
+import { publicFileExists } from '@/lib/files';
+
+interface Props {
+  book: Book;
+  lang: Lang;
+  compact?: boolean;
+  headingLevel?: 'h3' | 'h4';
+}
+const { book, lang, compact = false, headingLevel = 'h3' } = Astro.props;
+const Heading = headingLevel;
+const fr = lang === 'fr';
+
+const released = !book.releaseDate || new Date(book.releaseDate + 'T00:00:00') <= new Date();
+const releaseLabel = book.releaseDate
+  ? new Date(book.releaseDate + 'T12:00:00').toLocaleDateString(fr ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+  : '';
+const amazon =
+  book.amazonUrl?.[lang] || book.amazonUrl?.fr || (book.isbn ? `https://www.amazon.fr/s?k=${book.isbn.replace(/-/g, '')}` : '');
+const hasFile = publicFileExists(book.file);
+const hasCover = publicFileExists(book.cover);
+const coverAlt = fr ? `Couverture du livre « ${book.title} »` : `Cover of the book “${book.title}”`;
+const otherLang = book.lang !== lang;
+---
+<article class:list={['grid gap-6', compact ? 'grid-cols-[7.5rem_1fr] sm:grid-cols-[9rem_1fr]' : 'sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-10']}>
+  <div class:list={['self-start', !compact && 'w-full max-w-[16rem]']}>
+    {hasCover && book.coverLarge ? (
+      <button
+        type="button"
+        class="group relative block w-full cursor-zoom-in border border-bordure bg-white shadow-[6px_6px_0_var(--color-bordure)] transition-transform hover:-translate-y-0.5"
+        data-lightbox-src={book.coverLarge}
+        data-lightbox-alt={coverAlt}
+        aria-label={fr ? `Agrandir la couverture de « ${book.title} »` : `Enlarge the cover of “${book.title}”`}
+      >
+        <img src={book.cover} alt={coverAlt} width={book.coverSize?.width} height={book.coverSize?.height} class="block h-auto w-full" loading="lazy" decoding="async" />
+        {!compact && (
+          <span class="absolute right-2 bottom-2 bg-bleu/90 px-2 py-1 text-xs font-bold text-white opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+            {fr ? 'Agrandir' : 'Enlarge'}
+          </span>
+        )}
+      </button>
+    ) : (
+      <div class="border border-bordure shadow-[6px_6px_0_var(--color-bordure)]">
+        <DocCover title={book.title} tone="turq" kicker={fr ? 'Phi-Lean Press, e-book' : 'Phi-Lean Press, e-book'} />
+      </div>
+    )}
+  </div>
+
+  <div class="flex flex-col">
+    <div class="flex flex-wrap items-center gap-2">
+      {!released && (
+        <span class="bg-creme px-2.5 py-1 text-xs font-bold text-soleil-fonce">
+          {fr ? `Parution le ${releaseLabel}` : `Out on ${releaseLabel}`}
+        </span>
+      )}
+      {book.file && <span class="bg-menthe px-2.5 py-1 text-xs font-bold text-turquoise-fonce">{fr ? 'E-book gratuit' : 'Free e-book'}</span>}
+      {otherLang && <span class="border border-bordure px-2.5 py-0.5 text-xs text-gris">{book.lang === 'fr' ? 'In French' : 'En anglais'}</span>}
+    </div>
+    <Heading class:list={['mt-3 font-bold text-anthracite', compact ? 'text-lg' : 'text-2xl']}>{book.title}</Heading>
+    {book.subtitle && !compact && <p class="mt-1 text-lg text-gris">{book.subtitle}</p>}
+    {book.hook && <p class:list={['text-anthracite/90', compact ? 'mt-2 line-clamp-4 text-[0.95rem]' : 'mt-4 max-w-[62ch] text-[1.05rem]']}>{book.hook[lang]}</p>}
+    {!compact && book.details[lang].length > 0 && (
+      <ul class="list-square mt-4 text-[0.95rem]">{book.details[lang].map((d) => <li>{d}</li>)}</ul>
+    )}
+    <div class="mt-auto flex flex-wrap items-center gap-4 pt-5">
+      {book.file ? (
+        hasFile ? (
+          <a href={book.file} download class="btn btn-primary">
+            <Icon name="download" size={18} />
+            {fr ? 'Télécharger l’e-book' : 'Download the e-book'}
+          </a>
+        ) : (
+          <p class="text-sm font-bold text-gris">{fr ? 'Bientôt en téléchargement' : 'Download coming soon'}</p>
+        )
+      ) : released && amazon ? (
+        <a href={amazon} target="_blank" rel="noopener" class="btn btn-primary">
+          <Icon name="book" size={18} />
+          {fr ? 'Acheter sur Amazon' : 'Buy on Amazon'}
+          <span class="sr-only">{fr ? '(nouvel onglet)' : '(opens in a new tab)'}</span>
+        </a>
+      ) : (
+        <p class="inline-flex items-center gap-1.5 text-sm font-bold text-soleil-fonce">
+          <Icon name="book" size={18} />
+          {fr ? `Disponible sur Amazon le ${releaseLabel}` : `Available on Amazon from ${releaseLabel}`}
+        </p>
+      )}
+    </div>
+  </div>
+</article>

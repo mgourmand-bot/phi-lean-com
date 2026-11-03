@@ -1,0 +1,143 @@
+---
+/**
+ * Carte des zones d'intervention, calculée au moment du build (SVG statique,
+ * aucun script côté visiteur). Données : Natural Earth via world-atlas.
+ * - Bleu du logo : pays principaux.
+ * - Bleu clair : interventions ponctuelles et déplacements.
+ * À droite, un zoom sur l'Europe de l'Ouest rend visibles les petits pays
+ * et situe les deux bases (Liverdun et Royal Tunbridge Wells).
+ */
+import { geoNaturalEarth1, geoMercator, geoPath, geoBounds } from 'd3-geo';
+import type { GeoPermissibleObjects } from 'd3-geo';
+import { feature } from 'topojson-client';
+import world110 from 'world-atlas/countries-110m.json';
+import world50 from 'world-atlas/countries-50m.json';
+import { primaryCountries, secondaryCountries } from '@/data/presence';
+import { site } from '@/config/site';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+type Feat = { type: 'Feature'; id?: string; properties: { name: string }; geometry: GeoPermissibleObjects };
+const toFeatures = (topo: unknown): Feat[] => {
+  const t = topo as { objects: { countries: unknown } };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const feats = (feature(t as any, t.objects.countries as any) as unknown as { features: Feat[] }).features;
+  // France : on ne garde que la métropole et la Corse (la Guyane apparaîtrait sinon en Amérique du Sud)
+  return feats.map((f) => {
+    const g = f.geometry as { type: string; coordinates: number[][][][] };
+    if (f.properties.name !== 'France' || g.type !== 'MultiPolygon') return f;
+    const coordinates = g.coordinates.filter((poly) => poly[0][0][0] > -10 && poly[0][0][1] > 35);
+    return { ...f, geometry: { type: 'MultiPolygon', coordinates } as unknown as GeoPermissibleObjects };
+  });
+};
+
+const primary = new Set(primaryCountries.map((c) => c.atlas));
+const secondary = new Set(secondaryCountries.map((c) => c.atlas));
+const fillFor = (name: string) =>
+  primary.has(name) ? 'var(--color-bleu)' : secondary.has(name) ? 'var(--map-secondary)' : 'var(--map-other)';
+
+// ---- Monde ----
+const W = 960;
+const H = 470;
+const worldFeatures = toFeatures(world110).filter((f) => f.properties.name !== 'Antarctica');
+const worldProj = geoNaturalEarth1().fitExtent(
+  [[4, 4], [W - 4, H - 4]],
+  { type: 'FeatureCollection', features: worldFeatures } as unknown as GeoPermissibleObjects,
+);
+const worldPath = geoPath(worldProj).digits(1);
+const worldShapes = worldFeatures.map((f) => ({ d: worldPath(f.geometry) ?? '', fill: fillFor(f.properties.name), name: f.properties.name }));
+const worldOffices = site.offices.map((o) => worldProj([o.lon, o.lat]) ?? [0, 0]);
+// Cadre du zoom Europe dessiné sur la carte du monde
+const box = [[-11, 61], [17, 36]].map((p) => worldProj(p as [number, number]) ?? [0, 0]);
+
+// ---- Zoom Europe de l'Ouest ----
+const EW = 480;
+const EH = 470;
+const extent = { lonMin: -11, lonMax: 17, latMin: 36, latMax: 61 };
+const bboxFeature = {
+  type: 'Feature',
+  properties: {},
+  geometry: {
+    type: 'Polygon',
+    coordinates: [[[extent.lonMin, extent.latMin], [extent.lonMin, extent.latMax], [extent.lonMax, extent.latMax], [extent.lonMax, extent.latMin], [extent.lonMin, extent.latMin]]],
+  },
+} as unknown as GeoPermissibleObjects;
+const euProj = geoMercator().fitExtent([[0, 0], [EW, EH]], bboxFeature);
+euProj.clipExtent([[0, 0], [EW, EH]]);
+const euPath = geoPath(euProj).digits(1);
+const euFeatures = toFeatures(world50).filter((f) => {
+  const [[x0, y0], [x1, y1]] = geoBounds(f.geometry);
+  return !(x1 < extent.lonMin - 2 || x0 > extent.lonMax + 2 || y1 < extent.latMin - 2 || y0 > extent.latMax + 2) || x0 > x1;
+});
+const euShapes = euFeatures.map((f) => ({ d: euPath(f.geometry) ?? '', fill: fillFor(f.properties.name), name: f.properties.name })).filter((s) => s.d);
+const euOffices = site.offices.map((o) => ({ ...o, xy: euProj([o.lon, o.lat]) ?? [0, 0] }));
+
+const listFmt = new Intl.ListFormat(fr ? 'fr' : 'en', { type: 'conjunction' });
+const primaryNames = listFmt.format(primaryCountries.map((c) => c.name[lang]));
+const secondaryNames = listFmt.format(secondaryCountries.map((c) => c.name[lang]));
+const worldLabel = fr
+  ? `Carte du monde. Pays principaux, en bleu : ${primaryNames}. Interventions ponctuelles et déplacements, en bleu clair : ${secondaryNames}.`
+  : `World map. Main countries, in blue: ${primaryNames}. Occasional work and travel, in light blue: ${secondaryNames}.`;
+const euLabel = fr
+  ? 'Zoom sur l’Europe de l’Ouest, avec les deux bases : Liverdun (Grand Est) et Royal Tunbridge Wells (Kent).'
+  : 'Close-up of Western Europe, showing the two bases: Liverdun (Grand Est) and Royal Tunbridge Wells (Kent).';
+---
+<div class="presence-map grid gap-5 lg:grid-cols-[1.75fr_1fr]">
+  <figure class="m-0 border border-bordure bg-[var(--map-sea)] p-3 sm:p-4">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={worldLabel} class="block h-auto w-full">
+      <g stroke="#fff" stroke-width="0.6" stroke-linejoin="round">
+        {worldShapes.map((s) => <path d={s.d} fill={s.fill}><title>{s.name}</title></path>)}
+      </g>
+      <rect
+        x={box[0][0]} y={box[0][1]} width={box[1][0] - box[0][0]} height={box[1][1] - box[0][1]}
+        fill="none" stroke="var(--color-soleil)" stroke-width="1.6" stroke-dasharray="4 3"
+      />
+      {worldOffices.map(([x, y]) => <circle cx={x} cy={y} r="3.4" fill="var(--color-soleil)" stroke="#fff" stroke-width="1.2" />)}
+    </svg>
+    <figcaption class="mt-3 text-sm text-gris">{fr ? 'Le monde : nos pays principaux et nos destinations de mission.' : 'The world: our main countries and mission destinations.'}</figcaption>
+  </figure>
+
+  <figure class="m-0 border border-bordure border-t-[3px] border-t-soleil bg-[var(--map-sea)] p-3 sm:p-4">
+    <svg viewBox={`0 0 ${EW} ${EH}`} role="img" aria-label={euLabel} class="block h-auto w-full" font-family="Arial, Helvetica, sans-serif">
+      <g stroke="#fff" stroke-width="0.8" stroke-linejoin="round">
+        {euShapes.map((s) => <path d={s.d} fill={s.fill}><title>{s.name}</title></path>)}
+      </g>
+      {euOffices.map((o, i) => {
+        const [x, y] = o.xy;
+        const right = i === 0;
+        return (
+          <g>
+            <circle cx={x} cy={y} r="6.5" fill="var(--color-soleil)" stroke="#fff" stroke-width="2" />
+            <text
+              x={right ? x + 11 : x - 11}
+              y={right ? y + 5 : y - 10}
+              text-anchor={right ? 'start' : 'end'}
+              font-size="15"
+              font-weight="700"
+              fill="var(--color-anthracite)"
+              stroke="#fff"
+              stroke-width="4"
+              paint-order="stroke"
+            >
+              {o.city}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+    <figcaption class="mt-3 text-sm text-gris">{fr ? 'Zoom : nos deux bases, en France et au Royaume-Uni.' : 'Close-up: our two bases, in France and the UK.'}</figcaption>
+  </figure>
+</div>
+
+<style>
+  .presence-map {
+    --map-sea: #f4f7fb;
+    --map-secondary: #9cc0e4;
+    --map-other: #dfe5ec;
+  }
+</style>

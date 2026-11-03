@@ -1,0 +1,65 @@
+---
+/**
+ * Vidéo de la page Serious Games.
+ * - Fichier MP4 (prioritaire) : lecteur natif, aucun service tiers, rien n'est
+ *   téléchargé avant que le visiteur appuie sur lecture (preload="none").
+ * - Post LinkedIn : chargé seulement au clic (LinkedIn dépose ses cookies).
+ * Rien n'est affiché tant qu'aucune des deux sources n'est renseignée.
+ */
+import { gamesVideo } from '@/data/games';
+import type { Lang } from '@/i18n/routes';
+
+interface Props {
+  lang: Lang;
+  caption?: boolean;
+}
+const { lang, caption = true } = Astro.props;
+const fr = lang === 'fr';
+const { mp4, linkedinEmbed, poster, title, width, height } = gamesVideo;
+---
+{mp4 ? (
+  <figure class="m-0">
+    <video
+      controls
+      preload="none"
+      playsinline
+      poster={poster}
+      width={width}
+      height={height}
+      class="block h-auto w-full bg-bleu-nuit"
+      aria-label={title[lang]}
+    >
+      <source src={mp4} type="video/mp4" />
+      <a href={mp4}>{fr ? 'Télécharger la vidéo' : 'Download the video'}</a>
+    </video>
+    {caption && <figcaption class="mt-2 text-sm text-gris">{gamesVideo.caption[lang]}</figcaption>}
+  </figure>
+) : linkedinEmbed ? (
+  <div class="mx-auto w-full max-w-[34rem]" data-linkedin-embed={linkedinEmbed} data-title={title[lang]}>
+    <button type="button" class="group relative block w-full overflow-hidden border border-bordure bg-bleu-nuit text-left" data-linkedin-load>
+      <img src={poster} alt="" class="block aspect-[4/3] w-full object-cover opacity-70 transition-opacity group-hover:opacity-60" loading="lazy" />
+      <span class="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center text-white">
+        <span class="grid h-16 w-16 place-items-center rounded-full bg-white text-bleu">
+          <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
+        </span>
+        <span class="text-lg font-bold">{fr ? 'Lire la vidéo' : 'Play the video'}</span>
+        <span class="max-w-[34ch] text-sm text-white/85">
+          {fr ? 'La vidéo est hébergée sur LinkedIn, qui dépose ses propres cookies.' : 'The video is hosted on LinkedIn, which sets its own cookies.'}
+        </span>
+      </span>
+    </button>
+  </div>
+) : null}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-linkedin-embed]').forEach((box) => {
+    box.querySelector('[data-linkedin-load]')?.addEventListener('click', () => {
+      const iframe = document.createElement('iframe');
+      iframe.src = box.dataset.linkedinEmbed ?? '';
+      iframe.title = box.dataset.title ?? 'LinkedIn';
+      iframe.allowFullscreen = true;
+      iframe.className = 'block h-[44rem] w-full border-0 bg-white';
+      box.replaceChildren(iframe);
+    });
+  });
+</script>

@@ -1,221 +1,443 @@
 ---
 /**
- * PAGE D'ACCUEIL (FR « / » et EN « /en/ »)
- * 1. Hero terrain + double CTA     4. Diagnostic VSM Express
- * 2. Preuve sociale (KPI + cas)    5. Phi-Lean Press
- * 3. Les 4 piliers                 6. Fondateur, puis appel à l'action
+ * PAGE D'ACCUEIL (FR « / » et EN « /en/ ») – version executive
+ * 1. La maison Phi-Lean : la thèse, puis la lecture étage par étage
+ *    (la maison reste visible et surligne l'étage lu), puis les sources
+ *    de chaque élément (planche « Références bibliographiques »)
+ * 2. Ce que nous faisons, rattaché aux étages de la maison, et le point d'entrée
+ * 3. Le fondateur
+ * 4. Nos travaux (Phi-Lean Press)
+ * 5. Un appel sobre à échanger
  */
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import VsmLadder from '@/components/VsmLadder.astro';
-import KpiTile from '@/components/KpiTile.astro';
+import MaisonPhiLean from '@/components/MaisonPhiLean.astro';
 import CaseStudyCard from '@/components/CaseStudyCard.astro';
-import VsmExpressOffer from '@/components/VsmExpressOffer.astro';
-import BookCard from '@/components/BookCard.astro';
-import FounderBlock from '@/components/FounderBlock.astro';
 import CtaBand from '@/components/sections/CtaBand.astro';
-import { metrics, caseStudies } from '@/data/proof';
-import { books, whitePapers } from '@/data/publications';
+import Icon from '@/components/ui/Icon.astro';
+import { house, floors, sources, type ElementId, type RefSegment } from '@/data/house';
+import { caseStudies } from '@/data/cases';
 import { vsmExpress } from '@/data/offers';
+import { site } from '@/config/site';
 import type { Lang } from '@/i18n/routes';
-import { path, useTranslations } from '@/i18n/utils';
+import { path, anchorPath, formatPrice } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const t = useTranslations(lang);
 const fr = lang === 'fr';
+const price = formatPrice(vsmExpress.priceHT, lang);
 
 const c = {
   fr: {
-    title: 'Phi-Lean – Conseil et formation Lean pour l’usine, les services et la supply chain',
+    title: 'Phi-Lean – Excellence opérationnelle : profitables aujourd’hui et demain',
     description:
-      'Cabinet de conseil Lean fondé par Manuel Gourmand : Lean Manufacturing, Lean Office, Supply Chain & Risk Management, formations, serious games. Diagnostic VSM Express forfaitaire, 100 % déductible.',
-    h1: 'Le Lean qui tient, une fois le consultant parti.',
-    lead:
-      "Phi-Lean aide les usines, les services et les chaînes logistiques à réduire délais et stocks, avec la rigueur d'un chercheur et le pragmatisme d'un ancien directeur de site.",
-    reassurance: `Diagnostic de ${vsmExpress.days} jours, forfaitaire et 100 % déductible de la mission qui suit.`,
-    proofTitle: 'Des résultats mesurés sur le terrain',
-    proofLead:
-      'Chaque mission démarre par une mesure et se termine par une mesure. Voici ce que nos clients ont obtenu, cas anonymisés à leur demande.',
+      'Phi-Lean accompagne les dirigeants qui veulent une entreprise profitable aujourd’hui et demain : Lean Flux Usine, Lean Flux Supply Chain et gestion des risques, formation des équipes. Fondé par Manuel Gourmand.',
+    lead: 'Plutôt que de réduire ses dépenses, une entreprise doit faire croître ses revenus plus vite que ses dépenses. Phi-Lean aide les dirigeants à y parvenir, de l’usine à la supply chain, avec les équipes qui font le travail.',
+    meet: 'Prendre rendez-vous',
+    lines: 'Ce que nous faisons',
+    readTitle: 'La maison, de la base au cap',
+    caption: 'La maison Phi-Lean est développée dans le manifeste',
+    manifesto: 'Make Europe Great Again, Economically',
+    manifestoMeta: '(PDF en anglais, 8 pages)',
+    sheet: 'La planche et ses sources',
+    sheetMeta: '(PDF, 2 pages)',
+    sourcesTitle: 'Les sources de chaque élément',
+    sourcesLead: 'Chaque élément de la maison s’appuie sur des travaux de référence : sept ouvrages et articles, cités au format APA (7e édition).',
+    sourcesDownload: 'Télécharger la maison et ses sources',
+    refsLabel: 'Sources',
+    whatTitle: 'Ce que nous faisons',
+    whatLead: 'Trois façons d’intervenir dans la maison, toujours sur le terrain et avec vos équipes.',
+    entryTitle: 'Pour commencer : le Diagnostic VSM Express',
+    entryText: `Trois jours sur site, un flux cartographié avec vos équipes, un plan d’action chiffré à 90 jours. Forfait de ${price} HT, déductible de la mission qui suit.`,
+    entryCta: 'Voir le déroulé',
     casesTitle: 'Études de cas',
-    pillarsTitle: 'Quatre façons de travailler ensemble',
-    pillarsLead:
-      'Du diagnostic à l’autonomie des équipes : intervenir, transmettre, faire vivre l’expérience et documenter ce qui marche.',
-    pressTitle: 'Phi-Lean Press',
-    pressLead:
-      'La marque éditoriale du cabinet : des livres pour comprendre en profondeur, des white papers pour agir dès lundi.',
-    pressWp: 'White papers à télécharger',
-    pressAll: 'Toutes les publications',
-    founderEyebrow: 'Le fondateur',
+    founderRole: 'Fondateur de Phi-Lean',
+    founderBio:
+      'Ancien Site Manager, Manuel Gourmand a géré et démarré une usine au Brésil, puis piloté depuis le Brésil une supply chain internationale. Il enseigne en écoles de commerce et d’ingénierie et publie sous la marque Phi-Lean Press. Il intervient depuis Liverdun (Grand Est) et Royal Tunbridge Wells (Kent), en français, en anglais et en portugais.',
+    founderCta: 'Le cabinet',
+    credentials: [
+      { k: 'Formation', v: 'MSc Lean Enterprise' },
+      { k: 'Terrain', v: 'Direction et démarrage d’usine, supply chain internationale' },
+      { k: 'Enseignement', v: 'Écoles de commerce et d’ingénierie' },
+      { k: 'Langues', v: 'Français, anglais, portugais' },
+    ],
+    worksTitle: 'Nos travaux',
+    quote: 'Le logiciel ne coûte presque rien. La discipline nécessaire pour bien le mettre en œuvre, elle, est ce qui coûte : pas en argent, mais en réflexion.',
+    quoteSource: 'La spirale d’attrition systémique, 2026',
+    worksAll: 'Toute la Phi-Lean Press',
+    download: 'Télécharger le PDF',
+    bookLink: 'Voir le livre',
+    ctaTitle: 'Trente minutes pour faire le point',
+    ctaText: 'Un échange avec Manuel Gourmand, en visio ou au téléphone, pour comprendre votre situation et voir ensemble si un diagnostic a du sens.',
   },
   en: {
-    title: 'Phi-Lean – Lean consulting and training for plants, offices and supply chains',
+    title: 'Phi-Lean – Operational excellence: profitable today and tomorrow',
     description:
-      'Lean consulting firm founded by Manuel Gourmand: Lean Manufacturing, Lean Office, Supply Chain & Risk Management, training and serious games. Fixed-fee VSM Express Diagnostic, 100% deductible.',
-    h1: 'Lean that lasts after the consultant leaves.',
-    lead:
-      'Phi-Lean helps plants, service operations and supply chains cut lead times and inventory, with the rigour of a researcher and the pragmatism of a former site manager.',
-    reassurance: `A ${vsmExpress.days}-day, fixed-fee diagnostic, 100% deductible from the engagement that follows.`,
-    proofTitle: 'Results measured on the ground',
-    proofLead:
-      'Every engagement starts with a measurement and ends with one. Here is what our clients achieved, anonymised at their request.',
+      'Phi-Lean works with business leaders who want a company that is profitable today and tomorrow: Lean Plant Flow, Lean Supply Chain Flow and risk management, team training. Founded by Manuel Gourmand.',
+    lead: 'Instead of shrinking its expenses, a company must grow its income faster than its expenses. Phi-Lean helps business leaders get there, from the plant to the supply chain, with the teams who do the work.',
+    meet: 'Book a call',
+    lines: 'What we do',
+    readTitle: 'The house, from the foundation up',
+    caption: 'The Phi-Lean house is developed in the manifesto',
+    manifesto: 'Make Europe Great Again, Economically',
+    manifestoMeta: '(PDF, 8 pages)',
+    sheet: 'The house and its sources',
+    sheetMeta: '(PDF in French, 2 pages)',
+    sourcesTitle: 'The sources behind each element',
+    sourcesLead: 'Each element of the house rests on established work: seven books and articles, cited in APA style (7th edition).',
+    sourcesDownload: 'Download the house and its sources',
+    refsLabel: 'Sources',
+    whatTitle: 'What we do',
+    whatLead: 'Three ways to work on the house, always on the ground and with your teams.',
+    entryTitle: 'To get started: the VSM Express Diagnostic',
+    entryText: `Three days on site, one value stream mapped with your teams, a costed 90-day action plan. Fixed fee of ${price} excl. VAT, deductible from the engagement that follows.`,
+    entryCta: 'See how it works',
     casesTitle: 'Case studies',
-    pillarsTitle: 'Four ways to work together',
-    pillarsLead:
-      'From diagnostic to self-sufficient teams: we intervene, transfer skills, let people experience Lean and document what works.',
-    pressTitle: 'Phi-Lean Press',
-    pressLead: "The firm's publishing imprint: books to understand in depth, white papers to act on Monday morning.",
-    pressWp: 'White papers to download',
-    pressAll: 'All publications',
-    founderEyebrow: 'The founder',
+    founderRole: 'Founder of Phi-Lean',
+    founderBio:
+      'A former Site Manager, Manuel Gourmand managed and started up a plant in Brazil, then ran an international supply chain from Brazil. He teaches at business and engineering schools and publishes under the Phi-Lean Press imprint. He works from Liverdun (Grand Est, France) and Royal Tunbridge Wells (Kent, UK), in French, English and Portuguese.',
+    founderCta: 'The firm',
+    credentials: [
+      { k: 'Education', v: 'MSc Lean Enterprise' },
+      { k: 'Field', v: 'Plant management and start-up, international supply chain' },
+      { k: 'Teaching', v: 'Business and engineering schools' },
+      { k: 'Languages', v: 'French, English, Portuguese' },
+    ],
+    worksTitle: 'Our writing',
+    quote: 'The software costs almost nothing. The discipline to implement it well is what costs: not in money, but in thinking.',
+    quoteSource: 'The Systemic Attrition Spiral, 2026',
+    worksAll: 'All of Phi-Lean Press',
+    download: 'Download the PDF',
+    bookLink: 'See the book',
+    ctaTitle: 'Thirty minutes to take stock',
+    ctaText: 'A conversation with Manuel Gourmand, by video or phone, to understand your situation and see together whether a diagnostic makes sense.',
   },
 }[lang];
 
-const pillars = [
+const floorColor: Record<string, string> = {
+  socle: 'text-bleu',
+  leviers: 'text-bleu',
+  methode: 'text-bleu',
+  resultat: 'text-bleu',
+  cap: 'text-soleil-fonce',
+};
+
+/** Pastilles des sources, dessinées comme l'élément correspondant de la maison. */
+const chip: Record<ElementId, string> = {
+  cap: 'rounded-full border-2 border-dashed border-soleil bg-white text-soleil-fonce',
+  resultat: 'border-2 border-bleu bg-bleu text-white',
+  methode: 'border-2 border-bleu bg-white text-bleu',
+  capacite: 'border border-bleu bg-ciel text-bleu',
+  valeur: 'border border-bleu bg-ciel text-bleu',
+  socle: 'border-2 border-bleu-nuit bg-bleu-nuit text-white',
+};
+// Les références sont en anglais (lang="en") ; seul un segment traduit suit la langue de la page.
+const seg = (x: RefSegment) =>
+  typeof x === 'string' ? { text: x, kind: 'plain' } : 'i' in x ? { text: x.i, kind: 'italic' } : { text: x.t[lang], kind: 'local' };
+
+const offers = [
   {
-    key: 'consulting' as const,
-    color: 'border-t-bleu',
-    title: fr ? 'Conseil' : 'Consulting',
+    floor: fr ? 'Les piliers : servir plus, servir mieux' : 'The pillars: serve more, serve better',
+    title: fr ? 'Lean Flux Usine' : 'Lean Plant Flow',
     text: fr
-      ? 'Diagnostic et transformation, sur le terrain avec vos équipes.'
-      : 'Diagnostics and transformation, on the ground with your teams.',
-    items: fr
-      ? ['Usine : Lean Manufacturing', 'Service : Lean Office', 'Supply Chain & Risk Management']
-      : ['Plant: Lean Manufacturing', 'Office: Lean Office', 'Supply Chain & Risk Management'],
-    cta: fr ? 'Nos lignes de conseil' : 'Our consulting lines',
+      ? 'Le Lean appliqué à l’usine, à partir de la cartographie des flux (VSM) : libérer de la capacité sans investissement lourd, et obtenir la qualité du premier coup.'
+      : 'Lean applied to the plant, starting from value stream mapping: free up capacity without heavy investment, and get quality right first time.',
+    links: [{ href: anchorPath('consulting', 'usine', lang), label: fr ? 'Lean Flux Usine' : 'Lean Plant Flow' }],
   },
   {
-    key: 'training' as const,
-    color: 'border-t-turquoise',
-    title: fr ? 'Formations' : 'Training',
+    floor: fr ? 'La poutre : le flux de bout en bout' : 'The beam: the end-to-end flow',
+    title: fr ? 'Lean Flux Supply Chain' : 'Lean Supply Chain Flow',
     text: fr
-      ? 'Des formations opérationnelles, construites sur vos cas réels.'
-      : 'Hands-on courses built around your real cases.',
-    items: fr ? ['VSM, SMED, TPM, kanban', 'Lean Office et management visuel', 'Supply chain, SCRM et S&OP'] : ['VSM, SMED, TPM, kanban', 'Lean Office and visual management', 'Supply chain, SCRM and S&OP'],
-    cta: fr ? 'Le catalogue' : 'The course catalogue',
+      ? 'Le même regard au-delà de vos murs, des fournisseurs aux clients, avec un focus sur la gestion des risques : savoir à l’avance où la chaîne peut casser, et ce qui est prêt pour y faire face.'
+      : 'The same view beyond your walls, from suppliers to customers, with a focus on risk management: knowing in advance where the chain can break, and what is ready to cope.',
+    links: [{ href: anchorPath('consulting', 'supply', lang), label: fr ? 'Lean Flux Supply Chain' : 'Lean Supply Chain Flow' }],
   },
   {
-    key: 'games' as const,
-    color: 'border-t-soleil',
-    title: 'Serious Games',
+    floor: fr ? 'Le socle et le cap' : 'The foundation and the direction',
+    title: fr ? 'Équipes et comités de direction' : 'Teams and leadership teams',
     text: fr
-      ? 'Vivre le Lean en trois heures plutôt que l’écouter en trois jours.'
-      : 'Experience Lean in three hours rather than hear about it for three days.',
-    items: ['The Beer Game', 'The Lean Coffee Shop', fr ? 'Animation, kit physique ou Print & Play' : 'Facilitated, physical kit or Print & Play'],
-    cta: fr ? 'Découvrir les jeux' : 'Discover the games',
-  },
-  {
-    key: 'publications' as const,
-    color: 'border-t-bleu-nuit',
-    title: fr ? 'Publications' : 'Publications',
-    text: fr
-      ? 'Les livres, white papers et articles de Phi-Lean Press.'
-      : 'Books, white papers and papers from Phi-Lean Press.',
-    items: fr ? ['3 livres disponibles sur Amazon', 'White papers pratiques', 'Articles scientifiques en libre accès'] : ['3 books on Amazon', 'Practical white papers', 'Open-access scientific papers'],
-    cta: fr ? 'Lire Phi-Lean Press' : 'Read Phi-Lean Press',
+      ? 'Des formations opérationnelles et des serious games pour les équipes, et un exercice de gestion de crise conçu pour les comités de direction.'
+      : 'Hands-on training and serious games for teams, and a crisis management exercise designed for leadership teams.',
+    links: [
+      { href: path('training', lang), label: fr ? 'Formation' : 'Training' },
+      { href: `${path('games', lang)}#codir-crise`, label: fr ? 'Exercice de crise' : 'Crisis exercise' },
+    ],
   },
 ];
+
+const works = fr
+  ? [
+      {
+        title: 'Make Europe Great Again, Economically',
+        meta: 'Working Paper 25-01, janvier 2025, en anglais, 8 pages',
+        text: 'Le manifeste dont est issue la maison Phi-Lean : à quoi sert une entreprise, et pourquoi la réponse décide de tout le reste.',
+        thumb: '/images/articles/make-europe-great-again-economically.webp',
+        href: '/downloads/articles/make-europe-great-again-economically.pdf',
+        download: true,
+        lang: 'en',
+      },
+      {
+        title: 'La spirale d’attrition systémique',
+        meta: 'Cahier d’excellence opérationnelle n° 1, octobre 2026, 29 pages',
+        text: 'Comment l’intelligence artificielle menace le dernier avantage des PME, la proximité, et la feuille de route Lean pour y répondre.',
+        thumb: '/images/articles/spirale-attrition-systemique.webp',
+        href: '/downloads/articles/spirale-attrition-systemique.pdf',
+        download: true,
+        lang: 'fr',
+      },
+      {
+        title: 'Prendre le virage de l’IA',
+        meta: 'Livre, parution le 15 novembre 2026 sur Amazon',
+        text: 'Vingt fiches métiers et un autodiagnostic en dix questions, à l’usage des dirigeants de TPE et de PME.',
+        thumb: '/images/livres/prendre-le-virage-de-l-ia.webp',
+        href: anchorPath('publications', 'books', lang),
+        download: false,
+        lang: 'fr',
+      },
+    ]
+  : [
+      {
+        title: 'Make Europe Great Again, Economically',
+        meta: 'Working Paper 25-01, January 2025, 8 pages',
+        text: 'The manifesto behind the Phi-Lean house: what a company is really for, and why the answer decides everything else.',
+        thumb: '/images/articles/make-europe-great-again-economically.webp',
+        href: '/downloads/articles/make-europe-great-again-economically.pdf',
+        download: true,
+        lang: 'en',
+      },
+      {
+        title: 'The Systemic Attrition Spiral',
+        meta: 'Occasional Paper No. 1, October 2026, 25 pages',
+        text: 'How artificial intelligence threatens the last advantage of SMEs, proximity, and the Lean AI roadmap in response.',
+        thumb: '/images/articles/the-systemic-attrition-spiral.webp',
+        href: '/downloads/articles/the-systemic-attrition-spiral.pdf',
+        download: true,
+        lang: 'en',
+      },
+      {
+        title: 'Prendre le virage de l’IA',
+        meta: 'Book (in French), out on Amazon on 15 November 2026',
+        text: 'Twenty sheets by trade and a ten-question self-assessment, for leaders of small and mid-sized companies.',
+        thumb: '/images/livres/prendre-le-virage-de-l-ia.webp',
+        href: anchorPath('publications', 'books', lang),
+        download: false,
+        lang: 'fr',
+      },
+    ];
+const manifestoFile = '/downloads/articles/make-europe-great-again-economically.pdf';
 ---
 <BaseLayout lang={lang} routeKey="home" title={c.title} description={c.description}>
-  <!-- 1. HERO -->
-  <section class="relative overflow-hidden border-b border-bordure">
-    <div class="container-pl grid items-center gap-12 py-14 md:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24">
-      <div>
-        <h1 class="text-[2.6rem] font-bold leading-[1.05] tracking-tight text-bleu sm:text-6xl xl:text-[4.25rem]">
-          {c.h1}
+  <!-- 1. LA MAISON PHI-LEAN -->
+  <section class="border-b border-bordure" aria-labelledby="h-home">
+    <div class="container-pl grid gap-x-16 gap-y-12 pt-14 pb-10 md:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:pb-20">
+      <div class="lg:pt-4">
+        <p class="text-xs font-bold tracking-[0.16em] text-bleu uppercase">{house.eyebrow[lang]}</p>
+        <h1 id="h-home" class="mt-4 max-w-[19ch] text-[2.35rem] leading-[1.08] font-bold tracking-tight text-bleu sm:text-5xl xl:text-[3.3rem]">
+          {house.title[lang]}
         </h1>
-        <p class="lead mt-7">{c.lead}</p>
+        <p class="mt-7 max-w-[56ch] text-lg leading-relaxed text-anthracite/85 md:text-xl">{c.lead}</p>
         <div class="mt-9 flex flex-wrap gap-4">
-          <a href={path('contact', lang, '?sujet=vsm-express#formulaire')} class="btn btn-primary">{t('cta.vsm')}</a>
-          <a href={path('consulting', lang)} class="btn btn-secondary">{t('cta.expertise')}</a>
+          <a href={anchorPath('contact', 'meeting', lang)} class="btn btn-primary">
+            <Icon name="calendar" size={18} />
+            {c.meet}
+          </a>
+          <a href="#metiers" class="btn btn-secondary">{c.lines}</a>
         </div>
-        <p class="mt-5 max-w-[52ch] text-[0.95rem] text-gris">{c.reassurance}</p>
       </div>
-      <VsmLadder lang={lang} />
+
+      <div class="lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <div class="mx-auto max-w-[36rem] lg:sticky lg:top-28">
+          <MaisonPhiLean lang={lang} />
+          <p class="mt-6 text-center text-sm text-gris">
+            {c.caption}{' '}
+            <a href={manifestoFile} download class="font-bold text-bleu underline decoration-bordure underline-offset-4 hover:decoration-bleu" lang="en">{c.manifesto}</a>
+            {' '}{c.manifestoMeta}
+          </p>
+          <p class="mt-1 text-center text-sm text-gris">
+            <a href={house.pdf} download class="font-bold text-bleu underline decoration-bordure underline-offset-4 hover:decoration-bleu">{c.sheet}</a>
+            {' '}{c.sheetMeta}
+          </p>
+        </div>
+      </div>
+
+      <div class="lg:col-start-1 lg:pb-28">
+        <h2 class="text-xl font-bold text-anthracite">{c.readTitle}</h2>
+        <ol class="mt-5">
+          {floors.map((f) => (
+            <li id={`maison-${f.id}`} data-house-row={f.id} class="scroll-mt-28 border-t border-bordure py-8 lg:min-h-[17rem]">
+              <p class:list={['text-xs font-bold tracking-[0.14em] uppercase', floorColor[f.id]]}>{f.label[lang]}</p>
+              <h3 class="mt-2 text-2xl font-bold text-anthracite">{f.title[lang]}</h3>
+              <p class="mt-3 max-w-[58ch] text-[1.05rem] leading-relaxed text-anthracite/85">{f.text[lang]}</p>
+              <p class="mt-4 text-sm text-gris">
+                <span class="sr-only">{c.refsLabel} : </span>
+                <a href={`#source-${f.sourceId}`} class="italic underline decoration-bordure underline-offset-4 hover:text-bleu hover:decoration-bleu">{f.refs[lang]}</a>
+              </p>
+            </li>
+          ))}
+        </ol>
+      </div>
     </div>
   </section>
 
-  <!-- 2. PREUVE SOCIALE -->
-  <section class="bg-zebra py-16 md:py-24" aria-labelledby="preuve">
+  <!-- 1 bis. LES SOURCES DE CHAQUE ÉLÉMENT -->
+  <section id="sources" class="scroll-mt-24 border-b border-bordure bg-zebra py-14 md:py-20" aria-labelledby="h-sources">
     <div class="container-pl">
-      <h2 id="preuve" class="section-title">{c.proofTitle}</h2>
-      <p class="lead mt-6">{c.proofLead}</p>
-      <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((m) => <KpiTile value={m.value[lang]} label={m.label[lang]} tone={m.tone} />)}
+      <div class="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
+        <div>
+          <h2 id="h-sources" class="text-2xl font-bold tracking-tight text-bleu md:text-3xl">{c.sourcesTitle}</h2>
+          <p class="mt-3 max-w-[64ch] text-anthracite/85">{c.sourcesLead}</p>
+        </div>
+        <a href={house.pdf} download class="group inline-flex items-baseline gap-1.5 font-bold text-bleu">
+          <Icon name="download" size={16} class="shrink-0 self-center" />
+          <span><span class="group-hover:underline">{c.sourcesDownload}</span> <span class="font-normal text-gris">{c.sheetMeta}</span></span>
+        </a>
       </div>
-
-      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.casesTitle}</h3>
-      <div class="mt-6 grid gap-6 lg:grid-cols-3">
-        {caseStudies.map((study) => <CaseStudyCard study={study} lang={lang} headingLevel="h4" />)}
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. QUATRE PILIERS -->
-  <section class="py-16 md:py-24" aria-labelledby="piliers">
-    <div class="container-pl">
-      <h2 id="piliers" class="section-title">{c.pillarsTitle}</h2>
-      <p class="lead mt-6">{c.pillarsLead}</p>
-      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2">
-        {pillars.map((p) => (
-          <article class:list={['border-t-[6px] pt-6', p.color]}>
-            <h3 class="text-2xl font-bold text-anthracite">{p.title}</h3>
-            <p class="mt-2 text-lg text-anthracite/85">{p.text}</p>
-            <ul class="list-square mt-4">
-              {p.items.map((i) => <li>{i}</li>)}
+      <ol class="mt-10 border-b border-bordure">
+        {sources.map((g) => (
+          <li id={`source-${g.id}`} class="grid scroll-mt-28 gap-x-10 gap-y-3 border-t border-bordure py-6 md:grid-cols-[17.5rem_minmax(0,1fr)]">
+            <p class="self-start">
+              <span class:list={['inline-flex px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold', chip[g.id]]}>{g.element[lang]}</span>
+            </p>
+            <ul class="space-y-4">
+              {g.refs.map((r) => (
+                <li>
+                  <p class="text-[0.97rem] text-anthracite" lang="en">
+                    {r.cite.map(seg).map((x) => (x.kind === 'italic' ? <i>{x.text}</i> : x.kind === 'local' ? <span lang={lang}>{x.text}</span> : x.text))}
+                  </p>
+                  <p class="mt-1 text-sm text-gris">{r.note[lang]}</p>
+                </li>
+              ))}
             </ul>
-            <a href={path(p.key, lang)} class="link-pl mt-5 inline-block">{p.cta}</a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- 2. CE QUE NOUS FAISONS -->
+  <section id="metiers" class="scroll-mt-24 py-16 md:py-24" aria-labelledby="h-metiers">
+    <div class="container-pl">
+      <h2 id="h-metiers" class="section-title">{c.whatTitle}</h2>
+      <p class="lead mt-6">{c.whatLead}</p>
+      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-3">
+        {offers.map((o) => (
+          <article class="flex flex-col border-t-[3px] border-bleu pt-6">
+            <p class="text-sm font-bold text-gris">{o.floor}</p>
+            <h3 class="mt-2 text-2xl font-bold text-anthracite">{o.title}</h3>
+            <p class="mt-3 text-anthracite/85">{o.text}</p>
+            <p class="mt-auto flex flex-wrap gap-x-5 gap-y-2 pt-5">
+              {o.links.map((l) => <a href={l.href} class="link-pl">{l.label}</a>)}
+            </p>
           </article>
         ))}
       </div>
+
+      <div class="mt-16 flex flex-col gap-5 border-y border-bordure py-7 md:flex-row md:items-center md:justify-between md:gap-10">
+        <div>
+          <h3 class="text-lg font-bold text-anthracite">{c.entryTitle}</h3>
+          <p class="mt-1 max-w-[72ch] text-anthracite/85">{c.entryText}</p>
+        </div>
+        <a href={anchorPath('consulting', 'vsmExpress', lang)} class="btn btn-secondary shrink-0">{c.entryCta}</a>
+      </div>
+
+      {caseStudies.length > 0 && (
+        <>
+          <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.casesTitle}</h3>
+          <div class="mt-6 grid gap-6 lg:grid-cols-3">
+            {caseStudies.map((study) => <CaseStudyCard study={study} lang={lang} headingLevel="h4" />)}
+          </div>
+        </>
+      )}
     </div>
   </section>
 
-  <!-- 4. OFFRE PIED DANS LA PORTE -->
-  <section class="pb-16 md:pb-24" aria-label={fr ? 'Diagnostic VSM Express' : 'VSM Express Diagnostic'}>
-    <div class="container-pl">
-      <VsmExpressOffer lang={lang} variant="teaser" />
+  <!-- 3. LE FONDATEUR -->
+  <section class="border-y border-bordure bg-zebra py-16 md:py-24" aria-labelledby="h-founder">
+    <div class="container-pl grid gap-10 md:grid-cols-[12rem_1fr] lg:grid-cols-[15rem_minmax(0,1fr)_minmax(0,19rem)] lg:gap-14">
+      <img
+        src={site.founder.photo}
+        alt={fr ? `${site.founder.name}, fondateur de Phi-Lean` : `${site.founder.name}, founder of Phi-Lean`}
+        width="800"
+        height="1000"
+        class="aspect-[4/5] w-full max-w-[15rem] object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      <div>
+        <h2 id="h-founder" class="text-3xl font-bold tracking-tight text-bleu">{site.founder.name}</h2>
+        <p class="mt-1 font-bold text-anthracite/70">{c.founderRole}</p>
+        <p class="mt-5 max-w-[62ch] text-lg leading-relaxed">{c.founderBio}</p>
+        <a href={path('about', lang)} class="link-pl mt-6 inline-block">{c.founderCta}</a>
+      </div>
+      <dl class="divide-y divide-bordure border-y border-bordure md:col-span-2 lg:col-span-1">
+        {c.credentials.map((cr) => (
+          <div class="grid grid-cols-[7.5rem_1fr] gap-3 py-3 text-[0.97rem]">
+            <dt class="text-gris">{cr.k}</dt>
+            <dd class="font-bold text-anthracite">{cr.v}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   </section>
 
-  <!-- 5. PHI-LEAN PRESS -->
-  <section class="border-y border-bordure bg-zebra py-16 md:py-24" aria-labelledby="press">
+  <!-- 4. NOS TRAVAUX -->
+  <section class="py-16 md:py-24" aria-labelledby="h-works">
     <div class="container-pl">
       <div class="flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <h2 id="press" class="section-title">{c.pressTitle}</h2>
-          <p class="lead mt-6">{c.pressLead}</p>
-        </div>
-        <a href={path('publications', lang)} class="btn btn-secondary">{c.pressAll}</a>
+        <h2 id="h-works" class="section-title">{c.worksTitle}</h2>
+        <a href={path('publications', lang)} class="link-pl">{c.worksAll}</a>
       </div>
-      <div class="mt-12 grid gap-12 lg:grid-cols-[2fr_1fr]">
-        <div class="grid gap-10 sm:grid-cols-3">
-          {books.map((book) => <BookCard book={book} lang={lang} compact />)}
-        </div>
-        <aside class="border border-bordure bg-white p-6" aria-labelledby="wp-home">
-          <h3 id="wp-home" class="text-lg font-bold text-turquoise-fonce">{c.pressWp}</h3>
-          <ul class="mt-4 divide-y divide-bordure">
-            {whitePapers.map((wp) => (
-              <li class="py-3.5">
-                <a href={path('publications', lang, '#white-papers')} class="font-bold text-anthracite hover:text-bleu hover:underline">
-                  {wp.title[lang]}
-                </a>
-                <p class="mt-1 text-sm text-gris">{wp.pages} pages</p>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      </div>
+      <blockquote class="mt-10 max-w-[48rem] border-l-4 border-soleil pl-6">
+        <p class="text-xl leading-relaxed text-anthracite md:text-2xl">« {c.quote} »</p>
+        <footer class="mt-3 text-sm text-gris">{site.founder.name}, <cite>{c.quoteSource}</cite></footer>
+      </blockquote>
+      <ul class="mt-12 grid gap-x-10 gap-y-10 md:grid-cols-3">
+        {works.map((w) => (
+          <li class="grid grid-cols-[5.5rem_1fr] gap-5">
+            <a href={w.href} {...(w.download ? { download: true } : {})} class="block self-start border border-bordure bg-white" tabindex="-1" aria-hidden="true">
+              <img src={w.thumb} alt="" width="340" height="481" class="block aspect-[1/1.414] w-full object-cover object-top" loading="lazy" decoding="async" />
+            </a>
+            <div>
+              <h3 class="text-lg leading-snug font-bold text-anthracite" lang={w.lang !== lang ? w.lang : undefined}>{w.title}</h3>
+              <p class="mt-1 text-sm text-gris">{w.meta}</p>
+              <p class="mt-2 text-[0.97rem] text-anthracite/85">{w.text}</p>
+              <a href={w.href} {...(w.download ? { download: true } : {})} class="mt-3 inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+                {w.download && <Icon name="download" size={16} />}
+                {w.download ? c.download : c.bookLink}
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
-  <!-- 6. FONDATEUR -->
-  <section class="py-16 md:py-24" aria-label={c.founderEyebrow}>
-    <div class="container-pl">
-      <FounderBlock lang={lang} />
-    </div>
-  </section>
-
-  <CtaBand lang={lang} />
+  <CtaBand lang={lang} title={c.ctaTitle} text={c.ctaText} />
 </BaseLayout>
+
+<script>
+  // Lecture de la maison : l'étage dont l'explication traverse le milieu de l'écran reste net.
+  const maison = document.querySelector<HTMLElement>('[data-maison]');
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-house-row]')];
+  if (maison && rows.length && 'IntersectionObserver' in window) {
+    const visible = new Set<string>();
+    const update = () => {
+      const current = rows.filter((r) => visible.has(r.dataset.houseRow!)).pop();
+      if (current) maison.dataset.active = current.dataset.houseRow;
+      else delete maison.dataset.active;
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          const id = (e.target as HTMLElement).dataset.houseRow!;
+          if (e.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        });
+        update();
+      },
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    rows.forEach((r) => observer.observe(r));
+  }
+</script>
