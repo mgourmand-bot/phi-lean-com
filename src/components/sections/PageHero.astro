@@ -1,7 +1,9 @@
 ---
 /**
  * En-tête des pages intérieures : fil d'Ariane, grand titre bleu,
- * chapeau, liseré tricolore. Un slot « aside » accueille un encadré à droite.
+ * chapeau, liseré tricolore. Un slot « aside » accueille un encadré à droite,
+ * un slot « before » une étiquette au-dessus du titre.
+ * `parents` : niveaux intermédiaires du fil d'Ariane (pages détail).
  */
 import { routes, type Lang } from '@/i18n/routes';
 
@@ -10,8 +12,10 @@ interface Props {
   title: string;
   lead: string;
   crumb: string;
+  parents?: { label: string; href: string }[];
+  size?: 'xl' | 'lg';
 }
-const { lang, title, lead, crumb } = Astro.props;
+const { lang, title, lead, crumb, parents = [], size = 'xl' } = Astro.props;
 const hasAside = Astro.slots.has('aside');
 ---
 <section class="border-b border-bordure bg-zebra">
@@ -20,11 +24,18 @@ const hasAside = Astro.slots.has('aside');
       <nav aria-label={lang === 'fr' ? "Fil d'Ariane" : 'Breadcrumb'} class="mb-6 text-sm text-gris">
         <ol class="flex flex-wrap items-center gap-2">
           <li><a href={routes.home[lang]} class="hover:text-bleu hover:underline">{lang === 'fr' ? 'Accueil' : 'Home'}</a></li>
+          {parents.map((p) => (
+            <>
+              <li aria-hidden="true">/</li>
+              <li><a href={p.href} class="hover:text-bleu hover:underline">{p.label}</a></li>
+            </>
+          ))}
           <li aria-hidden="true">/</li>
           <li aria-current="page" class="font-bold text-anthracite">{crumb}</li>
         </ol>
       </nav>
-      <h1 class="max-w-[22ch] text-4xl font-bold tracking-tight text-bleu sm:text-5xl lg:text-6xl">{title}</h1>
+      <slot name="before" />
+      <h1 class:list={['max-w-[22ch] font-bold tracking-tight text-bleu', size === 'xl' ? 'text-4xl sm:text-5xl lg:text-6xl' : 'text-[2.1rem] leading-[1.12] sm:text-[2.6rem] lg:text-5xl']}>{title}</h1>
       <div class="stripe-tri mt-7 w-36" aria-hidden="true"></div>
       <p class="lead mt-7">{lead}</p>
       <slot name="actions" />

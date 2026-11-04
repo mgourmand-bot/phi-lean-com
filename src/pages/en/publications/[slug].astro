@@ -1,0 +1,11 @@
+---
+/** Page for each book or paper, in English (/en/publications/<id>/). */
+import PublicationPage from '@/views/PublicationPage.astro';
+import { publications } from '@/data/publications';
+
+export function getStaticPaths() {
+  return publications.map((p) => ({ params: { slug: p.id }, props: { id: p.id } }));
+}
+const { id } = Astro.props;
+---
+<PublicationPage lang="en" id={id} />

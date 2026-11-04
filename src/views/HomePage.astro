@@ -14,10 +14,13 @@ import MaisonPhiLean from '@/components/MaisonPhiLean.astro';
 import CaseStudyCard from '@/components/CaseStudyCard.astro';
 import CtaBand from '@/components/sections/CtaBand.astro';
 import Icon from '@/components/ui/Icon.astro';
-import { house, floors, sources, type ElementId, type RefSegment } from '@/data/house';
+import { house, floors, sources, elementChip, type ElementId, type RefSegment, type FloorId } from '@/data/house';
+import { housePath, houseBase, publicationPath } from '@/i18n/slugs';
+import { getPublication, formatPubDate } from '@/data/publications';
 import { caseStudies } from '@/data/cases';
 import { vsmExpress } from '@/data/offers';
 import { site } from '@/config/site';
+import { founderHeadline, founderShortBio, founderProof, founderLinks } from '@/data/founder';
 import type { Lang } from '@/i18n/routes';
 import { path, anchorPath, formatPrice } from '@/i18n/utils';
 
@@ -33,7 +36,10 @@ const c = {
     title: 'Phi-Lean – Excellence opérationnelle : profitables aujourd’hui et demain',
     description:
       'Phi-Lean accompagne les dirigeants qui veulent une entreprise profitable aujourd’hui et demain : Lean Flux Usine, Lean Flux Supply Chain et gestion des risques, formation des équipes. Fondé par Manuel Gourmand.',
-    lead: 'Plutôt que de réduire ses dépenses, une entreprise doit faire croître ses revenus plus vite que ses dépenses. Phi-Lean aide les dirigeants à y parvenir, de l’usine à la supply chain, avec les équipes qui font le travail.',
+    h1: 'Profitables aujourd’hui et demain.',
+    subtitle: 'Une culture de l’excellence opérationnelle bâtie avec vos équipes.',
+    lead: 'Réduire les coûts ne suffit pas : vos revenus doivent croître plus vite que vos dépenses. Phi-Lean vous y aide, de l’usine à la supply chain.',
+    deeper: 'Approfondir',
     meet: 'Prendre rendez-vous',
     lines: 'Ce que nous faisons',
     readTitle: 'La maison, de la base au cap',
@@ -43,23 +49,20 @@ const c = {
     sheet: 'La planche et ses sources',
     sheetMeta: '(PDF, 2 pages)',
     sourcesTitle: 'Les sources de chaque élément',
-    sourcesLead: 'Chaque élément de la maison s’appuie sur des travaux de référence : sept ouvrages et articles, cités au format APA (7e édition).',
+    sourcesLead: 'Chaque élément de la maison s’appuie sur des travaux de référence : sept ouvrages et articles, cités au format APA (7e édition). Cliquez sur un élément pour lire l’analyse complète et ce que nous en faisons en mission.',
     sourcesDownload: 'Télécharger la maison et ses sources',
     refsLabel: 'Sources',
     whatTitle: 'Ce que nous faisons',
-    whatLead: 'Trois façons d’intervenir dans la maison, toujours sur le terrain et avec vos équipes.',
+    whatLead: 'Six façons d’intervenir dans la maison, toujours sur le terrain et avec vos équipes, des PME aux grands groupes.',
     entryTitle: 'Pour commencer : le Diagnostic VSM Express',
     entryText: `Trois jours sur site, un flux cartographié avec vos équipes, un plan d’action chiffré à 90 jours. Forfait de ${price} HT, déductible de la mission qui suit.`,
     entryCta: 'Voir le déroulé',
     casesTitle: 'Études de cas',
-    founderRole: 'Fondateur de Phi-Lean',
-    founderBio:
-      'Ancien Site Manager, Manuel Gourmand a géré et démarré une usine au Brésil, puis piloté depuis le Brésil une supply chain internationale. Il enseigne en écoles de commerce et d’ingénierie et publie sous la marque Phi-Lean Press. Il intervient depuis Liverdun (Grand Est) et Royal Tunbridge Wells (Kent), en français, en anglais et en portugais.',
-    founderCta: 'Le cabinet',
+    founderCta: 'Son parcours complet',
     credentials: [
-      { k: 'Formation', v: 'MSc Lean Enterprise' },
-      { k: 'Terrain', v: 'Direction et démarrage d’usine, supply chain internationale' },
-      { k: 'Enseignement', v: 'Écoles de commerce et d’ingénierie' },
+      { k: 'Formation', v: 'Ingénieur ENIM · MSc Lean Enterprise, University of Buckingham (Distinction)' },
+      { k: 'Terrain', v: 'Direction de site, démarrage et intégration d’usines, supply chain groupe' },
+      { k: 'Secteurs', v: 'Machines agricoles, voirie, papier, ingrédients pharmaceutiques, distribution' },
       { k: 'Langues', v: 'Français, anglais, portugais' },
     ],
     worksTitle: 'Nos travaux',
@@ -75,7 +78,10 @@ const c = {
     title: 'Phi-Lean – Operational excellence: profitable today and tomorrow',
     description:
       'Phi-Lean works with business leaders who want a company that is profitable today and tomorrow: Lean Plant Flow, Lean Supply Chain Flow and risk management, team training. Founded by Manuel Gourmand.',
-    lead: 'Instead of shrinking its expenses, a company must grow its income faster than its expenses. Phi-Lean helps business leaders get there, from the plant to the supply chain, with the teams who do the work.',
+    h1: 'Profitable today and tomorrow.',
+    subtitle: 'A culture of operational excellence, built with your teams.',
+    lead: 'Cutting costs is not enough: your income must grow faster than your expenses. Phi-Lean helps you get there, from the plant to the supply chain.',
+    deeper: 'Read more',
     meet: 'Book a call',
     lines: 'What we do',
     readTitle: 'The house, from the foundation up',
@@ -85,23 +91,20 @@ const c = {
     sheet: 'The house and its sources',
     sheetMeta: '(PDF in French, 2 pages)',
     sourcesTitle: 'The sources behind each element',
-    sourcesLead: 'Each element of the house rests on established work: seven books and articles, cited in APA style (7th edition).',
+    sourcesLead: 'Each element of the house rests on established work: seven books and articles, cited in APA style (7th edition). Click an element for the full analysis and what we do with it in our work.',
     sourcesDownload: 'Download the house and its sources',
     refsLabel: 'Sources',
     whatTitle: 'What we do',
-    whatLead: 'Three ways to work on the house, always on the ground and with your teams.',
+    whatLead: 'Six ways to work on the house, always on the ground and with your teams, from SMEs to large groups.',
     entryTitle: 'To get started: the VSM Express Diagnostic',
     entryText: `Three days on site, one value stream mapped with your teams, a costed 90-day action plan. Fixed fee of ${price} excl. VAT, deductible from the engagement that follows.`,
     entryCta: 'See how it works',
     casesTitle: 'Case studies',
-    founderRole: 'Founder of Phi-Lean',
-    founderBio:
-      'A former Site Manager, Manuel Gourmand managed and started up a plant in Brazil, then ran an international supply chain from Brazil. He teaches at business and engineering schools and publishes under the Phi-Lean Press imprint. He works from Liverdun (Grand Est, France) and Royal Tunbridge Wells (Kent, UK), in French, English and Portuguese.',
-    founderCta: 'The firm',
+    founderCta: 'His full career',
     credentials: [
-      { k: 'Education', v: 'MSc Lean Enterprise' },
-      { k: 'Field', v: 'Plant management and start-up, international supply chain' },
-      { k: 'Teaching', v: 'Business and engineering schools' },
+      { k: 'Education', v: 'ENIM engineer · MSc Lean Enterprise, University of Buckingham (Distinction)' },
+      { k: 'Field', v: 'Site management, plant start-up and integration, group supply chain' },
+      { k: 'Sectors', v: 'Agricultural machinery, municipal vehicles, paper, pharmaceutical ingredients, distribution' },
       { k: 'Languages', v: 'French, English, Portuguese' },
     ],
     worksTitle: 'Our writing',
@@ -123,15 +126,17 @@ const floorColor: Record<string, string> = {
   cap: 'text-soleil-fonce',
 };
 
-/** Pastilles des sources, dessinées comme l'élément correspondant de la maison. */
-const chip: Record<ElementId, string> = {
-  cap: 'rounded-full border-2 border-dashed border-soleil bg-white text-soleil-fonce',
-  resultat: 'border-2 border-bleu bg-bleu text-white',
-  methode: 'border-2 border-bleu bg-white text-bleu',
-  capacite: 'border border-bleu bg-ciel text-bleu',
-  valeur: 'border border-bleu bg-ciel text-bleu',
-  socle: 'border-2 border-bleu-nuit bg-bleu-nuit text-white',
+/** Pastilles des sources : chacune mène à la page de son élément. */
+const chip = elementChip;
+/** Étage → élément(s) de la maison qui ont une page. */
+const floorElements: Record<FloorId, ElementId[]> = {
+  socle: ['socle'],
+  leviers: ['capacite', 'valeur'],
+  methode: ['methode'],
+  resultat: ['resultat'],
+  cap: ['cap'],
 };
+const elementName = (id: ElementId) => sources.find((g) => g.id === id)!.element[lang];
 // Les références sont en anglais (lang="en") ; seul un segment traduit suit la langue de la page.
 const seg = (x: RefSegment) =>
   typeof x === 'string' ? { text: x, kind: 'plain' } : 'i' in x ? { text: x.i, kind: 'italic' } : { text: x.t[lang], kind: 'local' };
@@ -146,12 +151,28 @@ const offers = [
     links: [{ href: anchorPath('consulting', 'usine', lang), label: fr ? 'Lean Flux Usine' : 'Lean Plant Flow' }],
   },
   {
+    floor: fr ? 'Les piliers, dans les bureaux' : 'The pillars, in the office',
+    title: fr ? 'Lean Flux Services' : 'Lean Services Flow',
+    text: fr
+      ? 'Pour les entreprises de service et les fonctions support : mesurer la demande d’échec (relances, ressaisies, réclamations), raccourcir le délai client, automatiser seulement au bon endroit.'
+      : 'For service businesses and support functions: measure failure demand (chasers, re-keying, complaints), shorten customer lead time, automate only in the right place.',
+    links: [{ href: path('services', lang), label: fr ? 'Lean Flux Services' : 'Lean Services Flow' }],
+  },
+  {
     floor: fr ? 'La poutre : le flux de bout en bout' : 'The beam: the end-to-end flow',
     title: fr ? 'Lean Flux Supply Chain' : 'Lean Supply Chain Flow',
     text: fr
-      ? 'Le même regard au-delà de vos murs, des fournisseurs aux clients, avec un focus sur la gestion des risques : savoir à l’avance où la chaîne peut casser, et ce qui est prêt pour y faire face.'
-      : 'The same view beyond your walls, from suppliers to customers, with a focus on risk management: knowing in advance where the chain can break, and what is ready to cope.',
+      ? 'Le même regard au-delà de vos murs, des fournisseurs aux clients : flux tirés entre sites et entrepôts, stocks de sécurité dimensionnés, S&OP qui fonctionne.'
+      : 'The same view beyond your walls, from suppliers to customers: pull flows between sites and warehouses, properly sized safety stock, an S&OP that works.',
     links: [{ href: anchorPath('consulting', 'supply', lang), label: fr ? 'Lean Flux Supply Chain' : 'Lean Supply Chain Flow' }],
+  },
+  {
+    floor: fr ? 'Le toit : le « demain »' : 'The roof: the “tomorrow”',
+    title: 'Lean Supply Chain Risk Management',
+    text: fr
+      ? 'Savoir combien de jours vous tenez si votre premier fournisseur s’arrête, et fermer les trous qui comptent. Une offre pour les PME, une pour les grands groupes.'
+      : 'Know how many days you can last if your first supplier stops, and close the gaps that matter. One offer for SMEs, one for large groups.',
+    links: [{ href: path('scrm', lang), label: fr ? 'Gestion des risques' : 'Risk management' }],
   },
   {
     floor: fr ? 'Le socle et le cap' : 'The foundation and the direction',
@@ -164,67 +185,36 @@ const offers = [
       { href: `${path('games', lang)}#codir-crise`, label: fr ? 'Exercice de crise' : 'Crisis exercise' },
     ],
   },
+  {
+    floor: fr ? 'Quand il faut quelqu’un, maintenant' : 'When you need someone, now',
+    title: fr ? 'Management de transition' : 'Interim management',
+    text: fr
+      ? 'Une direction de site, de supply chain, de maintenance ou des opérations à assurer pendant quelques mois : Manuel Gourmand prend le poste et laisse une organisation qui tient.'
+      : 'A site, supply chain, maintenance or operations leadership role to cover for a few months: Manuel Gourmand steps in and leaves an organisation that holds.',
+    links: [{ href: anchorPath('contact', 'form', lang, '?sujet=autre&detail=' + encodeURIComponent(fr ? 'Management de transition' : 'Interim management')), label: fr ? 'En parler' : 'Discuss it' }],
+  },
 ];
 
-const works = fr
-  ? [
-      {
-        title: 'Make Europe Great Again, Economically',
-        meta: 'Working Paper 25-01, janvier 2025, en anglais, 8 pages',
-        text: 'Le manifeste dont est issue la maison Phi-Lean : à quoi sert une entreprise, et pourquoi la réponse décide de tout le reste.',
-        thumb: '/images/articles/make-europe-great-again-economically.webp',
-        href: '/downloads/articles/make-europe-great-again-economically.pdf',
-        download: true,
-        lang: 'en',
-      },
-      {
-        title: 'La spirale d’attrition systémique',
-        meta: 'Cahier d’excellence opérationnelle n° 1, octobre 2026, 29 pages',
-        text: 'Comment l’intelligence artificielle menace le dernier avantage des PME, la proximité, et la feuille de route Lean pour y répondre.',
-        thumb: '/images/articles/spirale-attrition-systemique.webp',
-        href: '/downloads/articles/spirale-attrition-systemique.pdf',
-        download: true,
-        lang: 'fr',
-      },
-      {
-        title: 'Prendre le virage de l’IA',
-        meta: 'Livre, parution le 15 novembre 2026 sur Amazon',
-        text: 'Vingt fiches métiers et un autodiagnostic en dix questions, à l’usage des dirigeants de TPE et de PME.',
-        thumb: '/images/livres/prendre-le-virage-de-l-ia.webp',
-        href: anchorPath('publications', 'books', lang),
-        download: false,
-        lang: 'fr',
-      },
-    ]
-  : [
-      {
-        title: 'Make Europe Great Again, Economically',
-        meta: 'Working Paper 25-01, January 2025, 8 pages',
-        text: 'The manifesto behind the Phi-Lean house: what a company is really for, and why the answer decides everything else.',
-        thumb: '/images/articles/make-europe-great-again-economically.webp',
-        href: '/downloads/articles/make-europe-great-again-economically.pdf',
-        download: true,
-        lang: 'en',
-      },
-      {
-        title: 'The Systemic Attrition Spiral',
-        meta: 'Occasional Paper No. 1, October 2026, 25 pages',
-        text: 'How artificial intelligence threatens the last advantage of SMEs, proximity, and the Lean AI roadmap in response.',
-        thumb: '/images/articles/the-systemic-attrition-spiral.webp',
-        href: '/downloads/articles/the-systemic-attrition-spiral.pdf',
-        download: true,
-        lang: 'en',
-      },
-      {
-        title: 'Prendre le virage de l’IA',
-        meta: 'Book (in French), out on Amazon on 15 November 2026',
-        text: 'Twenty sheets by trade and a ten-question self-assessment, for leaders of small and mid-sized companies.',
-        thumb: '/images/livres/prendre-le-virage-de-l-ia.webp',
-        href: anchorPath('publications', 'books', lang),
-        download: false,
-        lang: 'fr',
-      },
-    ];
+// Nos travaux : quatre publications, chacune avec sa page (data : src/data/publications.ts)
+const workIds = fr
+  ? ['make-europe-great-again-economically', 'combien-de-jours-tenez-vous', 'spirale-attrition-systemique', 'prendre-le-virage-de-l-ia']
+  : ['make-europe-great-again-economically', 'state-of-the-art-supply-chain-risk-management-2026', 'the-systemic-attrition-spiral', 'combien-de-jours-tenez-vous'];
+const works = workIds.map((id) => {
+  const p = getPublication(id);
+  const isBook = p.kind === 'book';
+  const kind = isBook ? (p.file ? (fr ? 'E-book gratuit' : 'Free e-book') : fr ? 'Livre' : 'Book') : p.kind === 'article' && p.publication ? p.publication : fr ? 'Article' : 'Paper';
+  const when = isBook && p.releaseDate ? (fr ? `parution le ${formatPubDate(p.releaseDate, lang)}` : `out on ${formatPubDate(p.releaseDate, lang)}`) : formatPubDate(p.date, lang);
+  const langNote = p.lang !== lang ? (p.lang === 'fr' ? 'in French' : 'en anglais') : '';
+  return {
+    title: p.title,
+    meta: [kind, when, p.pages ? `${p.pages} pages` : '', langNote].filter(Boolean).join(' · '),
+    text: p.takeaways[lang][0],
+    thumb: isBook ? p.cover! : p.thumb!,
+    page: publicationPath(p.id, lang),
+    file: p.file,
+    lang: p.lang,
+  };
+});
 const manifestoFile = '/downloads/articles/make-europe-great-again-economically.pdf';
 ---
 <BaseLayout lang={lang} routeKey="home" title={c.title} description={c.description}>
@@ -233,10 +223,11 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
     <div class="container-pl grid gap-x-16 gap-y-12 pt-14 pb-10 md:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:pb-20">
       <div class="lg:pt-4">
         <p class="text-xs font-bold tracking-[0.16em] text-bleu uppercase">{house.eyebrow[lang]}</p>
-        <h1 id="h-home" class="mt-4 max-w-[19ch] text-[2.35rem] leading-[1.08] font-bold tracking-tight text-bleu sm:text-5xl xl:text-[3.3rem]">
-          {house.title[lang]}
+        <h1 id="h-home" class="mt-4 max-w-[16ch] text-[2.5rem] leading-[1.06] font-bold tracking-tight text-bleu sm:text-[3.4rem] xl:text-[3.75rem]">
+          {c.h1}
         </h1>
-        <p class="mt-7 max-w-[56ch] text-lg leading-relaxed text-anthracite/85 md:text-xl">{c.lead}</p>
+        <p class="mt-7 max-w-[30ch] text-xl leading-snug font-bold text-anthracite md:text-2xl">{c.subtitle}</p>
+        <p class="mt-4 max-w-[54ch] text-lg leading-relaxed text-anthracite/85 md:text-xl">{c.lead}</p>
         <div class="mt-9 flex flex-wrap gap-4">
           <a href={anchorPath('contact', 'meeting', lang)} class="btn btn-primary">
             <Icon name="calendar" size={18} />
@@ -249,7 +240,10 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
       <div class="lg:col-start-2 lg:row-span-2 lg:row-start-1">
         <div class="mx-auto max-w-[36rem] lg:sticky lg:top-28">
           <MaisonPhiLean lang={lang} />
-          <p class="mt-6 text-center text-sm text-gris">
+          <p class="mt-6 text-center">
+            <a href={houseBase[lang]} class="link-pl text-[0.95rem]">{fr ? 'Explorer la maison, élément par élément' : 'Explore the house, part by part'}</a>
+          </p>
+          <p class="mt-4 text-center text-sm text-gris">
             {c.caption}{' '}
             <a href={manifestoFile} download class="font-bold text-bleu underline decoration-bordure underline-offset-4 hover:decoration-bleu" lang="en">{c.manifesto}</a>
             {' '}{c.manifestoMeta}
@@ -262,8 +256,9 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
       </div>
 
       <div class="lg:col-start-1 lg:pb-28">
-        <h2 class="text-xl font-bold text-anthracite">{c.readTitle}</h2>
-        <ol class="mt-5">
+        <p class="text-xs font-bold tracking-[0.14em] text-gris uppercase">{c.readTitle}</p>
+        <h2 class="mt-2 max-w-[30ch] text-2xl leading-snug font-bold text-anthracite">{house.title[lang]}</h2>
+        <ol class="mt-6">
           {floors.map((f) => (
             <li id={`maison-${f.id}`} data-house-row={f.id} class="scroll-mt-28 border-t border-bordure py-8 lg:min-h-[17rem]">
               <p class:list={['text-xs font-bold tracking-[0.14em] uppercase', floorColor[f.id]]}>{f.label[lang]}</p>
@@ -272,6 +267,13 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
               <p class="mt-4 text-sm text-gris">
                 <span class="sr-only">{c.refsLabel} : </span>
                 <a href={`#source-${f.sourceId}`} class="italic underline decoration-bordure underline-offset-4 hover:text-bleu hover:decoration-bleu">{f.refs[lang]}</a>
+              </p>
+              <p class="mt-3 flex flex-wrap gap-x-5 gap-y-1">
+                {floorElements[f.id].map((el) => (
+                  <a href={housePath(el, lang)} class="link-pl text-[0.95rem]">
+                    {c.deeper}{floorElements[f.id].length > 1 ? ` : ${elementName(el)}` : ''}
+                  </a>
+                ))}
               </p>
             </li>
           ))}
@@ -296,8 +298,15 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
       <ol class="mt-10 border-b border-bordure">
         {sources.map((g) => (
           <li id={`source-${g.id}`} class="grid scroll-mt-28 gap-x-10 gap-y-3 border-t border-bordure py-6 md:grid-cols-[17.5rem_minmax(0,1fr)]">
-            <p class="self-start">
-              <span class:list={['inline-flex px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold', chip[g.id]]}>{g.element[lang]}</span>
+            <p class="flex flex-col items-start gap-2 self-start">
+              <a
+                href={housePath(g.id, lang)}
+                class:list={['inline-flex items-center gap-2 px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold shadow-[3px_3px_0_var(--color-bordure)] transition hover:-translate-y-0.5 hover:shadow-[4px_5px_0_var(--color-bordure)]', chip[g.id]]}
+              >
+                {g.element[lang]}
+                <span aria-hidden="true">→</span>
+              </a>
+              <a href={housePath(g.id, lang)} class="text-sm font-bold text-bleu hover:underline" tabindex="-1" aria-hidden="true">{c.deeper}</a>
             </p>
             <ul class="space-y-4">
               {g.refs.map((r) => (
@@ -320,7 +329,7 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
     <div class="container-pl">
       <h2 id="h-metiers" class="section-title">{c.whatTitle}</h2>
       <p class="lead mt-6">{c.whatLead}</p>
-      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-3">
+      <div class="mt-12 grid gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
         {offers.map((o) => (
           <article class="flex flex-col border-t-[3px] border-bleu pt-6">
             <p class="text-sm font-bold text-gris">{o.floor}</p>
@@ -366,9 +375,14 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
       />
       <div>
         <h2 id="h-founder" class="text-3xl font-bold tracking-tight text-bleu">{site.founder.name}</h2>
-        <p class="mt-1 font-bold text-anthracite/70">{c.founderRole}</p>
-        <p class="mt-5 max-w-[62ch] text-lg leading-relaxed">{c.founderBio}</p>
-        <a href={path('about', lang)} class="link-pl mt-6 inline-block">{c.founderCta}</a>
+        <p class="mt-1 font-bold text-turquoise-fonce">{founderHeadline[lang]}</p>
+        <p class="mt-5 max-w-[62ch] text-lg leading-relaxed">{founderShortBio[lang]}</p>
+        <p class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a href={anchorPath('about', 'founder', lang)} class="link-pl">{c.founderCta}</a>
+          <a href={founderLinks.linkedin} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+            <Icon name="linkedin" size={18} /> LinkedIn<span class="sr-only">{fr ? ' (nouvel onglet)' : ' (opens in a new tab)'}</span>
+          </a>
+        </p>
       </div>
       <dl class="divide-y divide-bordure border-y border-bordure md:col-span-2 lg:col-span-1">
         {c.credentials.map((cr) => (
@@ -378,6 +392,14 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
           </div>
         ))}
       </dl>
+      <ul class="grid gap-4 sm:grid-cols-2 md:col-span-2 lg:col-span-3 xl:grid-cols-4">
+        {founderProof.map((p) => (
+          <li class:list={['kpi-tile p-5', p.tone]}>
+            <p class="kpi-value text-3xl font-bold whitespace-nowrap">{p.value}</p>
+            <p class="mt-2 text-[0.93rem] leading-snug text-anthracite/85">{p.label[lang]}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
@@ -392,20 +414,26 @@ const manifestoFile = '/downloads/articles/make-europe-great-again-economically.
         <p class="text-xl leading-relaxed text-anthracite md:text-2xl">« {c.quote} »</p>
         <footer class="mt-3 text-sm text-gris">{site.founder.name}, <cite>{c.quoteSource}</cite></footer>
       </blockquote>
-      <ul class="mt-12 grid gap-x-10 gap-y-10 md:grid-cols-3">
+      <ul class="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-2">
         {works.map((w) => (
           <li class="grid grid-cols-[5.5rem_1fr] gap-5">
-            <a href={w.href} {...(w.download ? { download: true } : {})} class="block self-start border border-bordure bg-white" tabindex="-1" aria-hidden="true">
+            <a href={w.page} class="block self-start border border-bordure bg-white" tabindex="-1" aria-hidden="true">
               <img src={w.thumb} alt="" width="340" height="481" class="block aspect-[1/1.414] w-full object-cover object-top" loading="lazy" decoding="async" />
             </a>
             <div>
-              <h3 class="text-lg leading-snug font-bold text-anthracite" lang={w.lang !== lang ? w.lang : undefined}>{w.title}</h3>
+              <h3 class="text-lg leading-snug font-bold text-anthracite" lang={w.lang !== lang ? w.lang : undefined}>
+                <a href={w.page} class="hover:text-bleu hover:underline">{w.title}</a>
+              </h3>
               <p class="mt-1 text-sm text-gris">{w.meta}</p>
               <p class="mt-2 text-[0.97rem] text-anthracite/85">{w.text}</p>
-              <a href={w.href} {...(w.download ? { download: true } : {})} class="mt-3 inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
-                {w.download && <Icon name="download" size={16} />}
-                {w.download ? c.download : c.bookLink}
-              </a>
+              <p class="mt-3 flex flex-wrap gap-x-5 gap-y-1">
+                {w.file && (
+                  <a href={w.file} download class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+                    <Icon name="download" size={16} /> {c.download}
+                  </a>
+                )}
+                <a href={w.page} class="font-bold text-bleu hover:underline">{w.file ? (fr ? 'Présentation' : 'Overview') : c.bookLink}</a>
+              </p>
             </div>
           </li>
         ))}

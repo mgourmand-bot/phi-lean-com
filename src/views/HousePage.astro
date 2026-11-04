@@ -1,0 +1,69 @@
+---
+/**
+ * LA MAISON PHI-LEAN, VUE D'ENSEMBLE (FR « /maison/ », EN « /en/house/ »)
+ * Le dessin cliquable et les six éléments, chacun menant à sa page.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import MaisonPhiLean from '@/components/MaisonPhiLean.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { houseElements } from '@/data/houseElements';
+import { elementChip, house } from '@/data/house';
+import type { Lang } from '@/i18n/routes';
+import { housePath } from '@/i18n/slugs';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const c = fr
+  ? {
+      title: 'La maison Phi-Lean : les six éléments de la performance durable',
+      description: 'La maison Phi-Lean, élément par élément : raison d’être, profitabilité, pensée systémique, capacité, valeur ajoutée et équipes, avec les travaux de référence et leur mise en pratique.',
+      crumb: 'La maison Phi-Lean',
+      lead: 'Six éléments, de la base au cap. Chacun s’appuie sur des travaux de référence, et chacun a sa page : ce que dit la littérature, ce que nous en faisons en mission, et ce que cela changerait chez vous.',
+      read: 'Lire',
+      pdf: 'La planche et ses sources (PDF, 2 pages)',
+    }
+  : {
+      title: 'The Phi-Lean house: the six elements of lasting performance',
+      description: 'The Phi-Lean house, part by part: reason for being, profitability, systems thinking, capacity, added value and teams, with the reference works and how they are put into practice.',
+      crumb: 'The Phi-Lean house',
+      lead: 'Six parts, from the foundation to the direction. Each rests on reference works, and each has its own page: what the literature says, what we do with it in our work, and what it would change for you.',
+      read: 'Read',
+      pdf: 'The one-page house and its sources (PDF in French, 2 pages)',
+    };
+---
+<BaseLayout lang={lang} routeKey="house" title={c.title} description={c.description}>
+  <PageHero lang={lang} crumb={c.crumb} title={house.title[lang]} lead={c.lead} size="lg">
+    <div slot="aside" class="mx-auto w-full max-w-[30rem]">
+      <MaisonPhiLean lang={lang} links="pages" />
+    </div>
+    <p slot="actions" class="mt-7">
+      <a href={house.pdf} download class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+        <Icon name="download" size={16} /> {c.pdf}
+      </a>
+    </p>
+  </PageHero>
+
+  <section class="py-16 md:py-20">
+    <div class="container-pl">
+      <ul class="grid gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+        {houseElements.map((e) => (
+          <li class="flex flex-col border-t border-bordure pt-6">
+            <p><span class:list={['inline-flex px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold', elementChip[e.level]]}>{e.name[lang]}</span></p>
+            <h2 class="mt-4 text-xl leading-snug font-bold text-anthracite">
+              <a href={housePath(e.id, lang)} class="hover:text-bleu">{e.title[lang]}</a>
+            </h2>
+            <p class="mt-2 text-[0.97rem] text-anthracite/85">{e.lead[lang]}</p>
+            <a href={housePath(e.id, lang)} class="link-pl mt-auto self-start pt-4" aria-label={`${c.read} : ${e.name[lang]}`}>{c.read}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

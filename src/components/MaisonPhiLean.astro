@@ -6,6 +6,8 @@
  * - Chaque étage est un lien vers son explication (#maison-<étage>).
  * - Quand une explication est lue, la page met data-active sur la maison :
  *   l'étage concerné reste net, les autres s'estompent.
+ * - links="pages" (pages de la maison) : chaque élément, y compris chacun des
+ *   deux piliers, mène à sa page ; `active` met en valeur l'élément de la page.
 
  * Proportions et textes : planche « version executive » (piliers « Servir plus »
  * et « Servir mieux », chapiteau plus large que le fût).
@@ -14,51 +16,70 @@
  */
 import { house } from '@/data/house';
 import type { Lang } from '@/i18n/routes';
+import { housePath, type HouseElementId } from '@/i18n/slugs';
 
 interface Props {
   lang: Lang;
+  links?: 'anchors' | 'pages';
+  active?: HouseElementId;
+  animate?: boolean;
 }
-const { lang } = Astro.props;
+const { lang, links = 'anchors', active, animate = true } = Astro.props;
+const pages = links === 'pages';
+const href = (anchor: string, element: HouseElementId) => (pages ? housePath(element, lang) : `#maison-${anchor}`);
 const d = house.drawing;
 const fr = lang === 'fr';
 const label = fr
   ? 'La maison Phi-Lean. En bas, le socle : des équipes épanouies et compétentes, à moindres coûts. Au-dessus, deux piliers : servir plus, avec plus de capacité, et servir mieux, avec plus de valeur ajoutée, tous deux à moindres coûts. Une poutre les relie : Systems Thinking, la pensée systémique. Le toit : profitables aujourd’hui et demain. Au-dessus du toit, l’objectif ultime, relié au socle par une boucle.'
   : 'The Phi-Lean house. At the bottom, the foundation: fulfilled and competent teams, at lower cost. Above it, two pillars: serve more, with more capacity, and serve better, with more added value, both at lower cost. A beam ties them together: systems thinking. The roof: profitable today and tomorrow. Above the roof, the ultimate goal, linked to the foundation by a loop.';
 ---
-<figure class="maison m-0" data-maison aria-label={label} role="img">
+<figure class:list={['maison m-0', !animate && 'maison-static']} data-maison data-active={active} aria-label={label} role="img">
   <div class="maison-frame relative px-6" aria-hidden="true">
     <!-- Boucle cap ↔ socle -->
     <span class="maison-loop maison-loop-left"></span>
     <span class="maison-loop maison-loop-right"></span>
 
-    <a href="#maison-cap" data-level="cap" style="--d:640ms" class="maison-level maison-cap mx-auto flex w-[50%] items-center justify-center rounded-full border-2 border-dashed border-soleil bg-white text-center font-bold text-soleil-fonce" tabindex="-1">
+    <a href={href('cap', 'cap')} data-level="cap" style="--d:640ms" class="maison-level maison-cap mx-auto flex w-[50%] items-center justify-center rounded-full border-2 border-dashed border-soleil bg-white text-center font-bold text-soleil-fonce" tabindex="-1">
       {d.cap[lang]}
     </a>
 
-    <a href="#maison-resultat" data-level="resultat" style="--d:480ms" class="maison-level maison-roof mt-5 flex items-end justify-center bg-bleu pb-[2.4%] text-center font-bold text-white" tabindex="-1">
+    <a href={href('resultat', 'resultat')} data-level="resultat" style="--d:480ms" class="maison-level maison-roof mt-5 flex items-end justify-center bg-bleu pb-[2.4%] text-center font-bold text-white" tabindex="-1">
       <span class="maison-roof-text">{d.roof[lang]}</span>
     </a>
 
-    <a href="#maison-methode" data-level="methode" style="--d:320ms" class="maison-level mx-auto mt-2 flex h-12 w-[96%] items-center justify-center border-2 border-bleu bg-white font-bold text-bleu sm:h-14 sm:text-lg" tabindex="-1">
+    <a href={href('methode', 'methode')} data-level="methode" style="--d:320ms" class="maison-level mx-auto mt-2 flex h-12 w-[96%] items-center justify-center border-2 border-bleu bg-white font-bold text-bleu sm:h-14 sm:text-lg" tabindex="-1">
       {d.beam[lang]}
     </a>
 
-    <a href="#maison-leviers" data-level="leviers" style="--d:160ms" class="maison-level mt-2 grid grid-cols-2 gap-[10%] px-[3%] sm:gap-[20%] sm:px-[5%]" tabindex="-1">
-      {[
-        { head: d.pillarLeftHead[lang], body: d.pillarLeft[lang] },
-        { head: d.pillarRightHead[lang], body: d.pillarRight[lang] },
-      ].map((p) => (
-        <span class="flex flex-col">
+    {(() => {
+      const pillars = [
+        { head: d.pillarLeftHead[lang], body: d.pillarLeft[lang], id: 'capacite' as const },
+        { head: d.pillarRightHead[lang], body: d.pillarRight[lang], id: 'valeur' as const },
+      ];
+      const Wrap = pages ? 'div' : 'a';
+      const Pillar = pages ? 'a' : 'span';
+      return (
+    <Wrap
+      {...(pages ? {} : { href: '#maison-leviers', 'data-level': 'leviers', tabindex: '-1', style: '--d:160ms' })}
+      class:list={['mt-2 grid grid-cols-2 gap-[10%] px-[3%] sm:gap-[20%] sm:px-[5%]', !pages && 'maison-level']}
+    >
+      {pillars.map((p) => (
+        <Pillar
+          class:list={['flex flex-col', pages && 'maison-level']}
+          {...(pages ? { href: housePath(p.id, lang), 'data-level': p.id, tabindex: '-1', style: '--d:160ms' } : {})}
+        >
           <span class="flex h-9 items-center justify-center bg-bleu px-1 text-center text-sm leading-tight font-bold text-white sm:h-10 sm:text-base">{p.head}</span>
           <span class="mx-[6%] flex h-24 flex-col items-center justify-center border border-t-0 border-bleu bg-ciel px-1 text-center sm:h-28">
             <span class="text-[0.95rem] leading-tight font-bold text-bleu sm:text-[1.05rem]">{p.body}</span>
             <span class="mt-1 text-[0.7rem] text-gris sm:text-xs">{d.lowerCost[lang]}</span>
           </span>
-        </span>
+        </Pillar>
       ))}
-    </a>
+    </Wrap>
+      );
+    })()}
 
-    <a href="#maison-socle" data-level="socle" style="--d:0ms" class="maison-level maison-base relative z-10 flex flex-col items-center justify-center bg-bleu-nuit text-center text-white" tabindex="-1">
+    <a href={href('socle', 'socle')} data-level="socle" style="--d:0ms" class="maison-level maison-base relative z-10 flex flex-col items-center justify-center bg-bleu-nuit text-center text-white" tabindex="-1">
       <span class="font-bold sm:text-lg">{d.base[lang]}</span>
       <span class="text-[0.7rem] text-white/75 sm:text-xs">{d.lowerCost[lang]}</span>
     </a>
@@ -77,12 +98,11 @@ const label = fr
     aspect-ratio: 4.2 / 1;
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
   }
-  .maison-roof-text { font-size: clamp(0.8rem, 2.6vw, 1.15rem); }
+  /* Taille du texte du toit : proportionnelle à la largeur de la maison (unités de conteneur) */
+  .maison { container-type: inline-size; }
+  .maison-roof-text { font-size: clamp(0.62rem, 3.05cqi, 1.1rem); line-height: 1.15; }
   @media (min-width: 40rem) {
     .maison-roof { aspect-ratio: 5.4 / 1; }
-  }
-  @media (min-width: 64rem) {
-    .maison-roof-text { font-size: clamp(0.85rem, 1.2vw, 1.1rem); }
   }
 
   /* Boucle orange : du socle vers le cap, des deux côtés (flèche vers le cap) */
@@ -110,24 +130,29 @@ const label = fr
 
   .maison-level { transition: opacity 0.25s ease; }
 
-  /* Lecture en cours : l'étage lu reste net, les autres s'estompent */
+  /* Lecture en cours (ou page d'un élément) : l'élément lu reste net, les autres s'estompent */
   .maison[data-active] .maison-level { opacity: 0.22; }
   .maison[data-active] .maison-loop { opacity: 0.22; }
-  .maison[data-active="socle"] [data-level="socle"],
-  .maison[data-active="leviers"] [data-level="leviers"],
-  .maison[data-active="methode"] [data-level="methode"],
-  .maison[data-active="resultat"] [data-level="resultat"],
-  .maison[data-active="cap"] [data-level="cap"] { opacity: 1; }
+  /* Pages de la maison : les autres éléments sont cliquables, le survol les ravive */
+  .maison-static[data-active] .maison-level { opacity: 0.32; }
+  .maison-static[data-active] a.maison-level:hover { opacity: 0.75; }
+  .maison[data-active="socle"] .maison-level[data-level="socle"],
+  .maison[data-active="leviers"] .maison-level[data-level="leviers"],
+  .maison[data-active="methode"] .maison-level[data-level="methode"],
+  .maison[data-active="resultat"] .maison-level[data-level="resultat"],
+  .maison[data-active="cap"] .maison-level[data-level="cap"],
+  .maison[data-active="capacite"] .maison-level[data-level="capacite"],
+  .maison[data-active="valeur"] .maison-level[data-level="valeur"] { opacity: 1; }
   .maison[data-active="cap"] .maison-loop,
   .maison[data-active="socle"] .maison-loop { opacity: 1; }
 
   /* Montage de la base vers le cap, une seule fois au chargement */
   @media (prefers-reduced-motion: no-preference) {
-    .maison-level {
+    .maison:not(.maison-static) .maison-level {
       animation: maison-rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
       animation-delay: var(--d, 0ms);
     }
-    .maison-loop {
+    .maison:not(.maison-static) .maison-loop {
       animation: maison-fade 0.6s ease-out 0.85s backwards;
     }
   }

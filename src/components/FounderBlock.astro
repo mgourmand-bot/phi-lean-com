@@ -1,7 +1,21 @@
 ---
-/** Présentation du fondateur, avec son portrait. */
+/**
+ * Présentation complète du fondateur (page Le cabinet) : portrait, résultats,
+ * pour qui, parcours, formation, langues, liens pour vérifier.
+ * Contenu : src/data/founder.ts (d'après son CV).
+ */
 import Icon from './ui/Icon.astro';
 import { site } from '@/config/site';
+import {
+  founderHeadline,
+  founderProof,
+  founderForEveryone,
+  founderCareer,
+  founderEducation,
+  founderLanguages,
+  founderSources,
+  founderLinks,
+} from '@/data/founder';
 import type { Lang } from '@/i18n/routes';
 import { path } from '@/i18n/utils';
 
@@ -12,22 +26,13 @@ interface Props {
 }
 const { lang, showLink = true, headingLevel = 'h2' } = Astro.props;
 const Heading = headingLevel;
+const Sub = headingLevel === 'h2' ? 'h3' : 'h4';
 const fr = lang === 'fr';
-
-const credentials = fr
-  ? [
-      { title: 'MSc Lean Enterprise', text: 'Une formation de haut niveau aux principes et aux outils du Lean, du poste de travail à la stratégie.' },
-      { title: 'Ancien Site Manager', text: "Gestion et démarrage d'usine au Brésil, et pilotage d'une supply chain internationale depuis le Brésil." },
-      { title: 'Enseigne en écoles', text: "Il enseigne en écoles de commerce et d'ingénierie, où il fait vivre le Lean et la supply chain par le jeu." },
-    ]
-  : [
-      { title: 'MSc Lean Enterprise', text: 'Advanced training in Lean principles and tools, from the workstation to strategy.' },
-      { title: 'Former Site Manager', text: 'Managed and started up a plant in Brazil, and ran an international supply chain from Brazil.' },
-      { title: 'Teaches at schools', text: 'He teaches at business and engineering schools, where he brings Lean and supply chain to life through games.' },
-    ];
+const newTab = fr ? '(nouvel onglet)' : '(opens in a new tab)';
 ---
-<div class="grid items-start gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
-  <div class="relative max-w-[22rem]">
+<div class="grid items-start gap-10 lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-16">
+  <div class="max-w-[20rem] lg:sticky lg:top-28">
+    <div class="relative">
     <img
       src={site.founder.photo}
       alt={fr ? `${site.founder.name}, fondateur de Phi-Lean` : `${site.founder.name}, founder of Phi-Lean`}
@@ -38,55 +43,135 @@ const credentials = fr
       decoding="async"
     />
     <div class="stripe-tri absolute -bottom-3 left-6 w-2/3" aria-hidden="true"></div>
+    </div>
+    <a href={founderLinks.linkedin} target="_blank" rel="noopener" class="btn btn-secondary mt-8 w-full justify-center">
+      <Icon name="linkedin" size={18} /> {fr ? 'Son profil LinkedIn' : 'His LinkedIn profile'}
+      <span class="sr-only">{newTab}</span>
+    </a>
   </div>
 
   <div>
     <Heading class="section-title">{site.founder.name}</Heading>
-    <p class="mt-3 text-lg font-bold text-turquoise-fonce">{site.founder.jobTitle[lang]}</p>
-    <div class="mt-6 max-w-[64ch] space-y-4 text-[1.05rem]">
+    <p class="mt-3 text-lg font-bold text-turquoise-fonce">{founderHeadline[lang]}</p>
+    <div class="mt-6 max-w-[66ch] space-y-4 text-[1.05rem]">
       {fr ? (
         <>
           <p>
-            Avant de fonder Phi-Lean, Manuel Gourmand a géré et démarré une usine au Brésil, et piloté depuis le Brésil une
-            supply chain internationale. Il en a gardé une conviction : les outils Lean ne produisent des résultats durables
-            que si l'encadrement et les équipes les comprennent assez bien pour les faire vivre sans aide extérieure.
+            Ingénieur de l’ENIM, titulaire d’un MSc en Lean Enterprise de l’University of Buckingham, Manuel Gourmand a passé
+            quinze ans dans les opérations et la supply chain, en France, au Royaume-Uni, aux Pays-Bas, au Brésil et aux
+            États-Unis. Il a dirigé un site de production, compte de résultat compris, mené le démarrage d’une usine neuve,
+            intégré une usine rachetée et coordonné la distribution d’un groupe à travers onze plateformes régionales.
           </p>
           <p>
-            Il enseigne en écoles de commerce et d'ingénierie et publie sous la marque Phi-Lean Press. C'est le sens de la
-            signature du cabinet : <em>The True Philosophie of Lean</em>, le Lean comme manière de penser avant d'être une
-            boîte à outils. Il travaille en français, en anglais et en portugais.
+            Il en a gardé une conviction : les outils Lean ne produisent des résultats durables que si l’encadrement et les
+            équipes les comprennent assez bien pour les faire vivre sans aide extérieure. C’est le sens de la signature du
+            cabinet, <em>The True Philosophie of Lean</em>. Il intervient en écoles de commerce et d’ingénierie, publie sous
+            la marque Phi-Lean Press et accepte aussi des missions de management de transition.
           </p>
         </>
       ) : (
         <>
           <p>
-            Before founding Phi-Lean, Manuel Gourmand managed and started up a plant in Brazil, and ran an international supply
-            chain from Brazil. He came away with one conviction: Lean tools only deliver lasting results when managers and
-            teams understand them well enough to keep them alive without outside help.
+            An ENIM engineer with an MSc in Lean Enterprise from the University of Buckingham, Manuel Gourmand spent fifteen
+            years in operations and supply chain in France, the UK, the Netherlands, Brazil and the United States. He ran a
+            production site, P&amp;L included, led the start-up of a new plant, integrated an acquired plant and coordinated a
+            group’s distribution through eleven regional hubs.
           </p>
           <p>
-            He teaches at business and engineering schools and publishes under the Phi-Lean Press imprint. That is the meaning
-            of the firm's signature, <em>The True Philosophie of Lean</em>: Lean as a way of thinking before it is a toolbox. He
-            works in French, English and Portuguese.
+            He came away with one conviction: Lean tools only deliver lasting results when managers and teams understand them
+            well enough to keep them alive without outside help. That is the meaning of the firm’s signature, <em>The True
+            Philosophie of Lean</em>. He lectures at business and engineering schools, publishes under the Phi-Lean Press
+            imprint and also takes on interim management assignments.
           </p>
         </>
       )}
     </div>
-    <dl class="mt-8 grid gap-5 sm:grid-cols-3">
-      {credentials.map((c) => (
-        <div class="border-t-[3px] border-bleu pt-3">
-          <dt class="font-bold text-bleu">{c.title}</dt>
-          <dd class="mt-1 text-[0.95rem] text-anthracite/85">{c.text}</dd>
+
+    <ul class="mt-10 grid gap-4 sm:grid-cols-2">
+      {founderProof.map((p) => (
+        <li class:list={['kpi-tile p-5', p.tone]}>
+          <p class="kpi-value text-3xl font-bold whitespace-nowrap">{p.value}</p>
+          <p class="mt-2 text-[0.93rem] leading-snug text-anthracite/85">{p.label[lang]}</p>
+        </li>
+      ))}
+    </ul>
+
+    <Sub class="mt-14 text-2xl font-bold text-anthracite">{fr ? 'À l’aise partout où il y a un flux' : 'At home wherever there is a flow'}</Sub>
+    <div class="mt-6 grid gap-8 md:grid-cols-3">
+      {founderForEveryone.map((f) => (
+        <div class="border-t-[3px] border-bleu pt-4">
+          <p class="font-bold text-bleu">{f.title[lang]}</p>
+          <p class="mt-2 text-[0.97rem] text-anthracite/85">{f.text[lang]}</p>
         </div>
       ))}
-    </dl>
-    <div class="mt-8 flex flex-wrap items-center gap-5">
-      {showLink && <a href={path('about', lang)} class="btn btn-secondary">{fr ? 'Découvrir le cabinet' : 'About the firm'}</a>}
-      {site.founder.linkedin && (
-        <a href={site.founder.linkedin} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
-          <Icon name="linkedin" size={18} /> LinkedIn
-        </a>
-      )}
     </div>
+
+    <Sub class="mt-14 text-2xl font-bold text-anthracite">{fr ? 'Parcours' : 'Career'}</Sub>
+    <ol class="mt-6 border-l-2 border-bordure">
+      {founderCareer.map((step) => (
+        <li class="relative pb-7 pl-6 last:pb-0">
+          <span class="absolute top-1.5 -left-[7px] h-3 w-3 bg-bleu" aria-hidden="true"></span>
+          <p class="text-sm font-bold text-gris">{step.years} · {step.place[lang]}</p>
+          <p class="mt-1 text-lg font-bold text-anthracite">
+            {step.role[lang]},{' '}
+            {step.orgUrl ? (
+              <a href={step.orgUrl} target="_blank" rel="noopener" class="text-bleu underline decoration-bordure underline-offset-4 hover:decoration-bleu">
+                {step.org}<span class="sr-only"> {newTab}</span>
+              </a>
+            ) : (
+              <span class="text-bleu">{step.org}</span>
+            )}
+          </p>
+          <p class="mt-1 max-w-[70ch] text-[0.97rem] text-anthracite/85">{step.text[lang]}</p>
+        </li>
+      ))}
+    </ol>
+
+    <Sub class="mt-14 text-2xl font-bold text-anthracite">{fr ? 'Formation' : 'Education'}</Sub>
+    <div class="mt-6 grid gap-6 md:grid-cols-2">
+      {founderEducation.map((e) => (
+        <div class="border border-bordure bg-white p-6">
+          <p class="text-sm font-bold text-gris">{e.years}</p>
+          <p class="mt-1 text-lg font-bold text-anthracite">{e.title[lang]}</p>
+          <p class="font-bold text-bleu">
+            {e.url ? (
+              <a href={e.url} target="_blank" rel="noopener" class="underline decoration-bordure underline-offset-4 hover:decoration-bleu">
+                {e.school}<span class="sr-only"> {newTab}</span>
+              </a>
+            ) : (
+              e.school
+            )}
+          </p>
+          <p class="mt-3 text-[0.95rem] text-anthracite/85">{e.text[lang]}</p>
+        </div>
+      ))}
+    </div>
+    <p class="mt-6 text-[0.97rem]"><span class="font-bold">{fr ? 'Langues' : 'Languages'} :</span> {founderLanguages[lang]}</p>
+
+    <div class="mt-12 border-t border-bordure pt-6">
+      <p class="font-bold text-anthracite">{fr ? 'Pour vérifier par vous-même' : 'Check for yourself'}</p>
+      <ul class="mt-3 space-y-2 text-[0.95rem]">
+        {founderSources.map((s) => (
+          <li>
+            <a href={s.url} target="_blank" rel="noopener" class="inline-flex items-start gap-1.5 text-bleu hover:underline">
+              <Icon name="external" size={16} class="mt-0.5" />
+              <span>{s.label[lang]}<span class="sr-only"> {newTab}</span></span>
+            </a>
+          </li>
+        ))}
+        <li>
+          <a href={path('publications', lang)} class="inline-flex items-start gap-1.5 text-bleu hover:underline">
+            <Icon name="book" size={16} class="mt-0.5" />
+            <span>{fr ? 'Ses livres et articles, Phi-Lean Press (avec ISBN)' : 'His books and papers, Phi-Lean Press (with ISBN)'}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    {showLink && (
+      <div class="mt-8">
+        <a href={path('about', lang)} class="btn btn-secondary">{fr ? 'Découvrir le cabinet' : 'About the firm'}</a>
+      </div>
+    )}
   </div>
 </div>

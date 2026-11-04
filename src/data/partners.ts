@@ -34,8 +34,8 @@ export const partners: Partner[] = [
   {
     id: 'procid', name: 'Procid', anchor: 'procid',
     logo: '/images/partenaires/procid-logo.svg', logoWidth: 568, logoHeight: 62,
-    url: 'https://fr.linkedin.com/company/procid', urlLabel: 'LinkedIn',
-    short: { fr: 'Automatisme et informatique industrielle', en: 'Industrial automation and IT' },
+    url: 'https://www.procid-fr.com/', urlLabel: 'procid-fr.com',
+    short: { fr: 'Vision industrielle, intelligence artificielle et traçabilité', en: 'Machine vision, artificial intelligence and traceability' },
   },
   {
     id: 'start-and-grow', name: 'Start & Grow', anchor: 'startGrow',

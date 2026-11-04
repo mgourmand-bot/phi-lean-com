@@ -1,0 +1,290 @@
+---
+/**
+ * PAGE LEAN FLUX SERVICES (FR « /conseil/lean-flux-services/ », EN « /en/consulting/lean-services-flow/ »)
+ * Le Lean appliqué aux entreprises de service : demande de valeur et demande d'échec
+ * (Seddon, 2003), flux de service de bout en bout, technologie placée au bon endroit.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import { routes, type Lang } from '@/i18n/routes';
+import { anchorPath, path } from '@/i18n/utils';
+import { housePath, publicationPath } from '@/i18n/slugs';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+
+const c = {
+  fr: {
+    title: 'Lean Flux Services : le Lean appliqué aux entreprises de service',
+    description:
+      'Lean Flux Services : réduire les délais, les relances et les ressaisies dans les entreprises de service et les fonctions support. Analyse de la demande, cartographie du flux de service, plan à 90 jours.',
+    crumb: 'Lean Flux Services',
+    parent: 'Conseil',
+    h1: 'Lean Flux Services : vos dossiers attendent aussi',
+    lead: 'Dans une entreprise de service, le flux est invisible : pas de stock au sol, pas de chariot bloqué. Il se cache dans les boîtes mail, les files d’attente, les dossiers incomplets et les rappels clients. Lean Flux Services le rend visible, mesure ce qui n’aurait jamais dû exister, et reconstruit le service à partir de ce que le client demande vraiment.',
+    cta: 'Parler de votre service',
+    forTitle: 'Pour qui',
+    forLead: 'Toute organisation dont le produit est une demande traitée : un dossier, une commande, une intervention, un rendez-vous, une réponse.',
+    sectors: [
+      { title: 'Banque, assurance, mutuelles', text: 'Ouverture de compte, sinistre, demande de prêt, réclamation.' },
+      { title: 'Expertise comptable, conseil, professions libérales', text: 'Bilans, déclarations, dossiers clients qui attendent une pièce.' },
+      { title: 'Santé et services à la personne', text: 'Admissions, prises de rendez-vous, plannings, facturation.' },
+      { title: 'Transport, logistique, maintenance, SAV', text: 'Demandes d’intervention, retours, pièces de rechange, litiges.' },
+      { title: 'Services informatiques et éditeurs', text: 'Tickets de support, mises en service, demandes d’évolution.' },
+      { title: 'Fonctions support des entreprises industrielles', text: 'Administration des ventes, achats, comptabilité, RH, bureau d’études.' },
+    ],
+    symptomsTitle: 'Vous reconnaîtrez la situation',
+    symptoms: [
+      'Les clients relancent pour savoir où en est leur demande.',
+      'Un dossier passe par cinq personnes et revient incomplet.',
+      'Les délais promis ne sont pas tenus, alors que tout le monde travaille sans arrêt.',
+      'Les indicateurs sont verts (appels traités, temps moyen), et les clients mécontents.',
+      'Chaque nouvel outil ajoute une saisie au lieu d’en retirer.',
+    ],
+    demandTitle: 'Demande de valeur, demande d’échec',
+    demandText: [
+      'Le psychologue du travail britannique John Seddon a montré qu’une part de la charge d’un service n’existe que parce que quelque chose n’a pas été fait, ou mal fait, la première fois : le client rappelle, relance, corrige, se plaint. C’est la demande d’échec. Elle ne crée aucune valeur, et elle occupe des personnes que vous payez pour servir des clients.',
+      'La traiter plus vite ne sert à rien. Il faut la faire disparaître, en remontant à ce qui la provoque.',
+    ],
+    demandKpi: '80 %',
+    demandKpiLabel: 'de relances, de réclamations et de corrections sur 1 200 appels reçus par un service municipal du logement (Seddon, 2003).',
+    demandLink: 'Ce que la pensée systémique change, élément par élément',
+    methodTitle: 'Notre démarche, en six étapes',
+    method: [
+      { title: 'Écouter la demande', text: 'Une à deux semaines de demandes entrantes (appels, e-mails, formulaires) classées avec vos équipes : valeur ou échec, et pour quelle raison.' },
+      { title: 'Suivre un dossier de bout en bout', text: 'Une cartographie du flux de service (VSM), du premier contact à la réponse : temps de travail réel, temps d’attente, nombre de mains.' },
+      { title: 'Trouver les causes', text: 'Ressaisies, allers-retours, validations en cascade, informations manquantes, files d’attente entre deux services.' },
+      { title: 'Reconstruire le flux', text: 'Avec ceux qui font le travail : répondre au premier contact, décider au plus près du client, standardiser ce qui doit l’être.' },
+      { title: 'Mesurer ce qui compte pour le client', text: 'Délai de bout en bout, bon du premier coup, demande d’échec en baisse, plutôt que des volumes traités.' },
+      { title: 'Placer la technologie au bon endroit', text: 'Automatisation ou IA seulement là où le flux est propre : automatiser une relance, c’est industrialiser un défaut.' },
+    ],
+    leversTitle: 'Nos leviers',
+    levers: [
+      'Analyse de la demande et de ses causes',
+      'Cartographie du flux de service (VSM), état actuel et état futur',
+      'Management visuel des files et des engagements de délai',
+      'Standards de travail au bureau, et matrice des compétences',
+      'Lissage de la charge et affectation par compétences',
+      'Formation des équipes et des managers de proximité',
+    ],
+    deliverablesTitle: 'Ce que vous obtenez',
+    deliverables: [
+      'La part de demande d’échec, et ses causes classées',
+      'La cartographie du flux de service, avec son délai réel de bout en bout',
+      'Un plan d’action chiffré à 90 jours, centré sur le délai client et le bon du premier coup',
+      'Des standards et des routines transmis à vos équipes',
+    ],
+    gameTitle: 'Le vivre avant d’en parler : The Lean Café',
+    gameText: 'Un vrai café monté dans le hall de votre entreprise, de 3 à 16 participants : on sert de vrais clients, on mesure les attentes, on change l’organisation entre deux tours. Le flux d’un service devient visible en une matinée.',
+    gameCta: 'Découvrir The Lean Café',
+    expTitle: 'Une expérience vécue',
+    expText: 'Les services, Manuel Gourmand les a dirigés aussi : un centre de distribution de pièces de rechange (15 personnes, 15 M£ de chiffre d’affaires), un service d’ordonnancement pour une usine de 300 personnes, des projets de systèmes SAP chez Capgemini.',
+    aiTitle: 'Pourquoi maintenant',
+    aiText: 'Les grands groupes industrialisent la relation client avec l’intelligence artificielle. Une entreprise de service à taille humaine garde un avantage, la proximité, à condition que son flux ne la gaspille pas en relances et en ressaisies. Celles qui nettoient leur flux maintenant pourront automatiser au bon endroit ; les autres automatiseront leurs défauts.',
+    aiLink: 'Lire « La spirale d’attrition systémique »',
+    startTitle: 'Pour commencer',
+    startText: 'Un diagnostic de flux de service sur le modèle du Diagnostic VSM Express : trois jours chez vous, un flux suivi de bout en bout avec vos équipes, la demande d’échec mesurée, un plan d’action chiffré à 90 jours.',
+    startCta: 'Demander un diagnostic de flux de service',
+    vsmLink: 'Voir le Diagnostic VSM Express',
+  },
+  en: {
+    title: 'Lean Services Flow: Lean applied to service businesses',
+    description:
+      'Lean Services Flow: cutting lead times, chasers and re-keying in service businesses and support functions. Demand analysis, service value stream mapping, 90-day plan.',
+    crumb: 'Lean Services Flow',
+    parent: 'Consulting',
+    h1: 'Lean Services Flow: your files are waiting too',
+    lead: 'In a service business the flow is invisible: no stock on the floor, no stuck trolley. It hides in inboxes, queues, incomplete files and customer call-backs. Lean Services Flow makes it visible, measures what should never have existed, and rebuilds the service from what customers actually ask for.',
+    cta: 'Talk about your service',
+    forTitle: 'Who it is for',
+    forLead: 'Any organisation whose product is a request handled: a file, an order, a call-out, an appointment, an answer.',
+    sectors: [
+      { title: 'Banking, insurance, mutuals', text: 'Account opening, claims, loan applications, complaints.' },
+      { title: 'Accounting, consulting, professional services', text: 'Year-end accounts, returns, client files waiting for a document.' },
+      { title: 'Healthcare and personal services', text: 'Admissions, appointments, rotas, invoicing.' },
+      { title: 'Transport, logistics, maintenance, after-sales', text: 'Service requests, returns, spare parts, disputes.' },
+      { title: 'IT services and software vendors', text: 'Support tickets, onboarding, change requests.' },
+      { title: 'Support functions in industrial companies', text: 'Sales administration, purchasing, accounting, HR, engineering office.' },
+    ],
+    symptomsTitle: 'This will sound familiar',
+    symptoms: [
+      'Customers call back to ask where their request stands.',
+      'A file goes through five people and comes back incomplete.',
+      'Promised lead times are missed, while everyone works non-stop.',
+      'The indicators are green (calls handled, average handling time), and customers are unhappy.',
+      'Every new tool adds an input step instead of removing one.',
+    ],
+    demandTitle: 'Value demand, failure demand',
+    demandText: [
+      'British occupational psychologist John Seddon showed that part of a service’s workload exists only because something was not done, or not done right, the first time: the customer calls back, chases, corrects, complains. That is failure demand. It creates no value, and it ties up people you pay to serve customers.',
+      'Handling it faster is pointless. It has to disappear, by going back to what causes it.',
+    ],
+    demandKpi: '80%',
+    demandKpiLabel: 'of chasers, complaints and corrections in 1,200 calls received by a council housing service (Seddon, 2003).',
+    demandLink: 'What systems thinking changes, part by part',
+    methodTitle: 'Our approach, in six steps',
+    method: [
+      { title: 'Listen to demand', text: 'One to two weeks of incoming requests (calls, e-mails, forms) sorted with your teams: value or failure, and why.' },
+      { title: 'Follow one file end to end', text: 'A service value stream map, from first contact to answer: real work time, waiting time, number of hands.' },
+      { title: 'Find the causes', text: 'Re-keying, back-and-forth, cascading approvals, missing information, queues between two departments.' },
+      { title: 'Rebuild the flow', text: 'With the people who do the work: answer at first contact, decide close to the customer, standardise what should be.' },
+      { title: 'Measure what matters to the customer', text: 'End-to-end lead time, right first time, falling failure demand, rather than volumes handled.' },
+      { title: 'Put technology in the right place', text: 'Automation or AI only where the flow is clean: automating a chaser industrialises a defect.' },
+    ],
+    leversTitle: 'Our levers',
+    levers: [
+      'Demand analysis and its causes',
+      'Service value stream mapping, current and future state',
+      'Visual management of queues and lead-time commitments',
+      'Office standard work and skills matrix',
+      'Workload levelling and skills-based allocation',
+      'Training for teams and first-line managers',
+    ],
+    deliverablesTitle: 'What you get',
+    deliverables: [
+      'The share of failure demand, with its causes ranked',
+      'The service value stream map, with its real end-to-end lead time',
+      'A costed 90-day action plan, focused on customer lead time and right first time',
+      'Standards and routines handed over to your teams',
+    ],
+    gameTitle: 'Live it before talking about it: The Lean Café',
+    gameText: 'A real café set up in your company’s entrance hall, for 3 to 16 participants: you serve real customers, measure the waiting, and change the organisation between rounds. The flow of a service becomes visible in a morning.',
+    gameCta: 'Discover The Lean Café',
+    expTitle: 'From the field',
+    expText: 'Manuel Gourmand has run services too: a spare-parts distribution centre (15 people, £15M revenue), a scheduling department for a 300-person plant, SAP systems projects at Capgemini.',
+    aiTitle: 'Why now',
+    aiText: 'Large groups are industrialising customer relationships with artificial intelligence. A human-sized service business keeps one advantage, proximity, provided its flow does not waste it on chasers and re-keying. Those who clean up their flow now will be able to automate in the right place; the others will automate their defects.',
+    aiLink: 'Read “The Systemic Attrition Spiral”',
+    startTitle: 'To get started',
+    startText: 'A service flow diagnostic modelled on the VSM Express Diagnostic: three days on your premises, one flow followed end to end with your teams, failure demand measured, a costed 90-day action plan.',
+    startCta: 'Ask for a service flow diagnostic',
+    vsmLink: 'See the VSM Express Diagnostic',
+  },
+}[lang];
+
+const contactHref = anchorPath('contact', 'form', lang, '?sujet=lean-flux-services');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: c.crumb,
+  description: c.description,
+  serviceType: fr ? 'Conseil Lean pour les entreprises de service' : 'Lean consulting for service businesses',
+  provider: { '@id': `${site.url}/#organization` },
+  areaServed: ['FR', 'GB', 'BE', 'LU', 'CH', 'PT', 'IE'],
+};
+---
+<BaseLayout lang={lang} routeKey="services" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} parents={[{ label: c.parent, href: routes.consulting[lang] }]} title={c.h1} lead={c.lead} size="lg">
+    <div slot="actions" class="mt-8 flex flex-wrap gap-4">
+      <a href={contactHref} class="btn btn-primary">{c.cta}</a>
+      <a href={anchorPath('contact', 'meeting', lang)} class="btn btn-secondary"><Icon name="calendar" size={18} />{fr ? 'Prendre rendez-vous' : 'Book a call'}</a>
+    </div>
+    <div slot="aside" class="border-t-[6px] border-soleil bg-white p-6 md:p-7">
+      <p class="kpi-value text-5xl font-bold text-soleil-fonce">{c.demandKpi}</p>
+      <p class="mt-3 text-[0.97rem] text-anthracite/85">{c.demandKpiLabel}</p>
+    </div>
+  </PageHero>
+
+  <!-- POUR QUI -->
+  <section class="py-16 md:py-20" aria-labelledby="h-for">
+    <div class="container-pl">
+      <h2 id="h-for" class="section-title">{c.forTitle}</h2>
+      <p class="lead mt-6">{c.forLead}</p>
+      <ul class="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+        {c.sectors.map((s) => (
+          <li class="border-t-[3px] border-bleu pt-4">
+            <p class="text-lg font-bold text-anthracite">{s.title}</p>
+            <p class="mt-1 text-anthracite/85">{s.text}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-14 grid gap-10 lg:grid-cols-[1fr_1.1fr]">
+        <div>
+          <h3 class="text-xl font-bold text-anthracite">{c.symptomsTitle}</h3>
+          <ul class="list-square mt-4">{c.symptoms.map((s) => <li>{s}</li>)}</ul>
+        </div>
+        <div class="callout callout-blue self-start">
+          <p class="callout-head">{c.demandTitle}</p>
+          <div class="callout-body space-y-3">
+            {c.demandText.map((p) => <p>{p}</p>)}
+            <a href={housePath('methode', lang)} class="link-pl inline-block">{c.demandLink}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DÉMARCHE -->
+  <section class="border-y border-bordure bg-zebra py-16 md:py-20" aria-labelledby="h-method">
+    <div class="container-pl">
+      <h2 id="h-method" class="section-title">{c.methodTitle}</h2>
+      <ol class="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+        {c.method.map((m, i) => (
+          <li class="grid grid-cols-[2.5rem_1fr] gap-4">
+            <span class="grid h-10 w-10 place-items-center bg-bleu text-lg font-bold text-white" aria-hidden="true">{i + 1}</span>
+            <div>
+              <p class="text-lg font-bold text-anthracite">{m.title}</p>
+              <p class="mt-1 text-anthracite/85">{m.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div class="mt-14 grid gap-10 lg:grid-cols-2">
+        <div>
+          <h3 class="text-xl font-bold text-anthracite">{c.leversTitle}</h3>
+          <ul class="list-square mt-4">{c.levers.map((s) => <li>{s}</li>)}</ul>
+        </div>
+        <div class="callout callout-turq self-start">
+          <p class="callout-head">{c.deliverablesTitle}</p>
+          <div class="callout-body"><ul class="list-square">{c.deliverables.map((s) => <li>{s}</li>)}</ul></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIVRE, VÉCU, POURQUOI MAINTENANT -->
+  <section class="py-16 md:py-20">
+    <div class="container-pl grid gap-8 lg:grid-cols-3">
+      <div class="border border-bordure border-t-[6px] border-t-turquoise bg-white p-7">
+        <h2 class="text-xl font-bold text-anthracite">{c.gameTitle}</h2>
+        <p class="mt-3 text-anthracite/85">{c.gameText}</p>
+        <a href={path('games', lang)} class="link-pl mt-4 inline-block">{c.gameCta}</a>
+      </div>
+      <div class="border border-bordure border-t-[6px] border-t-bleu bg-white p-7">
+        <h2 class="text-xl font-bold text-anthracite">{c.expTitle}</h2>
+        <p class="mt-3 text-anthracite/85">{c.expText}</p>
+        <a href={anchorPath('about', 'founder', lang)} class="link-pl mt-4 inline-block">{fr ? 'Son parcours' : 'His career'}</a>
+      </div>
+      <div class="border border-bordure border-t-[6px] border-t-soleil bg-creme p-7">
+        <h2 class="text-xl font-bold text-anthracite">{c.aiTitle}</h2>
+        <p class="mt-3 text-anthracite/85">{c.aiText}</p>
+        <a href={publicationPath(fr ? 'spirale-attrition-systemique' : 'the-systemic-attrition-spiral', lang)} class="link-pl mt-4 inline-block">{c.aiLink}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- POUR COMMENCER -->
+  <section class="border-t border-bordure bg-zebra py-16 md:py-20" aria-labelledby="h-start">
+    <div class="container-pl">
+      <div class="callout callout-sun max-w-5xl">
+        <p class="callout-head">{c.startTitle}</p>
+        <div class="callout-body">
+          <h2 id="h-start" class="text-2xl font-bold text-bleu md:text-3xl">{fr ? 'Diagnostic de flux de service' : 'Service flow diagnostic'}</h2>
+          <p class="mt-3 max-w-[64ch] text-lg">{c.startText}</p>
+          <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <a href={contactHref} class="btn btn-primary">{c.startCta}</a>
+            <a href={anchorPath('consulting', 'vsmExpress', lang)} class="link-pl">{c.vsmLink}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

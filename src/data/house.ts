@@ -59,6 +59,16 @@ export const house = {
   pdf: '/downloads/la-maison-phi-lean.pdf',
 };
 
+/** Pastilles des éléments, dessinées comme l'élément correspondant de la maison. */
+export const elementChip: Record<ElementId, string> = {
+  cap: 'rounded-full border-2 border-dashed border-soleil bg-white text-soleil-fonce',
+  resultat: 'border-2 border-bleu bg-bleu text-white',
+  methode: 'border-2 border-bleu bg-white text-bleu',
+  capacite: 'border border-bleu bg-ciel text-bleu',
+  valeur: 'border border-bleu bg-ciel text-bleu',
+  socle: 'border-2 border-bleu-nuit bg-bleu-nuit text-white',
+};
+
 export const floors: Floor[] = [
   {
     id: 'socle',

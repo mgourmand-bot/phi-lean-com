@@ -10,14 +10,17 @@ import Icon from './ui/Icon.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { site } from '@/config/site';
 import { navigation, childHref } from '@/config/navigation';
-import { routes, type Lang, type RouteKey } from '@/i18n/routes';
+import { routes, type Lang, type RouteKey, type LangHrefs } from '@/i18n/routes';
 import { useTranslations, anchorPath } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
   routeKey?: RouteKey;
+  /** Page détail : liens du sélecteur de langue ; le menu reste allumé sans aria-current. */
+  langHrefs?: LangHrefs;
 }
-const { lang, routeKey } = Astro.props;
+const { lang, routeKey, langHrefs } = Astro.props;
+const currentRoute = langHrefs ? undefined : routeKey;
 const t = useTranslations(lang);
 const meetingHref = anchorPath('contact', 'meeting', lang);
 ---
@@ -36,7 +39,7 @@ const meetingHref = anchorPath('contact', 'meeting', lang);
             <li class="group relative">
               <a
                 href={routes[item.route][lang]}
-                aria-current={routeKey === item.route ? 'page' : undefined}
+                aria-current={currentRoute === item.route ? 'page' : undefined}
                 class:list={[
                   'relative flex items-center gap-1 whitespace-nowrap px-3 py-2 text-[0.95rem] font-bold transition-colors',
                   active ? 'text-bleu' : 'text-anthracite hover:text-bleu',
@@ -81,7 +84,7 @@ const meetingHref = anchorPath('contact', 'meeting', lang);
         <Icon name="bolt" size={16} class="text-soleil" />
         {t('nav.ai')}
       </a>
-      <LanguageSwitcher lang={lang} routeKey={routeKey} />
+      <LanguageSwitcher lang={lang} routeKey={routeKey} hrefs={langHrefs} />
       <a href={meetingHref} class="btn btn-primary">
         <Icon name="calendar" size={18} />
         {t('cta.meeting')}
@@ -114,7 +117,7 @@ const meetingHref = anchorPath('contact', 'meeting', lang);
           <li class="py-3">
             <a
               href={routes[item.route][lang]}
-              aria-current={routeKey === item.route ? 'page' : undefined}
+              aria-current={currentRoute === item.route ? 'page' : undefined}
               class:list={['block py-1 text-lg font-bold', routeKey !== undefined && item.activeFor.includes(routeKey) ? 'text-bleu' : 'text-anthracite']}
             >
               {item.label[lang]}
@@ -141,7 +144,7 @@ const meetingHref = anchorPath('contact', 'meeting', lang);
           <Icon name="bolt" size={16} class="text-soleil" />
           {t('nav.ai')}
         </a>
-        <LanguageSwitcher lang={lang} routeKey={routeKey} class="ml-auto" />
+        <LanguageSwitcher lang={lang} routeKey={routeKey} hrefs={langHrefs} class="ml-auto" />
       </div>
     </nav>
   </div>

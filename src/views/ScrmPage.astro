@@ -1,0 +1,478 @@
+---
+/**
+ * PAGE LEAN SUPPLY CHAIN RISK MANAGEMENT
+ * FR « /conseil/lean-supply-chain-risk-management/ », EN « /en/consulting/lean-supply-chain-risk-management/ »
+ * D'après la note de recherche « Supply Chain Risk Management : état de l'art et liens avec le Lean »,
+ * le Working Paper 26-04 (grandes entreprises) et l'e-book « Combien de jours tenez-vous ? » (PME).
+ * Deux publics : #pme (PME) et #grands-comptes (ETI et grands groupes).
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/config/site';
+import { routes, type Lang } from '@/i18n/routes';
+import { anchorPath } from '@/i18n/utils';
+import { housePath, publicationPath } from '@/i18n/slugs';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const fr = lang === 'fr';
+const sme = fr ? 'pme' : 'smes';
+const large = fr ? 'grands-comptes' : 'large-companies';
+const newTab = fr ? '(nouvel onglet)' : '(opens in a new tab)';
+
+const c = {
+  fr: {
+    title: 'Lean Supply Chain Risk Management : savoir combien de jours vous tenez',
+    description:
+      'Gestion des risques de la supply chain, avec la méthode Lean : temps de survie et temps de rétablissement, cartographie au-delà du rang 1, tests de résistance. Deux offres : PME et grandes entreprises.',
+    crumb: 'Lean Supply Chain Risk Management',
+    parent: 'Conseil',
+    h1: 'Combien de jours tenez-vous si votre premier fournisseur s’arrête lundi ?',
+    lead: 'La gestion des risques de la supply chain est une discipline mûre. Ce qui a changé en 2025 et 2026, ce n’est pas la théorie : c’est la fréquence et la combinaison des chocs. Une évaluation figée en 2024 mesure un monde qui n’existe plus. Nous remplaçons la photographie par un film, avec les méthodes du Lean.',
+    choose: 'Vous êtes',
+    smeChoice: 'Une PME',
+    smeChoiceText: 'Sans service risques dédié. Deux jours pour savoir où vous êtes à découvert.',
+    largeChoice: 'Une ETI ou un grand groupe',
+    largeChoiceText: 'Un réseau multi-sites et multi-rangs. Quatre-vingt-dix jours pour rattraper l’état de l’art.',
+    figuresTitle: 'Quatre chiffres pour situer l’enjeu',
+    figures: [
+      { v: '3,7 ans', l: 'fréquence moyenne d’une interruption d’un mois ou plus', s: 'McKinsey, 2020' },
+      { v: '> 40 %', l: 'd’une année de bénéfices effacés, une fois par décennie', s: 'McKinsey, 2020' },
+      { v: '3 %', l: 'des experts du risque jugent leur supply chain « très résiliente »', s: 'Allianz, 2026' },
+      { v: '51 %', l: 'voient une paralysie géopolitique comme le scénario extrême le plus plausible', s: 'Allianz, 2026' },
+    ],
+    whyTitle: 'Pourquoi une évaluation de 2024 est caduque',
+    why: [
+      { d: 'Sept. 2025', t: 'Cyberattaque chez Jaguar Land Rover : usines britanniques à l’arrêt plus d’un mois, fournisseurs PME au chômage technique.' },
+      { d: 'Oct. 2025', t: 'Crise Nexperia : l’automobile européenne privée de petites puces, alerte d’arrêt de production chez Volkswagen.' },
+      { d: 'Fév. 2026', t: 'Fermeture d’Ormuz et suspension de Suez : transits Asie–Europe allongés de 8 à 15 jours.' },
+      { d: 'Été 2026', t: 'Été le plus chaud jamais mesuré en Europe de l’Ouest, Rhin au plus bas : barges chargées à une fraction de leur capacité.' },
+      { d: 'Oct. 2026', t: 'Campagne britannique « Be Ready » : trois jours d’autonomie demandés à chaque foyer.' },
+    ],
+    whyNote: 'Une évaluation figée donne une probabilité à chaque événement, puis les traite séparément. 2025 et 2026 les ont additionnés.',
+    methodTitle: 'La méthode : compter en jours, pas en probabilités',
+    methodText: [
+      'Plutôt que de deviner la probabilité d’un événement que personne ne sait prévoir, David Simchi-Levi, au MIT, mesure deux durées pour chaque maillon : le temps de survie (combien de jours vous servez encore vos clients si ce maillon tombe) et le temps de rétablissement (combien de jours pour revenir à la normale).',
+      'Là où le temps de rétablissement dépasse le temps de survie, l’entreprise est à découvert. C’est là que se cache le prochain arrêt, et c’est souvent chez un petit fournisseur qu’on ne surveillait pas.',
+    ],
+    exTitle: 'Exemple',
+    exRows: [
+      { item: 'Acier, fournisseur unique', tts: 12, ttr: 45 },
+      { item: 'Serveur de gestion', tts: 2, ttr: 21 },
+      { item: 'Emballage, deux sources', tts: 20, ttr: 10 },
+    ],
+    exTts: 'Temps de survie',
+    exTtr: 'Temps de rétablissement',
+    exGap: 'Découvert',
+    exCovered: 'Couvert',
+    exDays: 'jours',
+    exMoney: '33 jours de découvert × 4 000 € de marge par jour = 132 000 € exposés. Pour une entreprise de trente personnes, c’est parfois plus d’une année de résultat net.',
+    leanTitle: 'Le Lean n’est pas l’accusé',
+    leanText: 'Chaque crise relance le même procès : le juste-à-temps aurait vidé les entrepôts. Le Lean n’interdit pas le stock ; il interdit le stock qui cache les problèmes. Depuis Fukushima, Toyota, l’inventeur du juste-à-temps, demande à ses fournisseurs de tenir deux à six mois de stock de puces, et sa base RESCUE a fait passer de deux semaines à douze heures le temps de localiser l’origine d’un problème.',
+    leanList: [
+      { k: 'Délai de bout en bout', v: 'un flux court, c’est une exposition plus courte' },
+      { k: 'VSM étendue aux fournisseurs', v: 'les points uniques et les vrais stocks deviennent visibles' },
+      { k: 'Lissage de la production', v: 'moins d’amplification de la demande vers l’amont' },
+      { k: 'Arrêt au défaut, résolution de problèmes', v: 'les réflexes d’une cellule de crise, déjà en place' },
+      { k: 'Polyvalence des équipes', v: 'de la capacité à se réorganiser quand un maillon tombe' },
+    ],
+    houseLink: 'Pourquoi c’est la condition du « demain » dans la maison Phi-Lean',
+    smeKicker: 'Pour les PME',
+    smeTitle: 'Le diagnostic « Combien de jours tenez-vous ? »',
+    smeLead: 'Une grande entreprise encaisse un choc avec sa trésorerie, ses juristes et ses acheteurs. Une PME l’encaisse avec son dirigeant. Les études montrent que les PME restent surtout réactives (Thun et al., 2011) ; c’est là qu’un accompagnement simple produit le plus d’effet.',
+    smeFacts: [
+      'Genex UK, 17 salariés, n’a jamais été piratée : l’arrêt de Jaguar Land Rover a suffi à mettre la majorité de l’équipe au chômage, sans salaire.',
+      'Octave, 38 salariés à Angers, a restauré ses systèmes six semaines après un rançongiciel. Sept mois après l’attaque, le tribunal prononçait la liquidation.',
+      'Pendant la crise d’Ormuz, 58 % des PME britanniques qui importent ou exportent se disaient touchées, avec 38 207 £ de pertes en moyenne.',
+    ],
+    smeDays: [
+      { d: 'Jour 1', t: 'Voir', x: 'La cartographie du flux du fournisseur au client, sur une feuille A3, avec vos équipes : stocks en jours, délais, points uniques (fournisseur, machine, personne, serveur).' },
+      { d: 'Jour 2', t: 'Compter', x: 'Temps de survie et temps de rétablissement de vos dix achats vitaux et de vos trois premiers clients, découverts chiffrés en marge exposée.' },
+    ],
+    smeDeliverables: ['La carte de vos trous, chiffrée', 'Trois actions prioritaires, chacune avec un responsable et une date', 'Un plan de continuité tenu sur une page'],
+    smeFor: 'Pour les entreprises de 15 à 80 salariés, adaptable au-delà.',
+    smeCta: 'Demander le diagnostic',
+    smeBook: 'Ou commencer seul avec l’e-book gratuit : 30 fiches, une par jour',
+    largeKicker: 'Pour les ETI et les grands groupes',
+    largeTitle: 'Rattraper l’état de l’art en quatre-vingt-dix jours',
+    largeLead: 'La plupart des comités de direction gèrent encore le risque supply chain avec une « Value at Risk » construite une fois, présentée aux auditeurs et classée. Six pratiques tiennent ; nous les installons avec vos équipes, sans acheter de logiciel avant la huitième semaine.',
+    practices: [
+      { t: 'Cartographier jusqu’au rang qui fait mal', x: 'Le rang 1 vous facture ; le risque vit souvent au rang 3. Vérifier qu’un double sourcing apparent ne repose pas sur une seule usine en amont.' },
+      { t: 'Remplacer la photographie par un film', x: 'Un modèle simple du réseau, temps de survie et de rétablissement à jour, un test de résistance chaque trimestre sur des scénarios combinés.' },
+      { t: 'Choisir son stock, ne pas le subir', x: 'Un tampon là où le rétablissement dépasse la survie ; et le stock qui ne protège rien, libéré. Un bon test libère souvent autant de trésorerie qu’il en immobilise.' },
+      { t: 'Protéger les petits fournisseurs', x: 'Un grand groupe est aussi résilient que la trésorerie de son fournisseur le plus fragile : payer à l’heure, financer le stock exigé, écrire le plan de continuité ensemble.' },
+      { t: 'Mettre cyber et climat sur la même carte', x: 'Un incident informatique chez un prestataire fait ce que fait une usine brûlée ; un fleuve trop bas, ce que fait un port fermé.' },
+      { t: 'Donner un propriétaire au risque', x: 'Un nom, des indicateurs avancés suivis chaque mois, un exercice de crise par an, une place permanente à l’ordre du jour du comité.' },
+    ],
+    offersTitle: 'Nos offres',
+    offers: [
+      { t: 'Cartographie étendue et test de résistance', x: 'VSM multi-rangs, temps de survie et de rétablissement par maillon, scénarios combinés, valeur exposée.', d: 'Registre des risques vivant, priorités chiffrées, feuille de route à 90 jours.' },
+      { t: 'Test de résistance trimestriel', x: 'Pour les clients déjà équipés : mise à jour des données, nouveaux scénarios, indicateurs avancés.', d: 'Tableau de bord et revue en comité de direction.' },
+      { t: 'Développement des fournisseurs PME', x: 'Pour les grands donneurs d’ordres : diagnostic des fournisseurs critiques et plans de continuité communs.', d: 'Des fournisseurs plus robustes, et des preuves de continuité.' },
+    ],
+    deliverableLabel: 'Livrable',
+    consultantTitle: 'Ce qu’un consultant doit apporter, et ne pas vendre',
+    consultantText: 'Aucun cabinet ne devrait vous vendre une nouvelle Value at Risk reliée et classée : elle serait périmée avant d’être lue. Nous apportons un regard extérieur, une méthode, du temps et des comparaisons entre secteurs, et nous laissons une capacité, pas un rapport : une équipe interne capable de refaire le test seule, un tableau de bord vivant, des achats qui négocient autrement.',
+    largeCta: 'Parler de votre réseau',
+    largePaper: 'Lire le Working Paper 26-04 : l’auto-évaluation en douze questions et le plan à 90 jours (en anglais)',
+    expTitle: 'Une expérience vécue',
+    expText: 'Manuel Gourmand a dirigé la supply chain de distribution d’un fournisseur de l’industrie pharmaceutique : une matière première produite aux États-Unis, en Allemagne, en Chine et en Corée, livrée aux clients par onze plateformes régionales. Il connaît le confort du document complet, et ses limites.',
+    fomoTitle: 'Ce qui arrive aux fournisseurs',
+    fomoText: 'Les États préparent la population et comptent sur les entreprises pour tenir les chaînes essentielles. Les grands donneurs d’ordres vont répercuter ces attentes sur leurs fournisseurs : questionnaires, preuves de continuité, cartographies. Le fournisseur qui sait dire combien de jours il tient devient celui qu’on garde.',
+    partnersText: 'Avec nos partenaires : la capacité des lignes en temps réel (Factbird) alimente le calcul du temps de survie ; la formation TWI à la polyvalence augmente la capacité de reconfiguration des équipes.',
+    sourcesTitle: 'Sources',
+  },
+  en: {
+    title: 'Lean Supply Chain Risk Management: know how many days you can last',
+    description:
+      'Supply chain risk management with Lean methods: time to survive and time to recover, mapping beyond tier one, stress tests. Two offers: SMEs and large companies.',
+    crumb: 'Lean Supply Chain Risk Management',
+    parent: 'Consulting',
+    h1: 'How many days would you last if your first supplier stopped on Monday?',
+    lead: 'Supply chain risk management is a mature discipline. What changed in 2025 and 2026 is not the theory: it is the frequency and the combination of shocks. An assessment frozen in 2024 measures a world that no longer exists. We replace the photograph with a film, using Lean methods.',
+    choose: 'You are',
+    smeChoice: 'An SME',
+    smeChoiceText: 'No dedicated risk department. Two days to find where you are exposed.',
+    largeChoice: 'A mid-cap or a large group',
+    largeChoiceText: 'A multi-site, multi-tier network. Ninety days to catch up with the state of the art.',
+    figuresTitle: 'Four figures to frame the stakes',
+    figures: [
+      { v: '3.7 years', l: 'average frequency of a disruption lasting a month or more', s: 'McKinsey, 2020' },
+      { v: '> 40%', l: 'of a year’s profit wiped out, once a decade', s: 'McKinsey, 2020' },
+      { v: '3%', l: 'of risk experts rate their supply chain “very resilient”', s: 'Allianz, 2026' },
+      { v: '51%', l: 'see geopolitical paralysis as the most plausible extreme scenario', s: 'Allianz, 2026' },
+    ],
+    whyTitle: 'Why a 2024 assessment is out of date',
+    why: [
+      { d: 'Sept 2025', t: 'Cyber attack at Jaguar Land Rover: British plants idle for over a month, SME suppliers laying staff off.' },
+      { d: 'Oct 2025', t: 'Nexperia crisis: European carmakers short of small chips, Volkswagen warns of a production stoppage.' },
+      { d: 'Feb 2026', t: 'Hormuz closed and Suez suspended: Asia–Europe transits 8 to 15 days longer.' },
+      { d: 'Summer 2026', t: 'Western Europe’s hottest summer on record, the Rhine near record lows: barges sailing a fraction full.' },
+      { d: 'Oct 2026', t: 'The UK “Be Ready” campaign: every household asked to last three days on its own.' },
+    ],
+    whyNote: 'A frozen assessment gives each event a probability, then treats them one at a time. 2025 and 2026 added them up.',
+    methodTitle: 'The method: count in days, not probabilities',
+    methodText: [
+      'Rather than guess the probability of an event nobody can forecast, MIT’s David Simchi-Levi measures two durations for every node: time to survive (how many days you can keep serving customers if that node goes down) and time to recover (how many days to get back to normal).',
+      'Where time to recover exceeds time to survive, the company is exposed. That is where the next stoppage hides, often at a small supplier nobody was watching.',
+    ],
+    exTitle: 'Example',
+    exRows: [
+      { item: 'Steel, single supplier', tts: 12, ttr: 45 },
+      { item: 'ERP server', tts: 2, ttr: 21 },
+      { item: 'Packaging, two sources', tts: 20, ttr: 10 },
+    ],
+    exTts: 'Time to survive',
+    exTtr: 'Time to recover',
+    exGap: 'Exposed',
+    exCovered: 'Covered',
+    exDays: 'days',
+    exMoney: '33 days exposed × €4,000 margin per day = €132,000 at stake. For a thirty-person company, that can be more than a year’s net profit.',
+    leanTitle: 'Lean is not the defendant',
+    leanText: 'Every crisis reopens the same trial: just-in-time emptied the warehouses. Lean does not forbid stock; it forbids stock that hides problems. Since Fukushima, Toyota, the inventor of just-in-time, has asked its suppliers to hold two to six months of chips, and its RESCUE database cut the time needed to locate the source of a problem from two weeks to twelve hours.',
+    leanList: [
+      { k: 'End-to-end lead time', v: 'a short flow is a shorter exposure' },
+      { k: 'VSM extended to suppliers', v: 'single points and real stocks become visible' },
+      { k: 'Production levelling', v: 'less demand amplification upstream' },
+      { k: 'Stop at the defect, problem solving', v: 'the reflexes of a crisis cell, already in place' },
+      { k: 'Multi-skilled teams', v: 'the capacity to reorganise when a node goes down' },
+    ],
+    houseLink: 'Why this is the “tomorrow” in the Phi-Lean house',
+    smeKicker: 'For SMEs',
+    smeTitle: 'The “How many days can you last?” diagnostic',
+    smeLead: 'A large company absorbs a shock with its cash, its lawyers and its buyers. An SME absorbs it with its owner. Research shows SMEs remain mostly reactive (Thun et al., 2011); that is where simple support has the most effect.',
+    smeFacts: [
+      'Genex UK, 17 staff, was never hacked: the Jaguar Land Rover shutdown was enough to lay off most of the team without pay.',
+      'Octave, 38 staff in Angers, restored its systems six weeks after a ransomware attack. Seven months after the attack, the court ordered its liquidation.',
+      'During the Hormuz crisis, 58% of UK SMEs that import or export said they were affected, with average losses of £38,207.',
+    ],
+    smeDays: [
+      { d: 'Day 1', t: 'See', x: 'The flow mapped from supplier to customer on one A3 sheet, with your teams: stock in days, lead times, single points (supplier, machine, person, server).' },
+      { d: 'Day 2', t: 'Count', x: 'Time to survive and time to recover for your ten vital purchases and your top three customers, with each gap priced as margin at stake.' },
+    ],
+    smeDeliverables: ['The map of your gaps, priced', 'Three priority actions, each with an owner and a date', 'A business continuity plan that fits on one page'],
+    smeFor: 'For companies of 15 to 80 employees, adaptable beyond.',
+    smeCta: 'Ask for the diagnostic',
+    smeBook: 'Or start on your own with the free e-book (in French): 30 sheets, one a day',
+    largeKicker: 'For mid-caps and large groups',
+    largeTitle: 'Catch up with the state of the art in ninety days',
+    largeLead: 'Most boards still manage supply chain risk with a Value at Risk built once, shown to the auditors and filed. Six practices hold; we install them with your teams, without buying software before week eight.',
+    practices: [
+      { t: 'Map down to the tier that hurts', x: 'Tier one invoices you; the risk often lives at tier three. Check that an apparent dual source does not rest on a single plant further up.' },
+      { t: 'Replace the photograph with a film', x: 'A simple model of the network, time to survive and time to recover kept up to date, a stress test every quarter on combined scenarios.' },
+      { t: 'Choose your stock, do not suffer it', x: 'A buffer where recovery exceeds survival; stock that protects nothing, released. A good stress test often frees as much cash as it ties up.' },
+      { t: 'Protect your smaller suppliers', x: 'A large group is as resilient as the cash position of its most fragile supplier: pay on time, finance the stock you demand, write the continuity plan together.' },
+      { t: 'Put cyber and climate on the same map', x: 'An IT incident at a provider does what a burnt-out plant does; a river too low does what a closed port does.' },
+      { t: 'Give the risk an owner', x: 'A name, leading indicators reviewed every month, a crisis exercise once a year, a standing place on the board agenda.' },
+    ],
+    offersTitle: 'Our offers',
+    offers: [
+      { t: 'Extended mapping and stress test', x: 'Multi-tier VSM, time to survive and time to recover by node, combined scenarios, value at stake.', d: 'A living risk register, costed priorities, a 90-day roadmap.' },
+      { t: 'Quarterly stress test', x: 'For clients already equipped: data refresh, new scenarios, leading indicators.', d: 'A dashboard and a board review.' },
+      { t: 'SME supplier development', x: 'For large buyers: diagnostic of critical suppliers and joint continuity plans.', d: 'Stronger suppliers, and proof of continuity.' },
+    ],
+    deliverableLabel: 'Deliverable',
+    consultantTitle: 'What a consultant should bring, and should not sell',
+    consultantText: 'No firm should sell you a new Value at Risk, bound and filed: it would be out of date before anyone read it. We bring an outside eye, a method, time and comparisons across industries, and we leave a capability, not a report: an internal team able to rerun the test alone, a live dashboard, a purchasing team that negotiates differently.',
+    largeCta: 'Talk about your network',
+    largePaper: 'Read Working Paper 26-04: the twelve-question self-audit and the 90-day plan',
+    expTitle: 'From the field',
+    expText: 'Manuel Gourmand ran the distribution supply chain of a supplier to the pharmaceutical industry: a raw material made in the United States, Germany, China and Korea, delivered to customers through eleven regional hubs. He knows the comfort of the complete document, and its limits.',
+    fomoTitle: 'What is coming for suppliers',
+    fomoText: 'Governments are preparing their populations and counting on companies to keep essential chains running. Large buyers will pass these expectations on to their suppliers: questionnaires, proof of continuity, maps. The supplier who can say how many days it can last becomes the one that is kept.',
+    partnersText: 'With our partners: real-time line capacity (Factbird) feeds the time-to-survive calculation; TWI training for multi-skilling increases the teams’ capacity to reconfigure.',
+    sourcesTitle: 'Sources',
+  },
+}[lang];
+
+const sources = [
+  { t: 'McKinsey Global Institute (2020). COVID-19 and climate change expose dangers of unstable supply chains.', u: 'https://www.mckinsey.com/capabilities/operations/our-insights/covid-19-and-climate-change-expose-dangers-of-unstable-supply-chains' },
+  { t: 'Allianz Commercial (2026). Allianz Risk Barometer 2026: Business interruption.', u: 'https://commercial.allianz.com/news-and-insights/expert-risk-articles/allianz-risk-barometer-2026-business-interruption.html' },
+  { t: 'Simchi-Levi, D., Schmidt, W., & Wei, Y. (2014). From superstorms to factory fires. Harvard Business Review, 92(1–2), 96–101.', u: 'https://dsl.mit.edu/biblio/superstorms-factory-fires-managing-unpredictable-supply-chain-disruptions' },
+  { t: 'Elsayed, M., Grosse Steffen, C., & Marx, M. (2026). Global supply chain tensions: Not all disruptions are alike. Banque de France.', u: 'https://www.banque-france.fr/en/publications-and-statistics/publications/global-supply-chain-tensions-not-all-disruptions-are-alike' },
+  { t: 'Barrett, E. (2021). How Toyota kept making cars when the chips were down. Fortune.', u: 'https://fortune.com/2021/08/02/toyota-cars-chip-shortage-semiconductors/amp/' },
+  { t: 'Reuters (2021). How Toyota thrives when the chips are down. The Japan Times.', u: 'https://www.japantimes.co.jp/news/2021/03/09/business/corporate-business/toyota-semiconductors-3-11' },
+  { t: 'Bibby Financial Services (2026). 70% of UK importers and exporters fear bankruptcy as Iran war hampers supply chains.', u: 'https://www.bibbyfinancialservices.com/news/70-percent-of-uk-importers-and-exporters-fear-bankruptcy-as-iran-war-hampers-supply-chains-and-drives-costs-higher' },
+  { t: 'BBC News (2025). Suppliers’ uncertainty despite JLR expected restart (AOL republication).', u: 'https://www.aol.com/articles/suppliers-uncertainty-despite-jlr-expected-063005447.html' },
+  { t: 'Clubic (2025). Une entreprise de logiciels basée en France terrassée par une cyberattaque.', u: 'https://www.clubic.com/actualite-558105-une-entreprise-de-logiciels-basee-en-france-terrassee-par-une-cyberattaque-et-elle-va-disparaitre.html' },
+  { t: 'Thun, J.-H., Drüke, M., & Hoenig, D. (2011). Managing uncertainty: An empirical analysis of supply chain risk management in SMEs. International Journal of Production Research, 49(18), 5511–5525.', u: 'https://www.econbiz.de/Record/managing-uncertainty-an-empirical-analysis-of-supply-chain-risk-management-in-small-and-medium-sized-enterprises/10009298524' },
+];
+
+const maxDays = Math.max(...c.exRows.flatMap((r) => [r.tts, r.ttr]));
+const smeHref = anchorPath('contact', 'form', lang, '?sujet=scrm-pme');
+const largeHref = anchorPath('contact', 'form', lang, '?sujet=scrm-grands-comptes');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Lean Supply Chain Risk Management',
+  description: c.description,
+  serviceType: 'Supply Chain Risk Management',
+  provider: { '@id': `${site.url}/#organization` },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: c.offersTitle,
+    itemListElement: [c.smeTitle, ...c.offers.map((o) => o.t)].map((name) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name } })),
+  },
+};
+---
+<BaseLayout lang={lang} routeKey="scrm" title={c.title} description={c.description} jsonLd={jsonLd}>
+  <PageHero lang={lang} crumb={c.crumb} parents={[{ label: c.parent, href: routes.consulting[lang] }]} title={c.h1} lead={c.lead} size="lg">
+    <div slot="before" class="mb-5"><span class="inline-flex border-2 border-bleu bg-white px-3.5 py-1.5 text-[0.95rem] font-bold text-bleu">Lean Supply Chain Risk Management</span></div>
+    <div slot="aside">
+      <p class="mb-3 text-xs font-bold tracking-[0.14em] text-gris uppercase">{c.choose}</p>
+      <div class="grid gap-4">
+        <a href={`#${sme}`} class="group block border border-bordure border-l-[6px] border-l-turquoise bg-white p-5 transition-colors hover:border-turquoise">
+          <span class="block text-xl font-bold text-turquoise-fonce group-hover:underline">{c.smeChoice} →</span>
+          <span class="mt-1 block text-[0.95rem] text-anthracite/85">{c.smeChoiceText}</span>
+        </a>
+        <a href={`#${large}`} class="group block border border-bordure border-l-[6px] border-l-bleu bg-white p-5 transition-colors hover:border-bleu">
+          <span class="block text-xl font-bold text-bleu group-hover:underline">{c.largeChoice} →</span>
+          <span class="mt-1 block text-[0.95rem] text-anthracite/85">{c.largeChoiceText}</span>
+        </a>
+      </div>
+    </div>
+  </PageHero>
+
+  <!-- CHIFFRES ET CONTEXTE -->
+  <section class="py-16 md:py-20" aria-labelledby="h-figures">
+    <div class="container-pl">
+      <h2 id="h-figures" class="section-title">{c.figuresTitle}</h2>
+      <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {c.figures.map((f, i) => (
+          <li class:list={['kpi-tile p-5', i < 2 ? 'kpi-sun' : 'kpi-coral']}>
+            <p class="kpi-value text-3xl font-bold whitespace-nowrap">{f.v}</p>
+            <p class="mt-2 text-[0.95rem] leading-snug">{f.l}</p>
+            <p class="mt-2 text-xs text-gris">{f.s}</p>
+          </li>
+        ))}
+      </ul>
+
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.whyTitle}</h3>
+      <ol class="mt-6 border-l-2 border-bordure">
+        {c.why.map((w) => (
+          <li class="relative grid gap-1 pb-5 pl-6 last:pb-0 sm:grid-cols-[8rem_1fr] sm:gap-6">
+            <span class="absolute top-1.5 -left-[7px] h-3 w-3 bg-corail" aria-hidden="true"></span>
+            <span class="font-bold text-corail">{w.d}</span>
+            <span class="text-anthracite/90">{w.t}</span>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-6 max-w-[70ch] text-lg font-bold text-anthracite">{c.whyNote}</p>
+    </div>
+  </section>
+
+  <!-- MÉTHODE TTS / TTR -->
+  <section class="border-y border-bordure bg-zebra py-16 md:py-20" aria-labelledby="h-method">
+    <div class="container-pl grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:items-start">
+      <div>
+        <h2 id="h-method" class="section-title">{c.methodTitle}</h2>
+        <div class="mt-6 max-w-[62ch] space-y-4 text-[1.05rem] leading-relaxed">{c.methodText.map((p) => <p>{p}</p>)}</div>
+      </div>
+      <figure class="m-0 border border-bordure bg-white p-6 md:p-7">
+        <figcaption class="text-xs font-bold tracking-[0.14em] text-gris uppercase">{c.exTitle}</figcaption>
+        <ul class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+          <li class="flex items-center gap-2"><span class="h-3 w-5 bg-turquoise" aria-hidden="true"></span>{c.exTts}</li>
+          <li class="flex items-center gap-2"><span class="h-3 w-5 bg-corail" aria-hidden="true"></span>{c.exTtr}</li>
+        </ul>
+        <div class="mt-5 space-y-6">
+          {c.exRows.map((r) => {
+            const gap = r.ttr - r.tts;
+            return (
+              <div>
+                <p class="flex flex-wrap items-baseline justify-between gap-2">
+                  <span class="font-bold text-anthracite">{r.item}</span>
+                  <span class:list={['text-sm font-bold', gap > 0 ? 'text-corail' : 'text-turquoise-fonce']}>
+                    {gap > 0 ? `${c.exGap} : ${gap} ${c.exDays}` : c.exCovered}
+                  </span>
+                </p>
+                <div class="mt-2 space-y-1.5" aria-hidden="true">
+                  <div class="flex items-center gap-2"><span class="block h-3 bg-turquoise" style={`width:${(r.tts / maxDays) * 85}%`}></span><span class="text-xs text-gris">{r.tts}</span></div>
+                  <div class="flex items-center gap-2"><span class="block h-3 bg-corail" style={`width:${(r.ttr / maxDays) * 85}%`}></span><span class="text-xs text-gris">{r.ttr}</span></div>
+                </div>
+                <p class="sr-only">{c.exTts} : {r.tts} {c.exDays}. {c.exTtr} : {r.ttr} {c.exDays}.</p>
+              </div>
+            );
+          })}
+        </div>
+        <p class="mt-6 border-t border-bordure pt-4 text-[0.95rem] text-anthracite/90">{c.exMoney}</p>
+      </figure>
+    </div>
+  </section>
+
+  <!-- LEAN ET RÉSILIENCE -->
+  <section class="py-16 md:py-20" aria-labelledby="h-lean">
+    <div class="container-pl grid gap-12 lg:grid-cols-2">
+      <div>
+        <h2 id="h-lean" class="section-title">{c.leanTitle}</h2>
+        <p class="mt-6 max-w-[62ch] text-[1.05rem] leading-relaxed">{c.leanText}</p>
+        <a href={housePath('resultat', lang)} class="link-pl mt-5 inline-block">{c.houseLink}</a>
+      </div>
+      <dl class="divide-y divide-bordure border-y border-bordure self-start">
+        {c.leanList.map((l) => (
+          <div class="grid gap-1 py-3 sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-4">
+            <dt class="font-bold text-bleu">{l.k}</dt>
+            <dd class="text-anthracite/85">{l.v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- PME -->
+  <section id={sme} class="scroll-mt-24 border-y border-bordure bg-menthe/60 py-16 md:py-24" aria-labelledby="h-sme">
+    <div class="container-pl">
+      <p class="text-xs font-bold tracking-[0.14em] text-turquoise-fonce uppercase">{c.smeKicker}</p>
+      <h2 id="h-sme" class="mt-2 text-3xl font-bold tracking-tight text-turquoise-fonce md:text-4xl">{c.smeTitle}</h2>
+      <p class="lead mt-5">{c.smeLead}</p>
+      <ul class="mt-8 grid gap-5 md:grid-cols-3">
+        {c.smeFacts.map((f) => <li class="border-l-4 border-corail bg-white p-5 text-[0.97rem]">{f}</li>)}
+      </ul>
+      <div class="mt-12 grid gap-8 lg:grid-cols-[1.3fr_1fr]">
+        <ol class="space-y-5">
+          {c.smeDays.map((d) => (
+            <li class="grid grid-cols-[5.5rem_1fr] gap-5 border border-bordure bg-white p-5">
+              <div>
+                <p class="text-sm font-bold text-gris">{d.d}</p>
+                <p class="text-2xl font-bold text-turquoise-fonce">{d.t}</p>
+              </div>
+              <p class="text-anthracite/90">{d.x}</p>
+            </li>
+          ))}
+        </ol>
+        <div class="callout callout-turq self-start">
+          <p class="callout-head">{fr ? 'Ce que vous obtenez' : 'What you get'}</p>
+          <div class="callout-body">
+            <ul class="list-square">{c.smeDeliverables.map((d) => <li>{d}</li>)}</ul>
+            <p class="mt-4 text-sm text-gris">{c.smeFor}</p>
+            <a href={smeHref} class="btn btn-primary mt-5">{c.smeCta}</a>
+          </div>
+        </div>
+      </div>
+      <a href={publicationPath('combien-de-jours-tenez-vous', lang)} class="mt-10 inline-flex items-center gap-2 font-bold text-bleu hover:underline">
+        <Icon name="book" size={18} /> {c.smeBook}
+      </a>
+    </div>
+  </section>
+
+  <!-- GRANDS COMPTES -->
+  <section id={large} class="scroll-mt-24 py-16 md:py-24" aria-labelledby="h-large">
+    <div class="container-pl">
+      <p class="text-xs font-bold tracking-[0.14em] text-bleu uppercase">{c.largeKicker}</p>
+      <h2 id="h-large" class="mt-2 text-3xl font-bold tracking-tight text-bleu md:text-4xl">{c.largeTitle}</h2>
+      <p class="lead mt-5">{c.largeLead}</p>
+      <ol class="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+        {c.practices.map((p, i) => (
+          <li class="grid grid-cols-[2.5rem_1fr] gap-4">
+            <span class="grid h-10 w-10 place-items-center bg-bleu text-lg font-bold text-white" aria-hidden="true">{i + 1}</span>
+            <div>
+              <p class="text-lg font-bold text-anthracite">{p.t}</p>
+              <p class="mt-1 text-[0.97rem] text-anthracite/85">{p.x}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+
+      <h3 class="mt-16 text-2xl font-bold text-anthracite">{c.offersTitle}</h3>
+      <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        {c.offers.map((o) => (
+          <div class="flex flex-col border border-bordure border-t-[6px] border-t-bleu bg-white p-6">
+            <p class="text-lg font-bold text-bleu">{o.t}</p>
+            <p class="mt-2 text-anthracite/85">{o.x}</p>
+            <p class="mt-auto pt-4 text-[0.95rem]"><span class="font-bold">{c.deliverableLabel} :</span> {o.d}</p>
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-12 grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+        <div class="callout callout-blue">
+          <p class="callout-head">{c.consultantTitle}</p>
+          <div class="callout-body">
+            <p>{c.consultantText}</p>
+            <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <a href={largeHref} class="btn btn-primary">{c.largeCta}</a>
+            </div>
+          </div>
+        </div>
+        <div class="border-l-4 border-soleil bg-creme p-6">
+          <p class="font-bold text-soleil-fonce">{c.expTitle}</p>
+          <p class="mt-2">{c.expText}</p>
+        </div>
+      </div>
+      <a href={publicationPath('state-of-the-art-supply-chain-risk-management-2026', lang)} class="mt-10 inline-flex items-center gap-2 font-bold text-bleu hover:underline">
+        <Icon name="download" size={18} /> {c.largePaper}
+      </a>
+    </div>
+  </section>
+
+  <!-- FOMO SOBRE + PARTENAIRES + SOURCES -->
+  <section class="border-t border-bordure bg-zebra py-16 md:py-20">
+    <div class="container-pl">
+      <div class="border-t-[6px] border-soleil bg-creme p-7 md:p-9">
+        <h2 class="text-2xl font-bold text-anthracite">{c.fomoTitle}</h2>
+        <p class="mt-3 max-w-[70ch] text-lg">{c.fomoText}</p>
+        <div class="mt-6 flex flex-wrap gap-4">
+          <a href={`#${sme}`} class="btn btn-primary">{c.smeChoice}</a>
+          <a href={`#${large}`} class="btn btn-secondary">{c.largeChoice}</a>
+        </div>
+      </div>
+      <p class="mt-8 flex max-w-[80ch] items-start gap-2 text-[0.97rem]">
+        <Icon name="bolt" size={18} class="mt-0.5 text-soleil" />
+        <span>{c.partnersText} <a href={anchorPath('partners', 'factbird', lang)} class="link-pl">Factbird</a></span>
+      </p>
+      <h2 class="mt-14 text-xl font-bold text-anthracite">{c.sourcesTitle}</h2>
+      <ul class="mt-4 space-y-2 text-[0.93rem]" lang="en">
+        {sources.map((s) => (
+          <li>
+            <a href={s.u} target="_blank" rel="noopener" class="text-bleu hover:underline">{s.t}<span class="sr-only" lang={lang}> {newTab}</span></a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</BaseLayout>

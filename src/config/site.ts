@@ -13,8 +13,8 @@ export const site = {
   email: 'manuel@phi-lean.com',
   founder: {
     name: 'Manuel Gourmand',
-    jobTitle: { fr: 'Fondateur de Phi-Lean, consultant et formateur Lean', en: 'Founder of Phi-Lean, Lean consultant and trainer' },
-    linkedin: '', // À COMPLÉTER : URL du profil LinkedIn
+    jobTitle: { fr: 'Fondateur de Phi-Lean, consultant en excellence opérationnelle', en: 'Founder of Phi-Lean, operational excellence consultant' },
+    linkedin: 'https://www.linkedin.com/in/manuelgourmand/',
     photo: '/images/manuel-gourmand.webp', // portrait 4:5, 800 x 1000
   },
   /** Deux bases d'intervention. */
@@ -32,12 +32,19 @@ export const site = {
   calendlyUrl: env.PUBLIC_CALENDLY_URL || 'https://calendly.com/manuel-phi-lean',
 
   /**
-   * Formulaires : FormSubmit (formsubmit.co) envoie chaque formulaire par e-mail
-   * à cette adresse, sans compte ni serveur. La toute première soumission déclenche
-   * un e-mail d'activation à confirmer une seule fois (voir README).
+   * Formulaires : envoi par e-mail sans serveur, via l'un de deux services.
+   * - « formsubmit » (par défaut) : aucun compte ; la toute première soumission
+   *   déclenche un e-mail d'activation à confirmer une seule fois.
+   * - « web3forms » : clé d'accès gratuite (250 envois par mois), à coller dans
+   *   PUBLIC_WEB3FORMS_KEY ; pas de pièce jointe en offre gratuite.
+   * Mode d'emploi pas à pas : README, section « Formulaires ».
    */
   forms: {
+    provider: (env.PUBLIC_FORM_PROVIDER === 'web3forms' && env.PUBLIC_WEB3FORMS_KEY ? 'web3forms' : 'formsubmit') as 'formsubmit' | 'web3forms',
     recipient: env.PUBLIC_FORM_RECIPIENT || 'manuel@phi-lean.com',
+    web3formsKey: env.PUBLIC_WEB3FORMS_KEY || '',
+    /** Pièces jointes possibles : FormSubmit, ou Web3Forms Pro (PUBLIC_WEB3FORMS_PRO=true). */
+    attachments: env.PUBLIC_FORM_PROVIDER !== 'web3forms' || !env.PUBLIC_WEB3FORMS_KEY || env.PUBLIC_WEB3FORMS_PRO === 'true',
   },
 
   /** Stripe Checkout via Payment Links : aucune clé secrète côté site. */
@@ -51,8 +58,8 @@ export const site = {
 
 export type StripeProduct = keyof typeof site.stripe;
 
-/** Points d'envoi FormSubmit. */
-export const formEndpoints = {
-  ajax: `https://formsubmit.co/ajax/${site.forms.recipient}`,
-  post: `https://formsubmit.co/${site.forms.recipient}`,
-};
+/** Points d'envoi du service de formulaires choisi. */
+export const formEndpoints =
+  site.forms.provider === 'web3forms'
+    ? { ajax: 'https://api.web3forms.com/submit', post: 'https://api.web3forms.com/submit' }
+    : { ajax: `https://formsubmit.co/ajax/${site.forms.recipient}`, post: `https://formsubmit.co/${site.forms.recipient}` };

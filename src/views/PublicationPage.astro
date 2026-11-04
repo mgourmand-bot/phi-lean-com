@@ -1,0 +1,353 @@
+---
+/**
+ * PAGE D'UNE PUBLICATION (livre ou article), à partager :
+ * FR « /publications/<id>/ », EN « /en/publications/<id>/ ».
+ * Couverture, date, accroche, téléchargement, partage, points clés, extrait,
+ * aperçu des premières pages, auteur, publications voisines.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CtaBand from '@/components/sections/CtaBand.astro';
+import Lightbox from '@/components/Lightbox.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { publications, getPublication, formatPubDate, type Related } from '@/data/publications';
+import { founderHeadline, founderLinks } from '@/data/founder';
+import { site } from '@/config/site';
+import { routes, type Lang } from '@/i18n/routes';
+import { anchorPath, path } from '@/i18n/utils';
+import { housePath, publicationPath } from '@/i18n/slugs';
+import { publicFileExists } from '@/lib/files';
+
+interface Props {
+  lang: Lang;
+  id: string;
+}
+const { lang, id } = Astro.props;
+const fr = lang === 'fr';
+const p = getPublication(id);
+const isBook = p.kind === 'book';
+const otherLang = p.lang !== lang;
+const textLang = otherLang ? p.lang : undefined;
+
+const date = formatPubDate(p.date, lang);
+const released = !isBook || !p.releaseDate || new Date(p.releaseDate + 'T00:00:00') <= new Date();
+const releaseLabel = isBook && p.releaseDate ? formatPubDate(p.releaseDate, lang) : '';
+const file = p.file;
+const hasFile = publicFileExists(file);
+const image = isBook ? p.coverLarge ?? p.cover : p.thumb?.replace(/\.webp$/, '@2x.webp');
+const imageSmall = isBook ? p.cover : p.thumb;
+const amazon = isBook ? p.amazonUrl?.[lang] || p.amazonUrl?.fr || (p.isbn ? `https://www.amazon.fr/s?k=${p.isbn.replace(/-/g, '')}` : '') : '';
+const ogImage = publicFileExists(`/og/publications/${p.id}.png`) ? `/og/publications/${p.id}.png` : undefined;
+
+const kindLabel = isBook
+  ? p.file
+    ? fr ? 'E-book gratuit' : 'Free e-book'
+    : fr ? 'Livre' : 'Book'
+  : p.series
+    ? p.series[lang]
+    : fr ? 'Article' : 'Paper';
+
+const meta = [
+  !isBook && p.readingTime ? (fr ? `${p.readingTime} min de lecture` : `${p.readingTime}-minute read`) : '',
+  p.pages ? `${p.pages} pages` : '',
+  p.lang === 'fr' ? (fr ? 'En français' : 'In French') : fr ? 'En anglais' : 'In English',
+  isBook && p.isbn ? `ISBN ${p.isbn}` : '',
+].filter(Boolean);
+
+const url = new URL(publicationPath(p.id, lang), site.url).href;
+const share = {
+  linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+  mail: `mailto:?subject=${encodeURIComponent(p.title)}&body=${encodeURIComponent(`${p.title}\n${url}`)}`,
+};
+
+const relatedHref = (r: Related) => {
+  if (r.publication) return publicationPath(r.publication, lang);
+  if (r.house) return housePath(r.house, lang);
+  if (r.route && r.anchor) return anchorPath(r.route, r.anchor, lang);
+  if (r.route) {
+    const hash = typeof r.hash === 'string' ? r.hash : r.hash?.[lang];
+    return `${routes[r.route][lang]}${hash ? `#${hash}` : ''}`;
+  }
+  return path('publications', lang);
+};
+const others = publications.filter((x) => x.id !== p.id).filter((x) => x.lang === lang || !otherLang).slice(0, 3);
+
+const t = fr
+  ? {
+      press: 'Phi-Lean Press',
+      download: 'Télécharger le PDF',
+      free: 'gratuit, sans inscription',
+      buy: 'Acheter sur Amazon',
+      soon: `Disponible sur Amazon le ${releaseLabel}`,
+      share: 'Partager',
+      copy: 'Copier le lien',
+      copied: 'Lien copié',
+      inside: 'Ce que vous y trouverez',
+      forWho: 'Pour qui',
+      excerpt: 'Extrait',
+      preview: 'Feuilleter les premières pages',
+      previewHint: 'Cliquez sur une page pour l’agrandir.',
+      page: 'Page',
+      author: 'L’auteur',
+      authorMore: 'Son parcours',
+      related: 'Pour aller plus loin',
+      others: 'Autres publications',
+      all: 'Toute la Phi-Lean Press',
+    }
+  : {
+      press: 'Phi-Lean Press',
+      download: 'Download the PDF',
+      free: 'free, no sign-up',
+      buy: 'Buy on Amazon',
+      soon: `Available on Amazon from ${releaseLabel}`,
+      share: 'Share',
+      copy: 'Copy link',
+      copied: 'Link copied',
+      inside: 'What you will find inside',
+      forWho: 'Who it is for',
+      excerpt: 'Excerpt',
+      preview: 'Leaf through the first pages',
+      previewHint: 'Click a page to enlarge it.',
+      page: 'Page',
+      author: 'The author',
+      authorMore: 'His career',
+      related: 'Go further',
+      others: 'More publications',
+      all: 'All of Phi-Lean Press',
+    };
+
+const description = (p.hook?.[lang] ?? p.title).replace(/\s+\S*$/, '').slice(0, 200).replace(/\s+\S*$/, '') + '…';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': isBook ? 'Book' : 'ScholarlyArticle',
+  ...(isBook ? { name: p.title, isbn: p.isbn, bookFormat: p.file ? 'https://schema.org/EBook' : undefined, numberOfPages: p.pages } : { headline: p.title }),
+  alternativeHeadline: p.subtitle,
+  description: p.hook?.[lang],
+  inLanguage: p.lang,
+  datePublished: isBook ? p.releaseDate ?? p.date : p.date,
+  url,
+  image: imageSmall ? new URL(imageSmall, site.url).href : undefined,
+  author: { '@type': 'Person', '@id': `${site.url}/#founder`, name: site.founder.name, sameAs: [founderLinks.linkedin] },
+  publisher: { '@type': 'Organization', name: 'Phi-Lean Press', parentOrganization: { '@id': `${site.url}/#organization` } },
+  isAccessibleForFree: Boolean(file),
+  ...(file && hasFile ? { encoding: { '@type': 'MediaObject', encodingFormat: 'application/pdf', contentUrl: new URL(file, site.url).href } } : {}),
+};
+---
+<BaseLayout
+  lang={lang}
+  routeKey="publications"
+  langHrefs={{ fr: publicationPath(p.id, 'fr'), en: publicationPath(p.id, 'en') }}
+  title={p.subtitle ? `${p.title} : ${p.subtitle}` : p.title}
+  description={description}
+  ogImage={ogImage}
+  ogType={isBook ? 'book' : 'article'}
+  jsonLd={jsonLd}
+>
+  <!-- EN-TÊTE -->
+  <section class="border-b border-bordure bg-zebra">
+    <div class="container-pl py-12 md:py-16">
+      <nav aria-label={fr ? "Fil d'Ariane" : 'Breadcrumb'} class="mb-8 text-sm text-gris">
+        <ol class="flex flex-wrap items-center gap-2">
+          <li><a href={routes.home[lang]} class="hover:text-bleu hover:underline">{fr ? 'Accueil' : 'Home'}</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a href={routes.publications[lang]} class="hover:text-bleu hover:underline">{t.press}</a></li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" class="font-bold text-anthracite" lang={textLang}>{p.title}</li>
+        </ol>
+      </nav>
+
+      <div class="grid gap-10 md:grid-cols-[minmax(0,17rem)_1fr] lg:grid-cols-[minmax(0,20rem)_1fr] lg:gap-16">
+        <div class="max-w-[17rem] md:max-w-none">
+          {image && publicFileExists(image) ? (
+            <button
+              type="button"
+              class="block w-full cursor-zoom-in border border-bordure bg-white shadow-[8px_8px_0_var(--color-bordure)]"
+              data-lightbox-src={image}
+              data-lightbox-alt={fr ? `Couverture de « ${p.title} »` : `Cover of “${p.title}”`}
+              aria-label={fr ? 'Agrandir la couverture' : 'Enlarge the cover'}
+            >
+              <img src={imageSmall} srcset={`${imageSmall} 1x, ${image} 2x`} alt={fr ? `Couverture de « ${p.title} »` : `Cover of “${p.title}”`} width={isBook ? 600 : 340} height={isBook ? 850 : 481} class="block h-auto w-full" />
+            </button>
+          ) : null}
+        </div>
+
+        <div>
+          <p class="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span class:list={['px-2.5 py-1 text-xs font-bold', isBook && p.file ? 'bg-menthe text-turquoise-fonce' : 'bg-ciel text-bleu']}>{kindLabel}</span>
+            {!isBook && p.publication && <span class="text-sm text-gris" lang={textLang}>{p.publication}</span>}
+          </p>
+          <h1 class="mt-4 max-w-[24ch] text-[2.1rem] leading-[1.1] font-bold tracking-tight text-bleu sm:text-5xl" lang={textLang}>{p.title}</h1>
+          {p.subtitle && <p class="mt-4 max-w-[52ch] text-xl leading-snug font-bold text-anthracite/80" lang={textLang}>{p.subtitle}</p>}
+
+          <p class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.97rem]">
+            {(date || (!released && releaseLabel)) && (
+              <span class="inline-flex items-center gap-2 font-bold text-anthracite">
+                <Icon name="calendar" size={18} class="text-bleu" />
+                {released ? <time datetime={p.date}>{date}</time> : <span>{fr ? `Parution le ${releaseLabel}` : `Out on ${releaseLabel}`}</span>}
+              </span>
+            )}
+            {meta.map((m) => <span class="text-gris">· {m}</span>)}
+          </p>
+
+          {p.hook && <p class="mt-6 max-w-[62ch] text-lg leading-relaxed text-anthracite/90">{p.hook[lang]}</p>}
+
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            {file && hasFile ? (
+              <a href={file} download class="btn btn-primary">
+                <Icon name="download" size={18} />
+                {t.download}
+              </a>
+            ) : isBook && released && amazon ? (
+              <a href={amazon} target="_blank" rel="noopener" class="btn btn-primary">
+                <Icon name="book" size={18} />
+                {t.buy}
+              </a>
+            ) : isBook ? (
+              <p class="inline-flex items-center gap-1.5 font-bold text-soleil-fonce"><Icon name="book" size={18} />{t.soon}</p>
+            ) : null}
+            {file && hasFile && <span class="text-sm text-gris">{t.free}</span>}
+          </div>
+
+          <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-bordure pt-5 text-[0.95rem]">
+            <span class="font-bold text-anthracite">{t.share} :</span>
+            <a href={share.linkedin} target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+              <Icon name="linkedin" size={18} /> LinkedIn<span class="sr-only">{fr ? ' (nouvel onglet)' : ' (opens in a new tab)'}</span>
+            </a>
+            <a href={share.mail} class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+              <Icon name="mail" size={18} /> E-mail
+            </a>
+            <button type="button" class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline" data-copy-link={url} data-copied={t.copied}>
+              <Icon name="link" size={18} /> <span data-copy-label>{t.copy}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POINTS CLÉS -->
+  <section class="py-16 md:py-20" aria-labelledby="h-inside">
+    <div class="container-pl grid gap-12 lg:grid-cols-[1.5fr_1fr]">
+      <div>
+        <h2 id="h-inside" class="section-title">{t.inside}</h2>
+        <ul class="mt-8 space-y-4">
+          {p.takeaways[lang].map((x) => (
+            <li class="grid grid-cols-[1.5rem_1fr] gap-3 text-[1.05rem]">
+              <Icon name="check" size={22} class="mt-0.5 text-turquoise" />
+              <span>{x}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="space-y-6 self-start">
+        <div class="border-t-[6px] border-bleu bg-ciel p-6">
+          <p class="text-xs font-bold tracking-[0.14em] text-bleu uppercase">{t.forWho}</p>
+          <p class="mt-2 text-lg">{p.audience[lang]}</p>
+        </div>
+        {p.excerpt && (
+          <figure class="m-0 border-l-4 border-soleil pl-5">
+            <figcaption class="text-xs font-bold tracking-[0.14em] text-soleil-fonce uppercase">{t.excerpt}</figcaption>
+            <blockquote class="mt-2 text-xl leading-relaxed text-anthracite" lang={textLang}>
+              {p.lang === 'fr' ? `« ${p.excerpt} »` : `“${p.excerpt}”`}
+            </blockquote>
+          </figure>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <!-- APERÇU -->
+  {p.previews && p.previews.length > 0 && (
+    <section class="border-y border-bordure bg-zebra py-16 md:py-20" aria-labelledby="h-preview">
+      <div class="container-pl">
+        <h2 id="h-preview" class="section-title">{t.preview}</h2>
+        <p class="mt-5 text-gris">{t.previewHint}</p>
+        <ul class:list={['mt-8 grid gap-6', p.previews.length === 1 ? 'max-w-sm' : 'sm:grid-cols-2 lg:grid-cols-3']}>
+          {p.previews.map((n) => {
+            const src = `/images/apercus/${p.id}-p${n}.webp`;
+            return (
+              <li>
+                <button
+                  type="button"
+                  class="block w-full cursor-zoom-in border border-bordure bg-white shadow-[5px_5px_0_var(--color-bordure)] transition-transform hover:-translate-y-0.5"
+                  data-lightbox-src={src}
+                  data-lightbox-alt={`${t.page} ${n} – ${p.title}`}
+                  aria-label={`${t.page} ${n}`}
+                >
+                  <img src={src} alt={`${t.page} ${n} – ${p.title}`} width="900" height="1273" class="block h-auto w-full" loading="lazy" decoding="async" />
+                </button>
+                <p class="mt-2 text-sm text-gris">{t.page} {n}</p>
+              </li>
+            );
+          })}
+        </ul>
+        {file && hasFile && (
+          <a href={file} download class="btn btn-primary mt-10"><Icon name="download" size={18} />{t.download}</a>
+        )}
+      </div>
+    </section>
+  )}
+
+  <!-- AUTEUR ET SUITE -->
+  <section class="py-16 md:py-20">
+    <div class="container-pl grid gap-12 lg:grid-cols-[1fr_1.2fr]">
+      <div class="grid grid-cols-[6rem_1fr] gap-5 self-start">
+        <img src={site.founder.photo} alt={site.founder.name} width="800" height="1000" class="aspect-[4/5] w-full object-cover" loading="lazy" />
+        <div>
+          <p class="text-xs font-bold tracking-[0.14em] text-gris uppercase">{t.author}</p>
+          <p class="mt-1 text-xl font-bold text-anthracite">{site.founder.name}</p>
+          <p class="mt-1 text-[0.95rem] text-turquoise-fonce">{founderHeadline[lang]}</p>
+          <p class="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+            <a href={anchorPath('about', 'founder', lang)} class="link-pl">{t.authorMore}</a>
+            <a href={founderLinks.linkedin} target="_blank" rel="noopener" class="inline-flex items-center gap-1 font-bold text-bleu hover:underline"><Icon name="linkedin" size={16} /> LinkedIn</a>
+          </p>
+        </div>
+      </div>
+      <div>
+        {p.related && p.related.length > 0 && (
+          <>
+            <h2 class="text-xl font-bold text-anthracite">{t.related}</h2>
+            <ul class="mt-4 space-y-2">
+              {p.related.map((r) => <li><a href={relatedHref(r)} class="link-pl">{r.label[lang]}</a></li>)}
+            </ul>
+          </>
+        )}
+        <h2 class="mt-10 text-xl font-bold text-anthracite">{t.others}</h2>
+        <ul class="mt-4 grid gap-4 sm:grid-cols-3">
+          {others.map((o) => {
+            const img = o.kind === 'book' ? o.cover : o.thumb;
+            return (
+              <li>
+                <a href={publicationPath(o.id, lang)} class="group block">
+                  {img && <img src={img} alt="" width="340" height="481" class="block aspect-[1/1.414] w-full border border-bordure object-cover object-top" loading="lazy" />}
+                  <span class="mt-2 block text-[0.95rem] leading-snug font-bold text-anthracite group-hover:text-bleu" lang={o.lang !== lang ? o.lang : undefined}>{o.title}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+        <a href={routes.publications[lang]} class="link-pl mt-6 inline-block">{t.all}</a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+  <Lightbox lang={lang} />
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-link]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const label = button.querySelector<HTMLElement>('[data-copy-label]');
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyLink ?? location.href);
+        if (label) {
+          const before = label.textContent;
+          label.textContent = button.dataset.copied ?? '✓';
+          setTimeout(() => (label.textContent = before), 2000);
+        }
+      } catch {
+        window.prompt('', button.dataset.copyLink ?? location.href);
+      }
+    });
+  });
+</script>

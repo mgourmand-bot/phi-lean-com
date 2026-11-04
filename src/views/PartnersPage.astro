@@ -3,7 +3,7 @@
  * PAGE PARTENAIRES (FR « /partenaires/ », EN « /en/partners/ »)
  * #factbird       : Factbird OEE (TRS, énergie, apport de Phi-Lean)
  * #enerlexia      : autoconsommation collective et gestion énergétique
- * #procid         : automatisme et informatique industrielle
+ * #procid         : vision industrielle, IA et traçabilité
  * #start-and-grow : réseau de dirigeants ENIM-Alumni
  * #farming-futura : agriculture Lean & Green, Ferme du Futur (Phi-Lean fait partie du réseau)
  * Informations tirées des sites publics des partenaires (sources en bas de page).
@@ -15,6 +15,7 @@ import PartnerLogos from '@/components/PartnerLogos.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { partners } from '@/data/partners';
 import type { Lang } from '@/i18n/routes';
+import { housePath } from '@/i18n/slugs';
 import { anchorId, anchorPath } from '@/i18n/utils';
 
 interface Props {
@@ -28,7 +29,7 @@ const c = {
   fr: {
     title: 'Partenaires : Factbird OEE, EnerLexia, Procid, Start & Grow, Farming Futura',
     description:
-      'Les partenaires de Phi-Lean : Factbird pour mesurer le TRS et l’énergie en temps réel, EnerLexia pour l’autoconsommation et la gestion énergétique, Procid pour l’automatisme industriel, Start & Grow pour le réseau de dirigeants, Farming Futura pour l’agriculture Lean & Green.',
+      'Les partenaires de Phi-Lean : Factbird pour mesurer le TRS et l’énergie en temps réel, EnerLexia pour l’autoconsommation et la gestion énergétique, PROCiD pour la vision industrielle et la traçabilité, Start & Grow pour le réseau de dirigeants, Farming Futura pour l’agriculture Lean & Green.',
     crumb: 'Partenaires',
     h1: 'Des partenaires pour aller plus loin',
     lead: 'Mesurer ce que font vraiment vos lignes, maîtriser l’énergie, automatiser, entreprendre, réinventer l’agriculture : nous travaillons avec des partenaires choisis pour prolonger le travail sur les flux.',
@@ -78,10 +79,26 @@ const c = {
     eText:
       "Basée à Metz, EnerLexia est spécialiste de l'autoconsommation collective et de la gestion énergétique dans le Grand Est. Elle réalise les études de faisabilité, joue le rôle de Personne Morale Organisatrice (PMO) des opérations d'autoconsommation collective, de la structure juridique à l'interface avec le gestionnaire de réseau, et accompagne la gestion énergétique au quotidien. Elle travaille avec des collectivités, des entreprises et des agriculteurs du quart nord-est de la France.",
     eWhy: 'Avec Factbird, vous savez ce que consomme chaque machine ; avec EnerLexia, vous agissez sur la façon dont l’énergie est produite et partagée localement.',
-    pTitle: 'Procid : automatisme et informatique industrielle',
+    pTitle: 'PROCiD : vision industrielle, intelligence artificielle et traçabilité',
     pText:
-      'Basée à Dieulouard, en Meurthe-et-Moselle, PROCID intègre et fournit des solutions d’automatisme industriel et d’informatique pour les entreprises.',
-    pWhy: 'Quand un chantier Lean demande de connecter une machine, de récupérer une donnée d’automate ou d’automatiser un poste, PROCID apporte le savoir-faire technique.',
+      'Basée à Dieulouard, en Meurthe-et-Moselle, à une dizaine de kilomètres de Liverdun, PROCiD conçoit des solutions de vision pour l’industrie et la logistique : contrôle qualité par caméra, guidage de robots, vision 3D, intelligence artificielle appliquée à la détection de défauts, identification et marquage. Son équipe d’ingénieurs et de techniciens réunit plus de 35 ans d’expérience en vision industrielle, et PROCiD a obtenu, moins de deux ans après sa création, le label Partner System Integrator de Cognex, leader mondial de la vision industrielle.',
+    pWhy: 'Le Lean cherche la qualité du premier coup : arrêter au premier défaut, là où il naît, plutôt que trier en fin de ligne. La vision industrielle rend ce contrôle systématique, pièce par pièce, et la traçabilité rend chaque palette retrouvable. Quand un diagnostic Phi-Lean montre qu’un contrôle manuel est un goulot, qu’un défaut échappe aux opérateurs ou qu’une traçabilité fiable manque à la gestion des risques, PROCiD apporte la solution technique. Nous partons du flux ; la machine vient ensuite, au bon endroit.',
+    pDomainsTitle: 'Quatre métiers',
+    pDomains: [
+      { t: 'Contrôle industriel', x: 'Des solutions 2D qui analysent des images prises à haute cadence par une caméra : présence, dimensions, aspect, lecture.' },
+      { t: 'Vision 3D et guidage de robots', x: 'Profils et profondeurs par profilomètre, projection de franges ou stéréovision, pour guider un robot vers la bonne pièce.' },
+      { t: 'Intelligence artificielle', x: 'Le deep learning appliqué à la vision : détecter et classer des anomalies sans les avoir décrites à l’avance.' },
+      { t: 'Traçabilité', x: 'Codes-barres, codes 2D, RFID, impression et marquage industriels, conçus pour les conditions extrêmes.' },
+    ],
+    pProductsTitle: 'Quelques solutions PROCiD',
+    pProducts: [
+      { t: 'HANDOGA', x: 'dévracage 3D (bin-picking)' },
+      { t: 'DENOBACT', x: 'analyse automatisée de boîtes de Petri par deep learning' },
+      { t: 'PIKEYE 2D', x: 'localisation de composants sur convoyeur' },
+      { t: 'MIKADO', x: 'dépalettisation automatique multiformat' },
+      { t: 'XB12', x: 'lecture automatique des codes palettes' },
+    ],
+    pHouse: 'Le pilier « Servir mieux » de la maison Phi-Lean',
     sTitle: 'Start & Grow : le réseau des dirigeants ENIM-Alumni',
     sText:
       'Start & Grow est un groupe professionnel d’ENIM-Alumni (ANIENIM), l’association des ingénieurs diplômés de l’École nationale d’ingénieurs de Metz. Il réunit dirigeants, décideurs, entrepreneurs, repreneurs et créateurs d’entreprise autour d’afterworks, de conférences thématiques, de visites d’entreprises et de retours d’expérience.',
@@ -109,7 +126,7 @@ const c = {
   en: {
     title: 'Partners: Factbird OEE, EnerLexia, Procid, Start & Grow, Farming Futura',
     description:
-      "Phi-Lean's partners: Factbird to measure OEE and energy in real time, EnerLexia for energy self-consumption and management, Procid for industrial automation, Start & Grow for the business leaders' network, Farming Futura for Lean & Green farming.",
+      "Phi-Lean's partners: Factbird to measure OEE and energy in real time, EnerLexia for energy self-consumption and management, PROCiD for machine vision and traceability, Start & Grow for the business leaders' network, Farming Futura for Lean & Green farming.",
     crumb: 'Partners',
     h1: 'Partners to go further',
     lead: 'Measuring what your lines really do, managing energy, automating, growing a business, reinventing farming: we work with carefully chosen partners to extend our work on flows.',
@@ -159,9 +176,26 @@ const c = {
     eText:
       'Based in Metz, EnerLexia specialises in collective energy self-consumption and energy management in the Grand Est region of France. It carries out feasibility studies, acts as the organising legal entity (PMO) for collective self-consumption schemes, from legal structure to the interface with the grid operator, and supports day-to-day energy management. It works with local authorities, businesses and farmers in north-eastern France.',
     eWhy: 'With Factbird you know what each machine consumes; with EnerLexia you act on how energy is produced and shared locally.',
-    pTitle: 'Procid: industrial automation and IT',
-    pText: 'Based in Dieulouard, in Meurthe-et-Moselle (France), PROCID integrates and supplies industrial automation and IT solutions for businesses.',
-    pWhy: 'When a Lean project requires connecting a machine, retrieving PLC data or automating a workstation, PROCID brings the technical know-how.',
+    pTitle: 'PROCiD: machine vision, artificial intelligence and traceability',
+    pText:
+      'Based in Dieulouard, in Meurthe-et-Moselle (France), about ten kilometres from Liverdun, PROCiD designs vision solutions for industry and logistics: camera-based quality inspection, robot guidance, 3D vision, artificial intelligence applied to defect detection, identification and marking. Its team of engineers and technicians brings more than 35 years of experience in machine vision, and less than two years after it was founded PROCiD earned the Partner System Integrator label from Cognex, the world leader in machine vision.',
+    pWhy: 'Lean seeks quality right first time: stop at the first defect, where it is born, rather than sort at the end of the line. Machine vision makes that check systematic, part by part, and traceability makes every pallet findable. When a Phi-Lean diagnostic shows that a manual inspection is a bottleneck, that a defect escapes operators, or that reliable traceability is missing from risk management, PROCiD brings the technical solution. We start from the flow; the machine comes next, in the right place.',
+    pDomainsTitle: 'Four fields',
+    pDomains: [
+      { t: 'Industrial inspection', x: '2D solutions analysing images captured at high speed by a camera: presence, dimensions, appearance, reading.' },
+      { t: '3D vision and robot guidance', x: 'Profiles and depth by profilometer, fringe projection or stereovision, to guide a robot to the right part.' },
+      { t: 'Artificial intelligence', x: 'Deep learning applied to vision: detecting and classifying anomalies without describing them in advance.' },
+      { t: 'Traceability', x: 'Barcodes, 2D codes, RFID, industrial printing and marking, built for extreme conditions.' },
+    ],
+    pProductsTitle: 'Some PROCiD solutions',
+    pProducts: [
+      { t: 'HANDOGA', x: '3D bin-picking' },
+      { t: 'DENOBACT', x: 'automated Petri dish analysis with deep learning' },
+      { t: 'PIKEYE 2D', x: 'locating components on a conveyor' },
+      { t: 'MIKADO', x: 'automatic multi-format depalletising' },
+      { t: 'XB12', x: 'automatic reading of pallet codes' },
+    ],
+    pHouse: 'The “Serve better” pillar of the Phi-Lean house',
     sTitle: "Start & Grow: the ENIM-Alumni business leaders' network",
     sText:
       'Start & Grow is a professional group of ENIM-Alumni (ANIENIM), the association of graduate engineers from the École nationale d’ingénieurs de Metz. It brings together business leaders, decision-makers, entrepreneurs, buyers and founders through afterworks, themed talks, company visits and experience sharing.',
@@ -193,6 +227,7 @@ const sources = [
   { label: 'Factbird, utility monitoring', url: 'https://www.factbird.com/solutions/utility-monitoring' },
   { label: 'Factbird DUO', url: 'https://factbird.com/product/factbird-duo' },
   { label: 'EnerLexia, PMO', url: 'https://enerlexia.fr/pmo.html' },
+  { label: 'PROCiD', url: 'https://www.procid-fr.com/' },
   { label: 'ANIENIM, Start&Grow', url: 'https://www.anienim.asso.fr/fr/group/start-grow/136' },
   { label: 'Farming Futura', url: 'https://farmingfutura.org/' },
   { label: 'UK IPO, marque ServerGro', url: 'https://www.ipo.gov.uk/tm/t-tmj/tm-journals/2026-004/UK00004319339.html' },
@@ -308,9 +343,32 @@ const sources = [
               <p class="font-bold text-turquoise-fonce">{c.why}</p>
               <p class="mt-1">{p.why}</p>
             </div>
-            <a href={partner.url} {...external} class="mt-6 inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
-              {c.visit} : {partner.urlLabel} <Icon name="external" size={15} />
-            </a>
+            {p.id === 'procid' && (
+              <>
+                <h3 class="mt-10 text-xl font-bold text-anthracite">{c.pDomainsTitle}</h3>
+                <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                  {c.pDomains.map((d) => (
+                    <div class="border-t-[3px] border-[#8c0000] bg-white p-5">
+                      <p class="font-bold text-anthracite">{d.t}</p>
+                      <p class="mt-1 text-[0.95rem] text-anthracite/85">{d.x}</p>
+                    </div>
+                  ))}
+                </div>
+                <h3 class="mt-8 text-lg font-bold text-anthracite">{c.pProductsTitle}</h3>
+                <ul class="mt-3 grid gap-x-8 gap-y-1.5 text-[0.97rem] sm:grid-cols-2">
+                  {c.pProducts.map((x) => <li><span class="font-bold text-bleu">{x.t}</span> : {x.x}</li>)}
+                </ul>
+                <a href={housePath('valeur', lang)} class="link-pl mt-6 inline-block">{c.pHouse}</a>
+              </>
+            )}
+            <p class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <a href={partner.url} {...external} class="inline-flex items-center gap-1.5 font-bold text-bleu hover:underline">
+                {c.visit} : {partner.urlLabel} <Icon name="external" size={15} />
+              </a>
+              {p.id === 'procid' && (
+                <a href={anchorPath('contact', 'form', lang, '?sujet=procid')} class="btn btn-secondary">{lang === 'fr' ? 'Parler d’un projet de vision' : 'Discuss a vision project'}</a>
+              )}
+            </p>
           </div>
         </div>
       </section>

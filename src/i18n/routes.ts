@@ -14,6 +14,9 @@ export const ogLocale: Record<Lang, string> = { fr: 'fr_FR', en: 'en_GB' };
 export const routes = {
   home: { fr: '/', en: '/en/' },
   consulting: { fr: '/conseil/', en: '/en/consulting/' },
+  services: { fr: '/conseil/lean-flux-services/', en: '/en/consulting/lean-services-flow/' },
+  scrm: { fr: '/conseil/lean-supply-chain-risk-management/', en: '/en/consulting/lean-supply-chain-risk-management/' },
+  house: { fr: '/maison/', en: '/en/house/' },
   training: { fr: '/formations/', en: '/en/training/' },
   games: { fr: '/serious-games/', en: '/en/serious-games/' },
   publications: { fr: '/publications/', en: '/en/publications/' },
@@ -52,6 +55,9 @@ export const anchors = {
 } as const satisfies Record<string, Record<Lang, string>>;
 
 export type AnchorKey = keyof typeof anchors;
+
+/** Liens FR / EN d'une page qui n'a pas de clé de route (pages détail). */
+export type LangHrefs = Record<Lang, string>;
 
 /** Page portugaise unique (lien discret du footer). */
 export const portugueseRoute = '/pt/';

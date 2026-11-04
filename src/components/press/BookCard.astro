@@ -5,8 +5,9 @@
  */
 import Icon from '../ui/Icon.astro';
 import DocCover from './DocCover.astro';
-import type { Book } from '@/data/publications';
+import { formatPubDate, type Book } from '@/data/publications';
 import type { Lang } from '@/i18n/routes';
+import { publicationPath } from '@/i18n/slugs';
 import { publicFileExists } from '@/lib/files';
 
 interface Props {
@@ -29,6 +30,8 @@ const hasFile = publicFileExists(book.file);
 const hasCover = publicFileExists(book.cover);
 const coverAlt = fr ? `Couverture du livre « ${book.title} »` : `Cover of the book “${book.title}”`;
 const otherLang = book.lang !== lang;
+const page = publicationPath(book.id, lang);
+const date = formatPubDate(book.date, lang);
 ---
 <article class:list={['grid gap-6', compact ? 'grid-cols-[7.5rem_1fr] sm:grid-cols-[9rem_1fr]' : 'sm:grid-cols-[minmax(0,15rem)_1fr] sm:gap-10']}>
   <div class:list={['self-start', !compact && 'w-full max-w-[16rem]']}>
@@ -62,15 +65,23 @@ const otherLang = book.lang !== lang;
         </span>
       )}
       {book.file && <span class="bg-menthe px-2.5 py-1 text-xs font-bold text-turquoise-fonce">{fr ? 'E-book gratuit' : 'Free e-book'}</span>}
+      {date && released && (
+        <span class="inline-flex items-center gap-1.5 text-sm font-bold text-anthracite">
+          <Icon name="calendar" size={16} class="text-bleu" />
+          <time datetime={book.date}>{date}</time>
+        </span>
+      )}
       {otherLang && <span class="border border-bordure px-2.5 py-0.5 text-xs text-gris">{book.lang === 'fr' ? 'In French' : 'En anglais'}</span>}
     </div>
-    <Heading class:list={['mt-3 font-bold text-anthracite', compact ? 'text-lg' : 'text-2xl']}>{book.title}</Heading>
+    <Heading class:list={['mt-3 font-bold text-anthracite', compact ? 'text-lg' : 'text-2xl']}>
+      <a href={page} class="hover:text-bleu hover:underline">{book.title}</a>
+    </Heading>
     {book.subtitle && !compact && <p class="mt-1 text-lg text-gris">{book.subtitle}</p>}
     {book.hook && <p class:list={['text-anthracite/90', compact ? 'mt-2 line-clamp-4 text-[0.95rem]' : 'mt-4 max-w-[62ch] text-[1.05rem]']}>{book.hook[lang]}</p>}
     {!compact && book.details[lang].length > 0 && (
       <ul class="list-square mt-4 text-[0.95rem]">{book.details[lang].map((d) => <li>{d}</li>)}</ul>
     )}
-    <div class="mt-auto flex flex-wrap items-center gap-4 pt-5">
+    <div class="mt-auto flex flex-wrap items-center gap-x-6 gap-y-4 pt-5">
       {book.file ? (
         hasFile ? (
           <a href={book.file} download class="btn btn-primary">
@@ -92,6 +103,7 @@ const otherLang = book.lang !== lang;
           {fr ? `Disponible sur Amazon le ${releaseLabel}` : `Available on Amazon from ${releaseLabel}`}
         </p>
       )}
+      <a href={page} class="font-bold text-bleu hover:underline">{fr ? 'Présentation et aperçu' : 'Overview and preview'}</a>
     </div>
   </div>
 </article>

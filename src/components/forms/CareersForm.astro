@@ -2,8 +2,11 @@
 /**
  * Candidature : deux parcours (rejoindre l'équipe / réseau d'experts associés).
  * Envoi classique (mode « post ») : le CV arrive en pièce jointe de l'e-mail.
+ * Si le service choisi n'accepte pas les pièces jointes (Web3Forms gratuit),
+ * le champ CV devient un lien vers le CV et le formulaire part en arrière-plan.
  */
 import FormShell from './FormShell.astro';
+import { site } from '@/config/site';
 import type { Lang } from '@/i18n/routes';
 
 interface Props {
@@ -11,6 +14,7 @@ interface Props {
 }
 const { lang } = Astro.props;
 const fr = lang === 'fr';
+const attachments = site.forms.attachments;
 
 const expertises = fr
   ? ['Lean Manufacturing', 'Supply chain et logistique', 'Gestion des risques', 'TPM et maintenance', 'Formation et animation', 'Serious games', 'Automatisation et IA']
@@ -29,12 +33,13 @@ const L = {
   years: fr ? 'Expérience Lean ou opérations' : 'Lean or operations experience',
   expertise: fr ? 'Domaines d’expertise' : 'Areas of expertise',
   cv: fr ? 'CV (PDF, 5 Mo maximum)' : 'CV (PDF, 5 MB max)',
+  cvLink: fr ? 'Lien vers votre CV (Drive, Dropbox…)' : 'Link to your CV (Drive, Dropbox…)',
   message: fr ? 'Ce que vous aimeriez apporter à Phi-Lean' : 'What you would like to bring to Phi-Lean',
   choose: fr ? 'Choisir…' : 'Choose…',
   submit: fr ? 'Envoyer ma candidature' : 'Send my application',
 };
 ---
-<FormShell id="careers-form" lang={lang} mode="post" subject={fr ? 'Candidature – phi-lean.com' : 'Application – phi-lean.com (EN)'} submitLabel={L.submit}>
+<FormShell id="careers-form" lang={lang} mode={attachments ? 'post' : 'ajax'} subject={fr ? 'Candidature – phi-lean.com' : 'Application – phi-lean.com (EN)'} submitLabel={L.submit}>
   <fieldset>
     <legend class="field-label">{L.track} *</legend>
     <div class="mt-2 grid gap-3 sm:grid-cols-2">
@@ -87,10 +92,17 @@ const L = {
     </div>
   </fieldset>
 
-  <div>
-    <label for="cr-cv" class="field-label">{L.cv}</label>
-    <input id="cr-cv" name="CV" type="file" accept="application/pdf,.pdf" class="field file:mr-4 file:border-0 file:bg-ciel file:px-3 file:py-1.5 file:font-bold file:text-bleu" />
-  </div>
+  {attachments ? (
+    <div>
+      <label for="cr-cv" class="field-label">{L.cv}</label>
+      <input id="cr-cv" name="CV" type="file" accept="application/pdf,.pdf" class="field file:mr-4 file:border-0 file:bg-ciel file:px-3 file:py-1.5 file:font-bold file:text-bleu" />
+    </div>
+  ) : (
+    <div>
+      <label for="cr-cv-link" class="field-label">{L.cvLink}</label>
+      <input id="cr-cv-link" name="CV (lien)" type="url" inputmode="url" placeholder="https://" class="field" />
+    </div>
+  )}
   <div>
     <label for="cr-message" class="field-label">{L.message} *</label>
     <textarea id="cr-message" name="Message" rows="5" required class="field"></textarea>

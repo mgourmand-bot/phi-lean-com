@@ -1,13 +1,16 @@
 ---
 /**
- * Enveloppe commune des formulaires, reliés à FormSubmit (formsubmit.co) :
- * chaque envoi arrive par e-mail à l'adresse de site.forms.recipient.
+ * Enveloppe commune des formulaires : chaque envoi arrive par e-mail à
+ * site.forms.recipient, via FormSubmit (par défaut) ou Web3Forms
+ * (PUBLIC_FORM_PROVIDER=web3forms + PUBLIC_WEB3FORMS_KEY). Voir README.
  *
  * mode="ajax" : envoi en arrière-plan, confirmation affichée sur place.
  *               Sans JavaScript, repli automatique en envoi classique.
  * mode="post" : envoi classique (obligatoire pour les pièces jointes, ex. CV),
  *               puis retour sur la page de remerciement.
- * Anti-spam : champ piège « _honey » ; captcha FormSubmit en mode « post ».
+ * Anti-spam : champ piège (« _honey » ou « botcheck ») ; captcha FormSubmit en mode « post ».
+ * En cas de refus du service (ex. formulaire pas encore activé), sa réponse
+ * s'affiche en petit sous le message d'erreur, pour diagnostiquer.
  */
 import { site, formEndpoints } from '@/config/site';
 import { routes, type Lang } from '@/i18n/routes';
@@ -25,6 +28,7 @@ interface Props {
 const { id, lang, subject, mode = 'ajax', submitLabel, successMessage, class: className = '' } = Astro.props;
 const t = useTranslations(lang);
 const thanksUrl = new URL(routes.thanks[lang], site.url).href;
+const web3 = site.forms.provider === 'web3forms';
 ---
 <form
   id={id}
@@ -38,15 +42,29 @@ const thanksUrl = new URL(routes.thanks[lang], site.url).href;
   data-msg-error={`${t('form.error')} ${site.email}.`}
   class:list={['space-y-5', className]}
 >
-  <input type="hidden" name="_subject" value={subject} />
-  <input type="hidden" name="_template" value="table" />
-  <input type="hidden" name="_next" value={thanksUrl} />
-  <input type="hidden" name="_captcha" value={mode === 'ajax' ? 'false' : 'true'} />
+  {web3 ? (
+    <>
+      <input type="hidden" name="access_key" value={site.forms.web3formsKey} />
+      <input type="hidden" name="subject" value={subject} />
+      <input type="hidden" name="from_name" value="Site phi-lean.com" />
+      <input type="hidden" name="redirect" value={thanksUrl} />
+      <input type="checkbox" name="botcheck" class="hidden" style="display: none" tabindex="-1" autocomplete="off" />
+    </>
+  ) : (
+    <>
+      <input type="hidden" name="_subject" value={subject} />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_next" value={thanksUrl} />
+      <input type="hidden" name="_captcha" value={mode === 'ajax' ? 'false' : 'true'} />
+    </>
+  )}
   <input type="hidden" name="Langue" value={lang.toUpperCase()} />
   <input type="hidden" name="Page" value="" data-page-url />
-  <div aria-hidden="true" class="absolute -left-[9999px] h-px w-px overflow-hidden">
-    <label>Ne pas remplir <input type="text" name="_honey" tabindex="-1" autocomplete="off" /></label>
-  </div>
+  {!web3 && (
+    <div aria-hidden="true" class="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <label>Ne pas remplir <input type="text" name="_honey" tabindex="-1" autocomplete="off" /></label>
+    </div>
+  )}
 
   <slot />
 
@@ -62,7 +80,7 @@ const thanksUrl = new URL(routes.thanks[lang], site.url).href;
     <button type="submit" class="btn btn-primary" data-submit>{submitLabel ?? t('form.send')}</button>
     <p class="text-sm text-gris">* {t('form.required')}</p>
   </div>
-  <p data-form-status role="status" aria-live="polite" class="hidden px-4 py-3 text-[0.95rem] font-bold"></p>
+  <div data-form-status role="status" aria-live="polite" class="hidden px-4 py-3 text-[0.95rem] font-bold"></div>
 </form>
 
 <script>
@@ -73,8 +91,14 @@ const thanksUrl = new URL(routes.thanks[lang], site.url).href;
 
     const status = form.querySelector<HTMLElement>('[data-form-status]')!;
     const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
-    const show = (ok: boolean, text: string) => {
+    const show = (ok: boolean, text: string, detail = '') => {
       status.textContent = text;
+      if (detail) {
+        const small = document.createElement('span');
+        small.className = 'mt-1 block text-xs font-normal';
+        small.textContent = detail;
+        status.append(small);
+      }
       status.className = 'px-4 py-3 text-[0.95rem] font-bold ' + (ok ? 'bg-menthe text-turquoise-fonce' : 'bg-corail-pale text-[#9a3412]');
     };
 
@@ -99,14 +123,17 @@ const thanksUrl = new URL(routes.thanks[lang], site.url).href;
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify(payload),
         });
-        const data = await response.json().catch(() => ({}));
-        const ok = response.ok && String((data as { success?: unknown }).success) === 'true';
-        if (!ok) throw new Error('not sent');
+        const data = (await response.json().catch(() => ({}))) as { success?: unknown; message?: unknown };
+        // FormSubmit répond « "true" » (texte), Web3Forms « true » : on compare en texte.
+        const ok = response.ok && String(data.success) === 'true';
+        if (!ok) throw new Error(typeof data.message === 'string' && data.message ? data.message : `HTTP ${response.status}`);
         form.reset();
         if (pageField) pageField.value = window.location.href;
         show(true, form.dataset.msgSuccess ?? '');
-      } catch {
-        show(false, form.dataset.msgError ?? '');
+      } catch (error) {
+        const detail = error instanceof Error && error.message !== 'Failed to fetch' ? error.message : 'network';
+        console.warn('[Phi-Lean] formulaire non envoyé :', detail);
+        show(false, form.dataset.msgError ?? '', `(${detail})`);
       } finally {
         submit.disabled = false;
         submit.textContent = label;

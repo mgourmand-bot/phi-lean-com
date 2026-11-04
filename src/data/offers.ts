@@ -42,7 +42,7 @@ export const plantLine: ConsultingLine = {
 export const supplyLine: ConsultingLine = {
   id: 'supply',
   title: { fr: 'Lean Flux Supply Chain', en: 'Lean Supply Chain Flow' },
-  tagline: { fr: 'Le Lean appliqué à la supply chain, avec un focus sur la gestion des risques (SCRM).', en: 'Lean applied to the supply chain, with a focus on supply chain risk management (SCRM).' },
+  tagline: { fr: 'Le Lean appliqué à la supply chain, du fournisseur au client.', en: 'Lean applied to the supply chain, from supplier to customer.' },
   intro: {
     fr: "Pour les entreprises dont la performance dépend d'un réseau de fournisseurs, de transporteurs et d'entrepôts qu'elles ne maîtrisent pas entièrement. Même logique que dans l'usine : suivre le flux de bout en bout, de vos fournisseurs à vos clients, et repérer où il attend, où il s'amplifie et où il peut casser.",
     en: 'For companies whose performance depends on a network of suppliers, carriers and warehouses they do not fully control. Same logic as in the plant: follow the flow end to end, from your suppliers to your customers, and find where it waits, where it amplifies and where it can break.',

@@ -1,0 +1,262 @@
+---
+/**
+ * PAGE D'UN ÉLÉMENT DE LA MAISON PHI-LEAN
+ * FR « /maison/<élément>/ », EN « /en/house/<element>/ ».
+ * 1. L'élément, dans la maison (dessin cliquable)
+ * 2. Ce que dit la littérature (références de la planche, développées)
+ * 3. Comment Phi-Lean l'applique en mission
+ * 4. Et chez vous ? (se reconnaître, ce que cela change)
+ * 5. Ce que coûte l'attente, et un appel sobre
+ * 6. Les autres éléments de la maison
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHero from '@/components/sections/PageHero.astro';
+import MaisonPhiLean from '@/components/MaisonPhiLean.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { houseElements, getElement, type ElementLink } from '@/data/houseElements';
+import { elementChip, house, type RefSegment } from '@/data/house';
+import { site } from '@/config/site';
+import { routes, type Lang } from '@/i18n/routes';
+import { anchorPath } from '@/i18n/utils';
+import { housePath, houseBase, type HouseElementId } from '@/i18n/slugs';
+
+interface Props {
+  lang: Lang;
+  id: HouseElementId;
+}
+const { lang, id } = Astro.props;
+const fr = lang === 'fr';
+const e = getElement(id);
+const index = houseElements.findIndex((x) => x.id === id);
+const prev = houseElements[index - 1];
+const next = houseElements[index + 1];
+
+const seg = (x: RefSegment) =>
+  typeof x === 'string' ? { text: x, kind: 'plain' } : 'i' in x ? { text: x.i, kind: 'italic' } : { text: x.t[lang], kind: 'local' };
+const linkHref = (l: ElementLink) =>
+  l.anchor ? anchorPath(l.route, l.anchor, lang) : `${routes[l.route][lang]}${l.hash ? `#${l.hash}` : ''}`;
+const newTab = fr ? '(nouvel onglet)' : '(opens in a new tab)';
+
+const t = fr
+  ? {
+      home: 'La maison Phi-Lean',
+      inHouse: 'Dans la maison',
+      inHouseHint: 'Chaque élément du dessin mène à sa page.',
+      litTitle: 'Ce que dit la littérature',
+      litLead: 'Les travaux de référence sur lesquels repose cet élément de la maison.',
+      verify: 'Vérifier',
+      practiceTitle: 'Comment Phi-Lean l’applique en mission',
+      practiceLead: 'Ce que nous faisons concrètement, sur le terrain et avec vos équipes.',
+      related: 'Pour aller plus loin',
+      proofLabel: 'Vécu sur le terrain',
+      youTitle: 'Et chez vous ?',
+      symptoms: 'Vous vous reconnaissez si…',
+      benefits: 'Ce que cela change pour vous',
+      costLabel: 'Ce que coûte l’attente',
+      scarcity:
+        'Phi-Lean est un petit cabinet, et c’est voulu : Manuel Gourmand conduit lui-même chaque mission, du diagnostic au dernier atelier. Le nombre de missions menées en même temps reste donc limité. Si le sujet est sur votre table ce trimestre, autant en parler maintenant.',
+      meet: 'Réserver 30 minutes',
+      vsm: 'Commencer par le Diagnostic VSM Express',
+      othersTitle: 'Les autres éléments de la maison',
+      prev: 'Élément précédent',
+      next: 'Élément suivant',
+      all: 'Toute la maison',
+      pdf: 'La planche et ses sources (PDF, 2 pages)',
+    }
+  : {
+      home: 'The Phi-Lean house',
+      inHouse: 'In the house',
+      inHouseHint: 'Each part of the drawing leads to its own page.',
+      litTitle: 'What the literature says',
+      litLead: 'The reference works this part of the house rests on.',
+      verify: 'Check',
+      practiceTitle: 'How Phi-Lean applies it',
+      practiceLead: 'What we actually do, on the ground and with your teams.',
+      related: 'Go further',
+      proofLabel: 'From the field',
+      youTitle: 'And in your company?',
+      symptoms: 'This will sound familiar if…',
+      benefits: 'What it changes for you',
+      costLabel: 'The cost of waiting',
+      scarcity:
+        'Phi-Lean is a small firm, on purpose: Manuel Gourmand leads every engagement himself, from the diagnostic to the last workshop. The number of engagements running at the same time is therefore limited. If this is on your agenda this quarter, it is worth talking now.',
+      meet: 'Book 30 minutes',
+      vsm: 'Start with the VSM Express Diagnostic',
+      othersTitle: 'The other parts of the house',
+      prev: 'Previous',
+      next: 'Next',
+      all: 'The whole house',
+      pdf: 'The one-page house and its sources (PDF in French, 2 pages)',
+    };
+
+const langHrefs = { fr: housePath(id, 'fr'), en: housePath(id, 'en') };
+const url = new URL(housePath(id, lang), site.url).href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: `${e.name[lang]} : ${e.title[lang]}`,
+  description: e.description[lang],
+  inLanguage: lang,
+  url,
+  mainEntityOfPage: url,
+  author: { '@id': `${site.url}/#founder` },
+  publisher: { '@id': `${site.url}/#organization` },
+  isPartOf: { '@type': 'CreativeWork', name: t.home, url: new URL(houseBase[lang], site.url).href },
+  citation: e.literature.map((l) => l.cite.map(seg).map((x) => x.text).join('')),
+};
+---
+<BaseLayout
+  lang={lang}
+  routeKey="house"
+  langHrefs={langHrefs}
+  title={`${e.name[lang]} – ${e.title[lang]}`}
+  description={e.description[lang]}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <PageHero lang={lang} crumb={e.name[lang]} parents={[{ label: t.home, href: houseBase[lang] }]} title={e.title[lang]} lead={e.lead[lang]} size="lg">
+    <div slot="before" class="mb-5 flex flex-wrap items-center gap-3">
+      <span class:list={['inline-flex px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold', elementChip[e.level]]}>{e.name[lang]}</span>
+      <span class="text-xs font-bold tracking-[0.14em] text-gris uppercase">{e.kicker[lang]}</span>
+    </div>
+    <div slot="aside" class="mx-auto w-full max-w-[26rem]">
+      <p class="mb-3 text-center text-xs font-bold tracking-[0.14em] text-gris uppercase">{t.inHouse}</p>
+      <MaisonPhiLean lang={lang} links="pages" active={e.level} animate={false} />
+      <p class="mt-4 text-center text-sm text-gris">{t.inHouseHint}</p>
+    </div>
+  </PageHero>
+
+  <!-- LITTÉRATURE -->
+  <section class="py-16 md:py-20" aria-labelledby="h-lit">
+    <div class="container-pl">
+      <h2 id="h-lit" class="section-title">{t.litTitle}</h2>
+      <p class="lead mt-6">{t.litLead}</p>
+      <div class="mt-12 space-y-14">
+        {e.literature.map((l) => (
+          <article class="grid gap-x-12 gap-y-5 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+            <div class="border-l-4 border-bleu pl-5">
+              <p class="text-[0.97rem] leading-relaxed text-anthracite" lang="en">
+                {l.cite.map(seg).map((x) => (x.kind === 'italic' ? <i>{x.text}</i> : x.kind === 'local' ? <span lang={lang}>{x.text}</span> : x.text))}
+              </p>
+              {l.link && (
+                <a href={l.link.url} target="_blank" rel="noopener" class="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
+                  <Icon name="external" size={15} />
+                  {t.verify} : {l.link.label}
+                  <span class="sr-only">{newTab}</span>
+                </a>
+              )}
+            </div>
+            <div class="max-w-[68ch] space-y-4 text-[1.05rem] leading-relaxed text-anthracite/90">
+              {l.body[lang].map((p) => <p>{p}</p>)}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PRATIQUE -->
+  <section class="border-y border-bordure bg-zebra py-16 md:py-20" aria-labelledby="h-practice">
+    <div class="container-pl">
+      <h2 id="h-practice" class="section-title">{t.practiceTitle}</h2>
+      <p class="lead mt-6">{t.practiceLead}</p>
+      <ol class="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
+        {e.practice[lang].map((p, i) => (
+          <li class="grid grid-cols-[2.5rem_1fr] gap-4">
+            <span class="grid h-10 w-10 place-items-center bg-bleu text-lg font-bold text-white" aria-hidden="true">{i + 1}</span>
+            <p class="text-[1.03rem] text-anthracite/90">{p}</p>
+          </li>
+        ))}
+      </ol>
+      {e.proof && (
+        <div class="callout callout-turq mt-12 max-w-4xl">
+          <p class="callout-head">{t.proofLabel}</p>
+          <p class="callout-body text-lg">{e.proof[lang]}</p>
+        </div>
+      )}
+      <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <p class="font-bold text-anthracite">{t.related} :</p>
+        {e.links.map((l) => <a href={linkHref(l)} class="link-pl">{l.label[lang]}</a>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ET CHEZ VOUS ? -->
+  <section class="py-16 md:py-20" aria-labelledby="h-you">
+    <div class="container-pl">
+      <h2 id="h-you" class="section-title">{t.youTitle}</h2>
+      <div class="mt-10 grid gap-10 lg:grid-cols-2">
+        <div class="border border-bordure border-t-[6px] border-t-corail bg-white p-7">
+          <h3 class="text-xl font-bold text-anthracite">{t.symptoms}</h3>
+          <ul class="mt-5 space-y-3">
+            {e.symptoms[lang].map((s) => (
+              <li class="grid grid-cols-[1.25rem_1fr] gap-3">
+                <span class="mt-2 h-2.5 w-2.5 bg-corail" aria-hidden="true"></span>
+                <span>{s}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="border border-bordure border-t-[6px] border-t-turquoise bg-white p-7">
+          <h3 class="text-xl font-bold text-anthracite">{t.benefits}</h3>
+          <ul class="mt-5 space-y-3">
+            {e.benefits[lang].map((b) => (
+              <li class="grid grid-cols-[1.25rem_1fr] gap-3">
+                <Icon name="check" size={20} class="mt-0.5 text-turquoise" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-12 border-t-[6px] border-soleil bg-creme p-7 md:p-9">
+        <p class="text-xs font-bold tracking-[0.14em] text-soleil-fonce uppercase">{t.costLabel}</p>
+        <p class="mt-3 max-w-[64ch] text-xl leading-relaxed text-anthracite">{e.cost[lang]}</p>
+        <p class="mt-5 max-w-[70ch] text-anthracite/85">{t.scarcity}</p>
+        <div class="mt-7 flex flex-wrap gap-4">
+          <a href={anchorPath('contact', 'meeting', lang)} class="btn btn-primary">
+            <Icon name="calendar" size={18} />
+            {t.meet}
+          </a>
+          <a href={anchorPath('consulting', 'vsmExpress', lang)} class="btn btn-secondary">{t.vsm}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LES AUTRES ÉLÉMENTS -->
+  <section class="border-t border-bordure bg-zebra py-14 md:py-16" aria-labelledby="h-others">
+    <div class="container-pl">
+      <h2 id="h-others" class="text-2xl font-bold text-anthracite">{t.othersTitle}</h2>
+      <ul class="mt-6 flex flex-wrap gap-3">
+        {houseElements.map((x) => (
+          <li>
+            {x.id === id ? (
+              <span aria-current="page" class:list={['inline-flex px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold outline-2 outline-offset-2 outline-soleil', elementChip[x.level]]}>{x.name[lang]}</span>
+            ) : (
+              <a href={housePath(x.id, lang)} class:list={['inline-flex px-3.5 py-1.5 text-[0.95rem] leading-tight font-bold transition-transform hover:-translate-y-0.5', elementChip[x.level]]}>{x.name[lang]}</a>
+            )}
+          </li>
+        ))}
+      </ul>
+      <nav class="mt-10 flex flex-wrap items-center justify-between gap-6 border-t border-bordure pt-6" aria-label={fr ? 'Navigation entre les éléments' : 'Navigation between parts'}>
+        {prev ? (
+          <a href={housePath(prev.id, lang)} class="group">
+            <span class="block text-sm text-gris">← {t.prev}</span>
+            <span class="font-bold text-bleu group-hover:underline">{prev.name[lang]}</span>
+          </a>
+        ) : <a href={houseBase[lang]} class="link-pl">{t.all}</a>}
+        <a href={house.pdf} download class="inline-flex items-center gap-1.5 text-sm font-bold text-bleu hover:underline">
+          <Icon name="download" size={16} /> {t.pdf}
+        </a>
+        {next ? (
+          <a href={housePath(next.id, lang)} class="group text-right">
+            <span class="block text-sm text-gris">{t.next} →</span>
+            <span class="font-bold text-bleu group-hover:underline">{next.name[lang]}</span>
+          </a>
+        ) : <a href={houseBase[lang]} class="link-pl">{t.all}</a>}
+      </nav>
+    </div>
+  </section>
+</BaseLayout>

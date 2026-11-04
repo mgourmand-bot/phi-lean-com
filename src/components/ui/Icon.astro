@@ -4,7 +4,7 @@
  * L'icône hérite de la couleur du texte (currentColor).
  */
 interface Props {
-  name: 'bolt' | 'menu' | 'close' | 'external' | 'download' | 'calendar' | 'check' | 'mail' | 'cart' | 'linkedin' | 'book' | 'lock';
+  name: 'bolt' | 'menu' | 'close' | 'external' | 'download' | 'calendar' | 'check' | 'mail' | 'cart' | 'linkedin' | 'book' | 'lock' | 'link';
   class?: string;
   size?: number;
 }
@@ -23,6 +23,7 @@ const paths: Record<Props['name'], string> = {
   linkedin: '<path d="M6.5 9.5V18M6.5 6.2v.1M10.5 18v-4.8a2.7 2.7 0 0 1 5.4 0V18M10.5 9.5V18"/>',
   book: '<path d="M5 4.5h10.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2V4.5Z"/><path d="M5 18a2 2 0 0 1 2-2h10.5"/>',
   lock: '<rect x="5" y="10.5" width="14" height="10" rx="1"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
 };
 ---
 <svg

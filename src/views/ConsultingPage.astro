@@ -1,7 +1,8 @@
 ---
 /**
  * PAGE CONSEIL (FR « /conseil/ », EN « /en/consulting/ »)
- * Deux métiers visibles dès l'ouverture : Lean Flux Usine et Lean Flux Supply Chain.
+ * Quatre métiers visibles dès l'ouverture : Lean Flux Usine et Lean Flux Supply Chain
+ * (sur cette page), Lean Flux Services et Lean Supply Chain Risk Management (pages dédiées).
  * #usine        : la VSM expliquée simplement, leviers, livrables
  * #supply-chain : flux logistiques et focus Supply Chain Risk Management
  * #vsm-express  : l'offre d'entrée et sa FAQ
@@ -11,7 +12,7 @@ import CtaBand from '@/components/sections/CtaBand.astro';
 import VsmExpressOffer from '@/components/VsmExpressOffer.astro';
 import BottleneckChart from '@/components/BottleneckChart.astro';
 import Icon from '@/components/ui/Icon.astro';
-import { plantLine, supplyLine, vsmExplained, scrmSteps, vsmExpress } from '@/data/offers';
+import { plantLine, supplyLine, vsmExplained, vsmExpress } from '@/data/offers';
 import { site } from '@/config/site';
 import { routes, type Lang } from '@/i18n/routes';
 import { anchorId, anchorPath } from '@/i18n/utils';
@@ -24,12 +25,13 @@ const fr = lang === 'fr';
 
 const c = {
   fr: {
-    title: 'Conseil Lean : Lean Flux Usine et Lean Flux Supply Chain',
+    title: 'Conseil Lean : usine, supply chain, services et gestion des risques',
     description:
-      "Deux métiers : le Lean appliqué à l'usine, avec la VSM pour point de départ, et le Lean appliqué à la supply chain, avec un focus sur la gestion des risques (SCRM). Diagnostic VSM Express 100 % déductible.",
+      "Quatre métiers : Lean Flux Usine, Lean Flux Supply Chain, Lean Flux Services pour les entreprises de service, et Lean Supply Chain Risk Management pour les PME et les grands groupes. Diagnostic VSM Express 100 % déductible.",
     crumb: 'Conseil',
-    h1: 'Deux métiers, une même méthode : suivre le flux',
-    lead: "De l'atelier au réseau de fournisseurs, on part du terrain, on mesure où le produit attend, et on construit avec vos équipes un flux qu'elles sauront faire vivre seules.",
+    h1: 'Quatre métiers, une même méthode : suivre le flux',
+    lead: "De l'atelier aux bureaux, jusqu'au réseau de fournisseurs, on part du terrain, on mesure où le produit ou le dossier attend, et on construit avec vos équipes un flux qu'elles sauront faire vivre seules.",
+    otherTitle: 'Deux métiers en page dédiée',
     discover: 'Découvrir',
     symptoms: 'Vous reconnaissez la situation',
     levers: 'Nos leviers',
@@ -40,10 +42,11 @@ const c = {
     vsmCta: 'Demander un Diagnostic VSM Express',
     factbird: 'Mesurer le TRS en continu, ligne par ligne, avec notre partenaire Factbird.',
     factbirdCta: 'Factbird OEE',
-    scrmTitle: 'Focus : Supply Chain Risk Management',
-    scrmLead: "Une chaîne logistique tendue est efficace… jusqu'au jour où un maillon casse. La gestion des risques consiste à savoir à l'avance où elle cassera, ce que cela coûtera, et ce qui est prêt pour y faire face.",
+    scrmTitle: 'Et quand un maillon casse ?',
+    scrmLead: "Une chaîne logistique tendue est efficace… jusqu'au jour où un maillon casse. La gestion des risques consiste à savoir à l'avance où elle cassera, combien de jours vous tiendrez, et ce qui est prêt pour y faire face. C'est un métier à part entière chez Phi-Lean, avec une offre pour les PME et une pour les grands groupes.",
+    scrmCta: 'Lean Supply Chain Risk Management',
     experience: 'Une expérience vécue',
-    experienceText: "Manuel Gourmand a piloté une supply chain internationale depuis le Brésil : pour nous, la gestion des risques n'est pas un exercice théorique.",
+    experienceText: "Manuel Gourmand a coordonné la supply chain de distribution d'un groupe international (11 plateformes régionales, 189 M$ de chiffre d'affaires) et assuré des intérims de direction supply chain en Amérique du Nord et en Amérique latine : pour nous, la gestion des risques n'est pas un exercice théorique.",
     supplyCta: 'Parler de votre supply chain',
     methodTitle: 'Notre démarche, quel que soit le métier',
     method: [
@@ -56,12 +59,13 @@ const c = {
     faqTitle: 'Questions fréquentes',
   },
   en: {
-    title: 'Lean consulting: Lean Plant Flow and Lean Supply Chain Flow',
+    title: 'Lean consulting: plant, supply chain, services and risk management',
     description:
-      'Two lines of work: Lean applied to the plant, starting from value stream mapping, and Lean applied to the supply chain, with a focus on supply chain risk management (SCRM). 100% deductible VSM Express Diagnostic.',
+      'Four lines of work: Lean Plant Flow, Lean Supply Chain Flow, Lean Services Flow for service businesses, and Lean Supply Chain Risk Management for SMEs and large groups. 100% deductible VSM Express Diagnostic.',
     crumb: 'Consulting',
-    h1: 'Two lines of work, one method: follow the flow',
-    lead: 'From the workshop to the supplier network, we start on the ground, measure where the product waits, and build with your teams a flow they can sustain on their own.',
+    h1: 'Four lines of work, one method: follow the flow',
+    lead: 'From the workshop to the office and out to the supplier network, we start on the ground, measure where the product or the file waits, and build with your teams a flow they can sustain on their own.',
+    otherTitle: 'Two lines with their own page',
     discover: 'Discover',
     symptoms: 'Sound familiar?',
     levers: 'Our levers',
@@ -72,10 +76,11 @@ const c = {
     vsmCta: 'Request a VSM Express Diagnostic',
     factbird: 'Measure OEE continuously, line by line, with our partner Factbird.',
     factbirdCta: 'Factbird OEE',
-    scrmTitle: 'Focus: Supply Chain Risk Management',
-    scrmLead: 'A lean supply chain is efficient… until the day a link breaks. Risk management means knowing in advance where it will break, what it will cost, and what is ready to cope.',
+    scrmTitle: 'And when a link breaks?',
+    scrmLead: 'A lean supply chain is efficient… until the day a link breaks. Risk management means knowing in advance where it will break, how many days you can last, and what is ready to cope. It is a line of work in its own right at Phi-Lean, with one offer for SMEs and one for large groups.',
+    scrmCta: 'Lean Supply Chain Risk Management',
     experience: 'First-hand experience',
-    experienceText: 'Manuel Gourmand ran an international supply chain from Brazil: for us, risk management is not a theoretical exercise.',
+    experienceText: 'Manuel Gourmand coordinated the distribution supply chain of an international group (11 regional hubs, $189M revenue) and covered supply chain leadership roles in North and Latin America: for us, risk management is not a theoretical exercise.',
     supplyCta: 'Talk about your supply chain',
     methodTitle: 'Our approach, whatever the line of work',
     method: [
@@ -90,8 +95,24 @@ const c = {
 }[lang];
 
 const lines = [
-  { line: plantLine, anchor: 'usine' as const, band: 'border-t-bleu', accent: 'text-bleu' },
-  { line: supplyLine, anchor: 'supply' as const, band: 'border-t-turquoise', accent: 'text-turquoise-fonce' },
+  { title: plantLine.title[lang], tagline: plantLine.tagline[lang], text: `${plantLine.deliverables[lang].join(' ; ')}.`, href: `#${anchorId('usine', lang)}`, band: 'border-t-bleu', accent: 'text-bleu' },
+  { title: supplyLine.title[lang], tagline: supplyLine.tagline[lang], text: `${supplyLine.deliverables[lang].join(' ; ')}.`, href: `#${anchorId('supply', lang)}`, band: 'border-t-turquoise', accent: 'text-turquoise-fonce' },
+  {
+    title: fr ? 'Lean Flux Services' : 'Lean Services Flow',
+    tagline: fr ? 'Le Lean appliqué aux entreprises de service et aux fonctions support.' : 'Lean applied to service businesses and support functions.',
+    text: fr ? 'Demande d’échec mesurée ; flux de service cartographié ; délai client et bon du premier coup.' : 'Failure demand measured; service flow mapped; customer lead time and right first time.',
+    href: routes.services[lang],
+    band: 'border-t-soleil',
+    accent: 'text-soleil-fonce',
+  },
+  {
+    title: 'Lean Supply Chain Risk Management',
+    tagline: fr ? 'Combien de jours tenez-vous ? Une offre PME, une offre grands groupes.' : 'How many days can you last? One offer for SMEs, one for large groups.',
+    text: fr ? 'Temps de survie et de rétablissement ; cartographie au-delà du rang 1 ; tests de résistance.' : 'Time to survive and time to recover; mapping beyond tier one; stress tests.',
+    href: routes.scrm[lang],
+    band: 'border-t-corail',
+    accent: 'text-[#b8401f]',
+  },
 ];
 
 const jsonLd = [
@@ -136,11 +157,11 @@ const jsonLd = [
       <h1 class="max-w-[24ch] text-4xl font-bold tracking-tight text-bleu sm:text-5xl">{c.h1}</h1>
       <p class="lead mt-5">{c.lead}</p>
       <div class="mt-10 grid gap-5 md:grid-cols-2">
-        {lines.map(({ line, anchor, band, accent }) => (
-          <a href={`#${anchorId(anchor, lang)}`} class:list={['group flex flex-col border border-bordure border-t-[8px] bg-white p-7 transition-colors hover:border-bleu md:p-8', band]}>
-            <span class:list={['text-3xl font-bold tracking-tight md:text-4xl', accent]}>{line.title[lang]}</span>
-            <span class="mt-3 text-lg font-bold text-anthracite">{line.tagline[lang]}</span>
-            <span class="mt-3 text-anthracite/85">{line.deliverables[lang].join(' ; ')}.</span>
+        {lines.map(({ title, tagline, text, href, band, accent }) => (
+          <a href={href} class:list={['group flex flex-col border border-bordure border-t-[8px] bg-white p-7 transition-colors hover:border-bleu md:p-8', band]}>
+            <span class:list={['text-3xl font-bold tracking-tight md:text-[2.1rem]', accent]}>{title}</span>
+            <span class="mt-3 text-lg font-bold text-anthracite">{tagline}</span>
+            <span class="mt-3 text-anthracite/85">{text}</span>
             <span class="mt-auto inline-flex items-center gap-2 pt-6 font-bold text-bleu group-hover:underline">
               {c.discover}
               <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
@@ -249,14 +270,7 @@ const jsonLd = [
       <div class="mt-14 border border-bordure bg-white p-6 md:p-10">
         <h3 class="text-3xl font-bold tracking-tight text-bleu">{c.scrmTitle}</h3>
         <p class="mt-4 max-w-[68ch] text-lg">{c.scrmLead}</p>
-        <ol class="list-steps mt-10 grid gap-x-8 md:grid-cols-2 lg:grid-cols-5 [&>li]:mb-6 [&>li+li]:mt-0">
-          {scrmSteps[lang].map((s) => (
-            <li>
-              <p class="text-lg font-bold text-anthracite">{s.title}</p>
-              <p class="mt-1 text-[0.97rem] text-anthracite/85">{s.text}</p>
-            </li>
-          ))}
-        </ol>
+        <a href={routes.scrm[lang]} class="btn btn-secondary mt-7">{c.scrmCta}</a>
       </div>
 
       <div class="mt-10 grid gap-6 lg:grid-cols-[1fr_1.1fr]">

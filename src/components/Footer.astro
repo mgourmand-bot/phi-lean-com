@@ -8,14 +8,15 @@ import Icon from './ui/Icon.astro';
 import LanguageSwitcher from './LanguageSwitcher.astro';
 import { site } from '@/config/site';
 import { navigation, childHref } from '@/config/navigation';
-import { routes, portugueseRoute, type Lang, type RouteKey } from '@/i18n/routes';
+import { routes, portugueseRoute, type Lang, type RouteKey, type LangHrefs } from '@/i18n/routes';
 import { useTranslations, anchorPath } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
   routeKey?: RouteKey;
+  langHrefs?: LangHrefs;
 }
-const { lang, routeKey } = Astro.props;
+const { lang, routeKey, langHrefs } = Astro.props;
 const t = useTranslations(lang);
 const year = new Date().getFullYear();
 
@@ -77,7 +78,7 @@ const columns = navigation.map((item) => ({
       <ul class="flex flex-wrap items-center gap-x-5 gap-y-2">
         <li><a href={routes.legal[lang]} class="hover:text-white hover:underline">{t('footer.legal')}</a></li>
         <li><a href={routes.privacy[lang]} class="hover:text-white hover:underline">{t('footer.privacy')}</a></li>
-        <li><LanguageSwitcher lang={lang} routeKey={routeKey} tone="dark" /></li>
+        <li><LanguageSwitcher lang={lang} routeKey={routeKey} hrefs={langHrefs} tone="dark" /></li>
         <li>
           <a href={portugueseRoute} hreflang="pt" lang="pt" class="text-white/50 hover:text-white hover:underline">{t('footer.pt')}</a>
         </li>

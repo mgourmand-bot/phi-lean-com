@@ -4,16 +4,18 @@
  * Renvoie vers la page équivalente dans l'autre langue (slugs traduits),
  * pas vers la page d'accueil.
  */
-import { languages, routes, type Lang, type RouteKey } from '@/i18n/routes';
+import { languages, routes, type Lang, type RouteKey, type LangHrefs } from '@/i18n/routes';
 import { useTranslations } from '@/i18n/utils';
 
 interface Props {
   lang: Lang;
   routeKey?: RouteKey;
+  /** Liens explicites (pages détail) ; sinon, la route de routeKey. */
+  hrefs?: LangHrefs;
   tone?: 'light' | 'dark';
   class?: string;
 }
-const { lang, routeKey = 'home', tone = 'light', class: className = '' } = Astro.props;
+const { lang, routeKey = 'home', hrefs, tone = 'light', class: className = '' } = Astro.props;
 const t = useTranslations(lang);
 const codes = Object.keys(languages) as Lang[];
 ---
@@ -31,7 +33,7 @@ const codes = Object.keys(languages) as Lang[];
         </span>
       ) : (
         <a
-          href={routes[routeKey][code]}
+          href={hrefs ? hrefs[code] : routes[routeKey][code]}
           hreflang={code}
           lang={code}
           title={code === 'en' ? 'English' : 'Français'}

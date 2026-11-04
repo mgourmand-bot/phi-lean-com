@@ -1,0 +1,11 @@
+---
+/** Pages des éléments de la maison, en français (/maison/<élément>/). */
+import HouseElementPage from '@/views/HouseElementPage.astro';
+import { houseSlugs, type HouseElementId } from '@/i18n/slugs';
+
+export function getStaticPaths() {
+  return (Object.keys(houseSlugs) as HouseElementId[]).map((id) => ({ params: { slug: houseSlugs[id].fr }, props: { id } }));
+}
+const { id } = Astro.props;
+---
+<HouseElementPage lang="fr" id={id} />

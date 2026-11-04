@@ -7,7 +7,7 @@ import '@/styles/global.css';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 import { site } from '@/config/site';
-import { routes, hreflang, ogLocale, portugueseRoute, type Lang, type RouteKey } from '@/i18n/routes';
+import { routes, hreflang, ogLocale, portugueseRoute, type Lang, type RouteKey, type LangHrefs } from '@/i18n/routes';
 import { useTranslations } from '@/i18n/utils';
 import { primaryCountries, secondaryCountries } from '@/data/presence';
 
@@ -23,7 +23,10 @@ interface Props {
   /** Remplace la langue du document (page portugaise). */
   htmlLang?: string;
   alternates?: Alternate[];
+  /** Page détail (livre, article, élément de la maison) : ses deux versions FR / EN. */
+  langHrefs?: LangHrefs;
   ogImage?: string;
+  ogType?: 'website' | 'article' | 'book';
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
 }
@@ -35,7 +38,9 @@ const {
   routeKey,
   htmlLang,
   alternates: customAlternates,
+  langHrefs,
   ogImage = site.ogImage,
+  ogType = 'website',
   jsonLd = [],
   noindex = false,
 } = Astro.props;
@@ -48,7 +53,13 @@ const fullTitle = title.includes(site.name) ? title : `${title} | ${site.name}`;
 const canonical = abs(Astro.url.pathname);
 
 let alternates: Alternate[] = customAlternates ?? [];
-if (!customAlternates && routeKey) {
+if (!customAlternates && langHrefs) {
+  alternates = [
+    { hreflang: hreflang.fr, href: abs(langHrefs.fr) },
+    { hreflang: hreflang.en, href: abs(langHrefs.en) },
+    { hreflang: 'x-default', href: abs(langHrefs.fr) },
+  ];
+} else if (!customAlternates && routeKey) {
   alternates = [
     { hreflang: hreflang.fr, href: abs(routes[routeKey].fr) },
     { hreflang: hreflang.en, href: abs(routes[routeKey].en) },
@@ -77,7 +88,17 @@ const organization = {
     name: site.founder.name,
     jobTitle: site.founder.jobTitle[lang],
     image: abs(site.founder.photo),
+    url: abs(lang === 'fr' ? '/a-propos/#fondateur' : '/en/about/#founder'),
     knowsLanguage: ['fr', 'en', 'pt'],
+    alumniOf: [
+      { '@type': 'CollegeOrUniversity', name: 'University of Buckingham', url: 'https://www.buckingham.ac.uk' },
+      { '@type': 'CollegeOrUniversity', name: 'École nationale d’ingénieurs de Metz (ENIM)', url: 'https://enim.univ-lorraine.fr/' },
+    ],
+    hasCredential: [
+      { '@type': 'EducationalOccupationalCredential', name: 'MSc Lean Enterprise (Distinction)', recognizedBy: { '@type': 'CollegeOrUniversity', name: 'University of Buckingham' } },
+      { '@type': 'EducationalOccupationalCredential', name: 'Diplôme d’ingénieur (MEng), génie industriel et mécanique', recognizedBy: { '@type': 'CollegeOrUniversity', name: 'ENIM' } },
+    ],
+    sameAs: [site.founder.linkedin].filter(Boolean),
   },
   location: site.offices.map((o) => ({
     '@type': 'Place',
@@ -103,7 +124,7 @@ const chromeLang = htmlLang ? lang : undefined;
     {noindex && <meta name="robots" content="noindex, follow" />}
     {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -134,13 +155,13 @@ const chromeLang = htmlLang ? lang : undefined;
       {t('skip')}
     </a>
     <div lang={chromeLang} class="contents">
-      <Header lang={lang} routeKey={routeKey} />
+      <Header lang={lang} routeKey={routeKey} langHrefs={langHrefs} />
     </div>
     <main id="contenu" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
     <div lang={chromeLang} class="contents">
-      <Footer lang={lang} routeKey={routeKey} />
+      <Footer lang={lang} routeKey={routeKey} langHrefs={langHrefs} />
     </div>
   </body>
 </html>

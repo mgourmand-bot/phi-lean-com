@@ -51,7 +51,7 @@ const updated = new Date().toLocaleDateString(fr ? 'fr-FR' : 'en-GB', { year: 'n
           <p>Le paiement s’effectue sur Stripe Checkout : Phi-Lean ne voit ni ne conserve vos données bancaires. Les pièces comptables sont conservées dix ans (obligation légale).</p>
           <h2>Destinataires et sous-traitants</h2>
           <ul>
-            <li>Formulaires : FormSubmit (formsubmit.co), qui transmet le contenu des formulaires par e-mail à Phi-Lean</li>
+            <li>Formulaires : {site.forms.provider === 'web3forms' ? 'Web3Forms (web3forms.com)' : 'FormSubmit (formsubmit.co)'}, qui transmet le contenu des formulaires par e-mail à Phi-Lean</li>
             <li>Prise de rendez-vous : Calendly LLC (États-Unis), uniquement si vous choisissez d’afficher l’agenda</li>
             <li>Paiements : Stripe Payments Europe Ltd. (Irlande)</li>
             <li>Hébergement : <span class="todo">[hébergeur]</span></li>
@@ -89,7 +89,7 @@ const updated = new Date().toLocaleDateString(fr ? 'fr-FR' : 'en-GB', { year: 'n
           <p>Payment takes place on Stripe Checkout: Phi-Lean never sees or stores your card details. Accounting records are kept for ten years (legal obligation).</p>
           <h2>Recipients and processors</h2>
           <ul>
-            <li>Forms: FormSubmit (formsubmit.co), which forwards form content to Phi-Lean by e-mail</li>
+            <li>Forms: {site.forms.provider === 'web3forms' ? 'Web3Forms (web3forms.com)' : 'FormSubmit (formsubmit.co)'}, which forwards form content to Phi-Lean by e-mail</li>
             <li>Scheduling: Calendly LLC (USA), only if you choose to display the calendar</li>
             <li>Payments: Stripe Payments Europe Ltd. (Ireland)</li>
             <li>Hosting: <span class="todo">[host]</span></li>

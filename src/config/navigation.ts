@@ -25,10 +25,12 @@ export const navigation: NavItem[] = [
   {
     route: 'consulting',
     label: { fr: 'Conseil', en: 'Consulting' },
-    activeFor: ['consulting'],
+    activeFor: ['consulting', 'services', 'scrm'],
     children: [
       { label: { fr: 'Lean Flux Usine', en: 'Lean Plant Flow' }, hint: { fr: 'VSM usine, flux tiré, TRS', en: 'Plant VSM, pull flow, OEE' }, route: 'consulting', anchor: 'usine' },
-      { label: { fr: 'Lean Flux Supply Chain', en: 'Lean Supply Chain Flow' }, hint: { fr: 'Flux logistiques et gestion des risques', en: 'Logistics flows and risk management' }, route: 'consulting', anchor: 'supply' },
+      { label: { fr: 'Lean Flux Supply Chain', en: 'Lean Supply Chain Flow' }, hint: { fr: 'Flux logistiques, du fournisseur au client', en: 'Logistics flows, from supplier to customer' }, route: 'consulting', anchor: 'supply' },
+      { label: { fr: 'Lean Flux Services', en: 'Lean Services Flow' }, hint: { fr: 'Entreprises de service et fonctions support', en: 'Service businesses and support functions' }, route: 'services' },
+      { label: { fr: 'Lean Supply Chain Risk Management', en: 'Lean Supply Chain Risk Management' }, hint: { fr: 'Combien de jours tenez-vous ? PME et grands groupes', en: 'How many days can you last? SMEs and large groups' }, route: 'scrm' },
     ],
   },
   {
@@ -45,7 +47,7 @@ export const navigation: NavItem[] = [
     label: { fr: 'Phi-Lean Press', en: 'Phi-Lean Press' },
     activeFor: ['publications'],
     children: [
-      { label: { fr: 'Livres', en: 'Books' }, hint: { fr: 'Dont « Prendre le virage de l’IA »', en: 'Including “Prendre le virage de l’IA”' }, route: 'publications', anchor: 'books' },
+      { label: { fr: 'Livres', en: 'Books' }, hint: { fr: 'Dont deux e-books gratuits', en: 'Including two free e-books' }, route: 'publications', anchor: 'books' },
       { label: { fr: 'Articles', en: 'Articles' }, hint: { fr: 'En téléchargement libre', en: 'Free to download' }, route: 'publications', anchor: 'articles' },
     ],
   },
@@ -56,7 +58,7 @@ export const navigation: NavItem[] = [
     children: [
       { label: { fr: 'Factbird OEE', en: 'Factbird OEE' }, hint: { fr: 'TRS et énergie en temps réel', en: 'Real-time OEE and energy' }, route: 'partners', anchor: 'factbird' },
       { label: { fr: 'EnerLexia', en: 'EnerLexia' }, hint: { fr: 'Autoconsommation et gestion énergétique', en: 'Energy self-consumption and management' }, route: 'partners', anchor: 'enerlexia' },
-      { label: { fr: 'Procid', en: 'Procid' }, hint: { fr: 'Automatisme et informatique industrielle', en: 'Industrial automation and IT' }, route: 'partners', anchor: 'procid' },
+      { label: { fr: 'Procid', en: 'Procid' }, hint: { fr: 'Vision industrielle, IA et traçabilité', en: 'Machine vision, AI and traceability' }, route: 'partners', anchor: 'procid' },
       { label: { fr: 'Start & Grow', en: 'Start & Grow' }, hint: { fr: 'Réseau de dirigeants ENIM-Alumni', en: 'ENIM-Alumni business leaders network' }, route: 'partners', anchor: 'startGrow' },
       { label: { fr: 'Farming Futura', en: 'Farming Futura' }, hint: { fr: 'Agriculture Lean & Green, Ferme du Futur', en: 'Lean & Green farming, Farm of the Future' }, route: 'partners', anchor: 'farmingFutura' },
     ],
@@ -64,7 +66,7 @@ export const navigation: NavItem[] = [
   {
     route: 'about',
     label: { fr: 'Le cabinet', en: 'The firm' },
-    activeFor: ['about', 'careers'],
+    activeFor: ['about', 'careers', 'house'],
     children: [
       { label: { fr: 'Notre approche', en: 'Our approach' }, route: 'about', anchor: 'approach' },
       { label: { fr: 'Le fondateur', en: 'The founder' }, route: 'about', anchor: 'founder' },

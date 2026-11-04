@@ -11,6 +11,7 @@ import BookCard from '@/components/press/BookCard.astro';
 import ArticleCard from '@/components/press/ArticleCard.astro';
 import Lightbox from '@/components/Lightbox.astro';
 import { books, articlesFor } from '@/data/publications';
+import { publicationPath } from '@/i18n/slugs';
 import { site } from '@/config/site';
 import type { Lang } from '@/i18n/routes';
 import { anchorId } from '@/i18n/utils';
@@ -26,7 +27,7 @@ const c = {
   fr: {
     title: 'Phi-Lean Press : livres et articles sur le Lean et la supply chain',
     description:
-      'Les publications de Manuel Gourmand : « Prendre le virage de l’IA », guide pour dirigeants de TPE et PME (Amazon, 15 novembre 2026), un e-book gratuit et des articles en téléchargement libre.',
+      'Les publications de Manuel Gourmand : « Prendre le virage de l’IA » (Amazon, 15 novembre 2026), les e-books gratuits « Combien de jours tenez-vous ? » et « Les 15 effets indésirables du Lean », et des articles en téléchargement libre.',
     crumb: 'Phi-Lean Press',
     lead: 'Ce que nous apprenons sur le terrain, nous le publions. Des livres pour prendre du recul, des articles à télécharger librement pour nourrir la réflexion.',
     books: 'Livres',
@@ -37,7 +38,7 @@ const c = {
   en: {
     title: 'Phi-Lean Press: books and articles on Lean and supply chain',
     description:
-      'Publications by Manuel Gourmand: “Prendre le virage de l’IA”, a guide for small business leaders (Amazon, 15 November 2026), a free e-book and articles free to download.',
+      'Publications by Manuel Gourmand: “Prendre le virage de l’IA” (Amazon, 15 November 2026), the free e-books “Combien de jours tenez-vous ?” and “Les 15 effets indésirables du Lean”, and papers free to download.',
     crumb: 'Phi-Lean Press',
     lead: 'What we learn in the field, we publish. Books to step back, and articles free to download to feed your thinking.',
     books: 'Books',
@@ -58,7 +59,8 @@ const jsonLd = [
     alternativeHeadline: b.subtitle,
     inLanguage: b.lang,
     isbn: b.isbn,
-    datePublished: b.releaseDate,
+    datePublished: b.releaseDate ?? b.date,
+    url: new URL(publicationPath(b.id, lang), site.url).href,
     image: b.cover ? new URL(b.cover, site.url).href : undefined,
     author: { '@type': 'Person', '@id': `${site.url}/#founder`, name: site.founder.name },
     publisher: { '@type': 'Organization', name: 'Phi-Lean Press' },
@@ -71,10 +73,11 @@ const jsonLd = [
       '@type': 'Article',
       headline: a.title,
       inLanguage: a.lang,
+      datePublished: a.date,
       author: { '@type': 'Person', name: site.founder.name },
       publisher: { '@type': 'Organization', name: 'Phi-Lean Press' },
       isAccessibleForFree: true,
-      url: new URL(a.file, site.url).href,
+      url: new URL(publicationPath(a.id, lang), site.url).href,
     })),
 ];
 ---
